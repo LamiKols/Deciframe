@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Map Columns - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-arrow-left-right"></i>
+                    Map Columns to Fields
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/?auth_token={{ auth_token }}">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/admin/import-data?auth_token={{ auth_token }}">Import Data</a>
+                        </li>
+                        <li class="breadcrumb-item active">Map Columns</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Step 2: Map Your File Columns to {{ job.data_type }} Fields</h5>
+                            <small class="text-muted">Job ID: {{ job.id }} | File: {{ job.filename }}</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info mb-4">
+                                <h6><i class="bi bi-info-circle"></i> Column Mapping Instructions</h6>
+                                <p class="mb-2">Map each field to the corresponding column in your uploaded file.</p>
+                                <ul class="mb-0">
+                                    <li><strong>Required fields</strong> must be mapped to proceed</li>
+                                    <li><strong>Optional fields</strong> can be left unmapped if not available</li>
+                                    <li>Fields marked with <span class="text-danger">*</span> are required</li>
+                                </ul>
+                            </div>
+
+                            <form method="POST">
+                                <input type="hidden" name="auth_token" value="{{ auth_token }}">
+                                
+                                <div class="row">
+                                    <!-- Required Fields -->
+                                    <div class="col-md-6">
+                                        <h6 class="text-danger">Required Fields</h6>
+                                        {% set required_fields = {
+                                            'Problem': ['title', 'description'],
+                                            'BusinessCase': ['title', 'summary'], 
+                                            'Project': ['name', 'description']
+                                        } %}
+                                        
+                                        {% for field in required_fields[job.data_type] %}
+                                        <div class="mb-3">
+                                            <label for="{{ field }}" class="form-label">
+                                                {{ field.replace('_', ' ').title() }} <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" id="{{ field }}" name="{{ field }}" required>
+                                                <option value="">Select column for {{ field }}...</option>
+                                                {% for column in columns %}
+                                                <option value="{{ column }}">{{ column }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Optional Fields -->
+                                    <div class="col-md-6">
+                                        <h6 class="text-secondary">Optional Fields</h6>
+                                        {% set optional_fields = {
+                                            'Problem': ['priority', 'reporter_email', 'department_name', 'status', 'impact', 'urgency'],
+                                            'BusinessCase': ['case_type', 'cost_estimate', 'benefit_estimate', 'submitter_email', 'department_name', 'status'],
+                                            'Project': ['project_manager_email', 'department_name', 'status', 'budget', 'start_date', 'target_end_date']
+                                        } %}
+                                        
+                                        {% for field in optional_fields[job.data_type] %}
+                                        <div class="mb-3">
+                                            <label for="{{ field }}" class="form-label">
+                                                {{ field.replace('_', ' ').title() }}
+                                            </label>
+                                            <select class="form-select" id="{{ field }}" name="{{ field }}">
+                                                <option value="">Skip this field</option>
+                                                {% for column in columns %}
+                                                <option value="{{ column }}">{{ column }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            {% if 'email' in field %}
+                                            <div class="form-text">Must match existing user email addresses</div>
+                                            {% elif 'department_name' in field %}
+                                            <div class="form-text">Must match existing department names</div>
+                                            {% elif 'date' in field %}
+                                            <div class="form-text">Date format: YYYY-MM-DD</div>
+                                            {% elif field in ['cost_estimate', 'benefit_estimate', 'budget'] %}
+                                            <div class="form-text">Numeric values only</div>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- File Preview -->
+                                <div class="mt-4">
+                                    <h6>File Preview (First 5 Rows)</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    {% for column in columns %}
+                                                    <th>{{ column }}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Preview data would be loaded here via JavaScript -->
+                                                <tr>
+                                                    {% for column in columns %}
+                                                    <td class="text-muted">Sample data...</td>
+                                                    {% endfor %}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <a href="/admin/import-data?auth_token={{ auth_token }}" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-left"></i> Back to Upload
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check"></i> Save Mapping and Execute Import
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-suggest mappings based on column names
+document.addEventListener('DOMContentLoaded', function() {
+    const mappingSuggestions = {
+        // Problem fields
+        'title': ['title', 'name', 'problem_title', 'issue_title'],
+        'description': ['description', 'desc', 'details', 'problem_description'],
+        'priority': ['priority', 'pri', 'importance'],
+        'status': ['status', 'state', 'condition'],
+        'impact': ['impact', 'severity', 'effect'],
+        'urgency': ['urgency', 'urgent', 'time_sensitive'],
+        
+        // Business Case fields
+        'summary': ['summary', 'description', 'overview', 'abstract'],
+        'case_type': ['case_type', 'type', 'category'],
+        'cost_estimate': ['cost_estimate', 'cost', 'budget', 'expense'],
+        'benefit_estimate': ['benefit_estimate', 'benefit', 'savings', 'value'],
+        
+        // Project fields
+        'name': ['name', 'title', 'project_name'],
+        'budget': ['budget', 'cost', 'funding', 'allocation'],
+        'start_date': ['start_date', 'begin_date', 'commence_date'],
+        'target_end_date': ['target_end_date', 'end_date', 'completion_date'],
+        
+        // Common fields
+        'department_name': ['department_name', 'department', 'dept', 'division'],
+        'reporter_email': ['reporter_email', 'reporter', 'submitted_by', 'email'],
+        'submitter_email': ['submitter_email', 'submitter', 'submitted_by', 'email'],
+        'project_manager_email': ['project_manager_email', 'pm_email', 'manager_email', 'pm']
+    };
+    
+    // Get all columns from the form
+    const columns = [{% for column in columns %}'{{ column|lower }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+    
+    // Auto-suggest mappings
+    Object.keys(mappingSuggestions).forEach(field => {
+        const select = document.getElementById(field);
+        if (select) {
+            const suggestions = mappingSuggestions[field];
+            for (let suggestion of suggestions) {
+                const matchingColumn = columns.find(col => col.includes(suggestion));
+                if (matchingColumn) {
+                    // Find the actual column name (with original case)
+                    const originalColumns = [{% for column in columns %}'{{ column }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+                    const originalColumn = originalColumns.find(col => col.toLowerCase() === matchingColumn);
+                    if (originalColumn) {
+                        select.value = originalColumn;
+                        break;
+                    }
+                }
+            }
+        }
+    });
+});
+
+// Validation before submit
+document.querySelector('form').addEventListener('submit', function(e) {
+    const requiredFields = document.querySelectorAll('select[required]');
+    let hasErrors = false;
+    
+    requiredFields.forEach(field => {
+        if (!field.value) {
+            field.classList.add('is-invalid');
+            hasErrors = true;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (hasErrors) {
+        e.preventDefault();
+        alert('Please map all required fields before proceeding.');
+    }
+});
+</script>
+{% endblock %}

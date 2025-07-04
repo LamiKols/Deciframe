@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Department Assignment Pending{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Department Assignment Pending
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-clock text-warning" style="font-size: 4rem;"></i>
+                        <h5 class="mt-3">Welcome, {{ user.name }}!</h5>
+                        <p class="text-muted">Your account is being processed by our administrators.</p>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>What's happening?</h6>
+                        <p class="mb-0">
+                            You selected "My department isn't listed" during registration. 
+                            Our administrators will assign you to the appropriate department shortly.
+                        </p>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-dark">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Your Information</h6>
+                                    <p class="mb-1"><strong>Name:</strong> {{ user.name }}</p>
+                                    <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                                    <p class="mb-0"><strong>Role:</strong> {{ user.role.value }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Current Status</h6>
+                                    <span class="badge bg-warning text-dark fs-6 mb-2">
+                                        <i class="fas fa-clock me-1"></i>Pending Assignment
+                                    </span>
+                                    <p class="mb-0 small text-muted">
+                                        {% if pending_count > 1 %}
+                                            {{ pending_count }} users awaiting assignment
+                                        {% else %}
+                                            You're next in the queue
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-lock me-2"></i>Limited Access</h6>
+                        <p class="mb-2">
+                            While your department assignment is pending, you have limited access to the system:
+                        </p>
+                        <ul class="mb-0">
+                            <li>✓ View your profile and account information</li>
+                            <li>✓ Access help documentation and support</li>
+                            <li>✗ Create problems, business cases, or projects</li>
+                            <li>✗ Access department-specific data and workflows</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="btn-group mb-3" role="group">
+                            <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-user me-2"></i>View Profile
+                            </a>
+                            <a href="{{ url_for('admin_help_center') }}" class="btn btn-outline-info">
+                                <i class="fas fa-question-circle me-2"></i>Help Center
+                            </a>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-envelope me-1"></i>
+                                Need immediate assistance? Contact your administrator or reply to your registration confirmation email.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-clock me-2"></i>What Happens Next?</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4 text-center">
+                            <div class="p-3">
+                                <i class="fas fa-user-check text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">1. Admin Review</h6>
+                                <small class="text-muted">Administrator reviews your registration and determines the appropriate department</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="p-3">
+                                <i class="fas fa-sitemap text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">2. Department Assignment</h6>
+                                <small class="text-muted">You'll be assigned to the correct department and granted full access</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="p-3">
+                                <i class="fas fa-rocket text-info" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">3. Full Access</h6>
+                                <small class="text-muted">Create problems, business cases, projects, and access all system features</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

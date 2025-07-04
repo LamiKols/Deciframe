@@ -1,0 +1,104 @@
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.custom-dropdown select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #1a1a2e;
+  color: #ffffff !important;
+  padding: 10px 40px 10px 12px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.custom-dropdown select option {
+  background-color: #2e2e48 !important;
+  color: #ffffff !important;
+  padding: 8px 12px;
+}
+
+.custom-dropdown select:focus {
+  border-color: #4CAF50;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+/* Additional compatibility for all select elements */
+select, .form-select {
+  background-color: #1a1a2e !important;
+  color: #ffffff !important;
+  border: 1px solid #444 !important;
+}
+
+select option, .form-select option {
+  background-color: #2e2e48 !important;
+  color: #ffffff !important;
+  padding: 8px 12px;
+}
+
+/* Force visibility for Bootstrap form controls */
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+}
+
+/* Ensure text is always visible in any select dropdown */
+select, option {
+  color: #ffffff !important;
+}
+
+/* Chrome and Safari specific fixes */
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1a1a2e inset !important;
+}
+
+/* Light theme overrides for dropdown visibility */
+.light-theme select,
+.light-theme .form-select,
+.light-theme select option,
+.light-theme .form-select option {
+  background-color: #fefefe !important;
+  color: #212121 !important;
+  border: 1px solid #2d5aa0 !important;
+}
+
+.light-theme .custom-dropdown select {
+  background-color: #fefefe !important;
+  color: #212121 !important;
+  border: 1px solid #2d5aa0 !important;
+}
+
+.light-theme .custom-dropdown select option {
+  background-color: #fefefe !important;
+  color: #212121 !important;
+}
+
+/* Force light theme text visibility */
+body:not([data-theme="dark"]) select,
+body:not([data-theme="dark"]) .form-select,
+body:not([data-theme="dark"]) select option,
+body:not([data-theme="dark"]) .form-select option {
+  background-color: #fefefe !important;
+  color: #212121 !important;
+  border: 1px solid #2d5aa0 !important;
+}
+
+.custom-dropdown::after {
+  content: '▼';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: #ccc;
+  pointer-events: none;
+}

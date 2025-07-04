@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+<!-- Fixed Admin Users Template -->
+
+{% block title %}User Management - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>User Management</h2>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('admin.admin_dashboard') }}{{ '?auth_token=' + request.args.get('auth_token') if request.args.get('auth_token') else '' }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Admin
+                    </a>
+                    <a href="{{ url_for('admin.create_user') }}{{ '?auth_token=' + request.args.get('auth_token') if request.args.get('auth_token') else '' }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add User
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('admin.list_users') }}">
+                        {% if request.args.get('auth_token') %}
+                        <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                        {% endif %}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="search" class="form-label">Search Users</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="search" 
+                                       name="search" 
+                                       value="{{ search or '' }}" 
+                                       placeholder="Search by name or email...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="department" class="form-label">Department</label>
+                                <select class="form-select" id="department" name="department">
+                                    <option value="">All Departments</option>
+                                    {% for dept in departments %}
+                                    <option value="{{ dept.id }}" {{ 'selected' if department_filter == dept.id|string else '' }}>
+                                        {{ dept.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="role" class="form-label">Role</label>
+                                <select class="form-select" id="role" name="role">
+                                    <option value="">All Roles</option>
+                                    <option value="Admin" {{ 'selected' if role_filter == 'Admin' else '' }}>Admin</option>
+                                    <option value="CEO" {{ 'selected' if role_filter == 'CEO' else '' }}>CEO</option>
+                                    <option value="Director" {{ 'selected' if role_filter == 'Director' else '' }}>Director</option>
+                                    <option value="Manager" {{ 'selected' if role_filter == 'Manager' else '' }}>Manager</option>
+                                    <option value="PM" {{ 'selected' if role_filter == 'PM' else '' }}>Project Manager</option>
+                                    <option value="BA" {{ 'selected' if role_filter == 'BA' else '' }}>Business Analyst</option>
+                                    <option value="Staff" {{ 'selected' if role_filter == 'Staff' else '' }}>Staff</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Filter
+                                    </button>
+                                    <a href="{{ url_for('admin.list_users') }}{{ '?auth_token=' + request.args.get('auth_token') if request.args.get('auth_token') else '' }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Clear
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Users ({{ users|length }})</h5>
+                    <small class="text-muted">
+                        Showing {{ users|length }} user(s)
+                    </small>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Department</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th width="150">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-secondary rounded-circle">
+                                                    {{ user.name[0].upper() if user.name else 'U' }}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">{{ user.name }}</div>
+                                                <small class="text-muted">ID: {{ user.id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if user.role.value == 'Admin' else 'secondary' }}">
+                                            {{ user.role.value if user.role else 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ user.department.name if user.department else '-' }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('admin.edit_user', id=user.id) }}{{ '?auth_token=' + request.args.get('auth_token') if request.args.get('auth_token') else '' }}" 
+                                               class="btn btn-primary" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ url_for('admin.toggle_user_status', id=user.id) }}{{ '?auth_token=' + request.args.get('auth_token') if request.args.get('auth_token') else '' }}" 
+                                                  class="d-inline">
+                                                <button type="submit" 
+                                                        class="btn btn-{{ 'warning' if user.is_active else 'success' }}"
+                                                        title="{{ 'Deactivate' if user.is_active else 'Activate' }} User"
+                                                        onclick="return confirm('Are you sure you want to {{ 'deactivate' if user.is_active else 'activate' }} this user?')">
+                                                    <i class="fas fa-{{ 'pause' if user.is_active else 'play' }}"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No users found</h5>
+                        <p class="text-muted">Try adjusting your search criteria or create a new user.</p>
+                        <a href="{{ url_for('admin.create_user') }}{{ '?auth_token=' + request.args.get('auth_token') if request.args.get('auth_token') else '' }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add First User
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

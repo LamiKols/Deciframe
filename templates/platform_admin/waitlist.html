@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Waitlist Management - DeciFrame Platform Admin{% endblock %}
+
+{% block content %}
+    <style>
+        .platform-navbar {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 2px solid #e74c3c;
+            padding: 1rem 0;
+        }
+        .platform-badge {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .filters-card {
+            background: rgba(46, 46, 72, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn-platform {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+        .btn-platform:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+            color: white;
+        }
+        .table-container {
+            background: rgba(46, 46, 72, 0.8);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .contacted {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        .uncontacted {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+        .company-tag {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        .role-tag {
+            background: rgba(155, 89, 182, 0.2);
+            color: #9b59b6;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        .action-btn {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin: 0.1rem;
+        }
+        .pagination-container {
+            background: rgba(46, 46, 72, 0.8);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Platform Admin Navbar -->
+    <nav class="platform-navbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="text-white mb-0 d-inline-block me-3">DeciFrame Platform Admin</h4>
+                    <span class="platform-badge">Staff Only</span>
+                </div>
+                <div>
+                    <a href="{{ url_for('platform_admin.dashboard') }}" class="btn btn-outline-light me-2">Dashboard</a>
+                    <a href="{{ url_for('platform_admin.analytics') }}" class="btn btn-outline-light me-2">Analytics</a>
+                    <a href="{{ url_for('platform_admin.logout') }}" class="btn btn-outline-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="text-white mb-3">Waitlist Management</h2>
+                <p class="text-muted">Manage and track all waitlist signups across the DeciFrame platform</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-card">
+            <h5 class="text-white mb-3">🔍 Search & Filters</h5>
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label text-white">Search</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search }}" placeholder="Name, email, company...">
+                </div>
+                <div class="col-md-2">
+                    <label for="contacted" class="form-label text-white">Status</label>
+                    <select class="form-select" id="contacted" name="contacted">
+                        <option value="">All</option>
+                        <option value="contacted" {{ 'selected' if contacted_filter == 'contacted' }}>Contacted</option>
+                        <option value="uncontacted" {{ 'selected' if contacted_filter == 'uncontacted' }}>Uncontacted</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="role" class="form-label text-white">Role</label>
+                    <select class="form-select" id="role" name="role">
+                        <option value="">All Roles</option>
+                        {% for role in all_roles %}
+                            <option value="{{ role }}" {{ 'selected' if role_filter == role }}>{{ role|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="company_size" class="form-label text-white">Company Size</label>
+                    <select class="form-select" id="company_size" name="company_size">
+                        <option value="">All Sizes</option>
+                        {% for size in all_company_sizes %}
+                            <option value="{{ size }}" {{ 'selected' if company_size_filter == size }}>{{ size|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-platform w-100">Filter</button>
+                </div>
+            </form>
+            
+            <!-- Date Filters -->
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label for="date_from" class="form-label text-white">From Date</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="date_to" class="form-label text-white">To Date</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <a href="{{ url_for('platform_admin.waitlist_management') }}" class="btn btn-outline-light w-100">Clear Filters</a>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-success w-100" onclick="exportCSV()">📊 Export CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waitlist Table -->
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="text-white mb-0">
+                    Waitlist Entries 
+                    <span class="badge bg-secondary">{{ entries.total }} total</span>
+                </h5>
+                <div class="text-muted">
+                    Showing {{ entries.items|length }} of {{ entries.total }} entries
+                </div>
+            </div>
+
+            {% if entries.items %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Company</th>
+                                <th>Role</th>
+                                <th>Size</th>
+                                <th>Signup Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in entries.items %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ entry.full_name }}</strong>
+                                        {% if entry.use_case %}
+                                            <br><small class="text-muted">{{ entry.use_case[:50] }}{% if entry.use_case|length > 50 %}...{% endif %}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="mailto:{{ entry.email }}" class="text-info">{{ entry.email }}</a>
+                                    </td>
+                                    <td>
+                                        {% if entry.company %}
+                                            <span class="company-tag">{{ entry.company }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if entry.role %}
+                                            <span class="role-tag">{{ entry.role|title }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if entry.company_size %}
+                                            <small>{{ entry.company_size|title }}</small>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ entry.created_at.strftime('%Y-%m-%d') }}</small>
+                                        <br><small class="text-muted">{{ entry.created_at.strftime('%H:%M') }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {{ 'contacted' if entry.contacted else 'uncontacted' }}">
+                                            {{ 'Contacted' if entry.contacted else 'Uncontacted' }}
+                                        </span>
+                                        {% if entry.contacted and entry.contacted_at %}
+                                            <br><small class="text-muted">{{ entry.contacted_at.strftime('%m/%d/%Y') }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('platform_admin.toggle_contacted', entry_id=entry.id) }}" style="display: inline;">
+                                            <button type="submit" class="btn action-btn {{ 'btn-warning' if entry.contacted else 'btn-success' }}" 
+                                                    onclick="return confirm('Toggle contact status for {{ entry.full_name }}?')">
+                                                {{ '📞 Mark Uncontacted' if entry.contacted else '✅ Mark Contacted' }}
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('platform_admin.delete_entry', entry_id=entry.id) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-danger action-btn" 
+                                                    onclick="return confirm('Are you sure you want to delete {{ entry.full_name }}? This cannot be undone.')">
+                                                🗑️ Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if entries.pages > 1 %}
+                    <div class="pagination-container">
+                        <nav aria-label="Waitlist pagination">
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if entries.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('platform_admin.waitlist_management', page=entries.prev_num, **request.args) }}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for page_num in entries.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != entries.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('platform_admin.waitlist_management', page=page_num, **request.args) }}">{{ page_num }}</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ page_num }}</span>
+                                            </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if entries.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('platform_admin.waitlist_management', page=entries.next_num, **request.args) }}">Next</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="text-muted mb-3">
+                        <i class="fs-1">📭</i>
+                    </div>
+                    <h5 class="text-white">No entries found</h5>
+                    <p class="text-muted">No waitlist entries match your current filters.</p>
+                    <a href="{{ url_for('platform_admin.waitlist_management') }}" class="btn btn-outline-light">Clear Filters</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-submit form when date filters change
+        document.getElementById('date_from').addEventListener('change', function() {
+            this.form.submit();
+        });
+        document.getElementById('date_to').addEventListener('change', function() {
+            this.form.submit();
+        });
+
+        // Export CSV function
+        async function exportCSV() {
+            try {
+                const response = await fetch('{{ url_for("platform_admin.export_csv") }}');
+                const data = await response.json();
+                
+                const blob = new Blob([data.csv_content], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = data.filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                alert('Export completed successfully!');
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Export failed. Please try again.');
+            }
+        }
+    </script>
+{% endblock %}

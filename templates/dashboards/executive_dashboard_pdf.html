@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Executive Dashboard Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2d5aa0;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            color: #2d5aa0;
+            margin: 0;
+            font-size: 24px;
+        }
+        .meta-info {
+            margin-top: 10px;
+            color: #666;
+            font-size: 11px;
+        }
+        .metrics-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        .metric-card {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .metric-card h3 {
+            margin: 0 0 10px 0;
+            color: #2d5aa0;
+            font-size: 14px;
+        }
+        .metric-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #2d5aa0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #2d5aa0;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .status-approved { color: #28a745; font-weight: bold; }
+        .status-rejected { color: #dc3545; font-weight: bold; }
+        .status-pending { color: #ffc107; font-weight: bold; }
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: #999;
+            font-size: 10px;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .summary-stats div {
+            text-align: center;
+            padding: 10px;
+        }
+        .chart-placeholder {
+            height: 200px;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Executive Dashboard Report</h1>
+        <div class="meta-info">
+            Generated: {{ generated_date }}<br>
+            Prepared for: {{ user_name }}<br>
+            DeciFrame Business Intelligence Platform
+        </div>
+    </div>
+
+    <!-- Key Metrics Overview -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <h3>Total Business Cases</h3>
+            <div class="value">{{ case_count }}</div>
+        </div>
+        <div class="metric-card">
+            <h3>Approved Projects</h3>
+            <div class="value">{{ project_count }}</div>
+        </div>
+        <div class="metric-card">
+            <h3>Open Problems</h3>
+            <div class="value">{{ problem_count }}</div>
+        </div>
+        <div class="metric-card">
+            <h3>Total Budget Approved</h3>
+            <div class="value">{{ currency_symbol }}{{ total_budget|int }}</div>
+        </div>
+    </div>
+
+    <!-- Department Performance -->
+    <div class="section">
+        <h2>📈 Department Performance</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Department</th>
+                    <th>Total Cases</th>
+                    <th>Approved</th>
+                    <th>Rejected</th>
+                    <th>Pending</th>
+                    <th>Success Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dept in case_stats %}
+                <tr>
+                    <td>{{ dept.name }}</td>
+                    <td>{{ dept.total }}</td>
+                    <td class="status-approved">{{ dept.approved }}</td>
+                    <td class="status-rejected">{{ dept.rejected }}</td>
+                    <td class="status-pending">{{ dept.pending }}</td>
+                    <td>
+                        {% if dept.total > 0 %}
+                            {{ ((dept.approved / dept.total) * 100)|round(1) }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Project Portfolio -->
+    <div class="section">
+        <h2>🔗 Active Projects Portfolio</h2>
+        {% if projects %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Budget</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>Manager</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects[:10] %}
+                <tr>
+                    <td>{{ project.title }}</td>
+                    <td>{{ currency_symbol }}{{ project.budget|int if project.budget else 0 }}</td>
+                    <td>{{ project.status }}</td>
+                    <td>{{ project.start_date.strftime('%Y-%m-%d') if project.start_date else 'TBD' }}</td>
+                    <td>
+                        {% if project.project_manager %}
+                            {{ (project.project_manager.first_name or '') ~ ' ' ~ (project.project_manager.last_name or '') }}
+                        {% else %}
+                            Unassigned
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if projects|length > 10 %}
+                <tr>
+                    <td colspan="5" style="text-align: center; font-style: italic;">
+                        ... and {{ projects|length - 10 }} more projects
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No active projects at this time.</p>
+        {% endif %}
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="section">
+        <h2>📋 Executive Summary</h2>
+        <div class="summary-stats">
+            <div>
+                <strong>{{ case_count }}</strong><br>
+                Total Cases
+            </div>
+            <div>
+                <strong>{{ project_count }}</strong><br>
+                Active Projects
+            </div>
+            <div>
+                <strong>{{ problem_count }}</strong><br>
+                Open Issues
+            </div>
+            <div>
+                <strong>{{ currency_symbol }}{{ total_budget|int }}</strong><br>
+                Total Investment
+            </div>
+        </div>
+        
+        <p>This executive dashboard provides a comprehensive overview of organizational performance across all key business metrics. The data reflects current activity levels and investment allocation across departments and projects.</p>
+        
+        {% if case_stats %}
+        <p><strong>Key Insights:</strong></p>
+        <ul>
+            <li>Total business cases in progress: {{ case_count }}</li>
+            <li>Active project portfolio value: {{ currency_symbol }}{{ total_budget|int }}</li>
+            <li>Departments tracked: {{ case_stats|length }}</li>
+            {% if problem_count > 0 %}
+            <li>{{ problem_count }} open problems requiring attention</li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <footer class="footer">
+        {{ watermark }} | {{ generated_date }}
+    </footer>
+</body>
+</html>

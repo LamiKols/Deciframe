@@ -1,0 +1,86 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Data Management - DeciFrame{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Data Export & Retention</h1>
+</div>
+
+<!-- Statistics Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Active Records</h5>
+                        <h3 class="mb-0">{{ stats.total_active or 0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-database fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-secondary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Storage Size</h5>
+                        <h3 class="mb-0">{{ stats.storage_size or 'Unknown' }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-hdd fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Bulk Data Import</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Import large datasets from CSV files with column mapping and validation.</p>
+                <a href="/admin/import-data" class="btn btn-success">
+                    <i class="fas fa-upload"></i> Import Data
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Data Export</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Export system data to CSV format with optional date filtering.</p>
+                <a href="{{ url_for('data_management.export_data') }}" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Export Data
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Data Retention</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Archive and purge old data to manage database size.</p>
+                <a href="{{ url_for('data_management.data_retention_page') }}" class="btn btn-warning">
+                    <i class="fas fa-archive"></i> Manage Retention
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

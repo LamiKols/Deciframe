@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}Project Backlog - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Project Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-light mb-1">{{ project.name }} Backlog</h2>
+            <p class="text-muted mb-0">{{ project.code }} | {{ project.description or 'No description available' }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('projects.view_project', id=project.id) | add_auth_token }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Project
+            </a>
+            {% if user.role.value == 'BA' %}
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEpicModal">
+                <i class="fas fa-plus"></i> Create Epic
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-dark border-secondary">
+                <div class="card-body text-center">
+                    <h3 class="text-info">{{ epics|length }}</h3>
+                    <p class="text-muted mb-0">Total Epics</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-dark border-secondary">
+                <div class="card-body text-center">
+                    <h3 class="text-success">{{ total_stories }}</h3>
+                    <p class="text-muted mb-0">User Stories</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-dark border-secondary">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">{{ high_priority_stories }}</h3>
+                    <p class="text-muted mb-0">High Priority</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-dark border-secondary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">{{ estimated_stories }}</h3>
+                    <p class="text-muted mb-0">Estimated Stories</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Project Backlog Container -->
+    <div id="project-backlog-container">
+        <!-- Content will be loaded dynamically by refine_stories.js -->
+    </div>
+
+    <!-- Static fallback for non-JS users -->
+    <noscript>
+    <div class="row">
+        {% for epic in epics %}
+        <div class="col-12 mb-4">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1 text-light">{{ epic.title }}</h5>
+                        <small class="text-muted">{{ epic.description or 'No description' }}</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-info">{{ epic.stories|length }} stories</span>
+                        {% if user.role.value == 'BA' %}
+                        <button class="btn btn-sm btn-outline-primary" onclick="editEpic({{ epic.id }}, '{{ epic.title }}', '{{ epic.description or '' }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="addStoryToEpic({{ epic.id }})">
+                            <i class="fas fa-plus"></i> Add Story
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if epic.stories %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Story Title</th>
+                                    <th>Description</th>
+                                    <th>Priority</th>
+                                    <th>Effort</th>
+                                    {% if user.role.value == 'BA' %}
+                                    <th>Actions</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for story in epic.stories %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-light">{{ story.title }}</strong>
+                                    </td>
+                                    <td class="text-muted">{{ story.description or 'No description' }}</td>
+                                    <td>
+                                        {% if story.priority %}
+                                            {% if story.priority.lower() == 'high' %}
+                                                <span class="badge bg-danger">{{ story.priority }}</span>
+                                            {% elif story.priority.lower() == 'medium' %}
+                                                <span class="badge bg-warning">{{ story.priority }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ story.priority }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">Not set</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if story.effort_estimate %}
+                                            <span class="badge bg-info">{{ story.effort_estimate }}</span>
+                                        {% else %}
+                                            <span class="text-muted">Not estimated</span>
+                                        {% endif %}
+                                    </td>
+                                    {% if user.role.value == 'BA' %}
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" onclick="editStory({{ story.id }}, '{{ story.title }}', '{{ story.description or '' }}', '{{ story.priority or '' }}', '{{ story.effort_estimate or '' }}')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger" onclick="deleteStory({{ story.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card-body text-center text-muted">
+                    <p>No user stories in this epic yet.</p>
+                    {% if user.role.value == 'BA' %}
+                    <button class="btn btn-outline-primary" onclick="addStoryToEpic({{ epic.id }})">
+                        <i class="fas fa-plus"></i> Add First Story
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-tasks fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">No Epics Found</h4>
+        <p class="text-muted">This project doesn't have any epics yet.</p>
+        {% if user.role.value == 'BA' %}
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEpicModal">
+            <i class="fas fa-plus"></i> Create First Epic
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modals for Story Refinement -->
+{% if user.role.value == 'BA' %}
+
+<!-- New Epic Modal -->
+<div class="modal fade" id="newEpicModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Create New Epic</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="newEpicTitle" class="form-label text-light">Epic Title</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="newEpicTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newEpicDescription" class="form-label text-light">Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="newEpicDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Epic</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Story Modal -->
+<div class="modal fade" id="editStoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Edit User Story</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="editStoryTitle" class="form-label text-light">Story Title</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editStoryTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStoryDescription" class="form-label text-light">Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="editStoryDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStoryPriority" class="form-label text-light">Priority</label>
+                        <select class="form-select bg-dark text-light border-secondary" id="editStoryPriority">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Story</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Story Modal -->
+<div class="modal fade" id="newStoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Add User Story</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="newStoryTitle" class="form-label text-light">Story Title</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="newStoryTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newStoryDescription" class="form-label text-light">Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="newStoryDescription" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="newStoryPriority" class="form-label text-light">Priority</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="newStoryPriority">
+                                <option value="High">High</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="newStoryEffort" class="form-label text-light">Effort Estimate</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="newStoryEffort">
+                                <option value="">Select Effort</option>
+                                <option value="1">1 - Very Small</option>
+                                <option value="2">2 - Small</option>
+                                <option value="3">3 - Medium</option>
+                                <option value="5">5 - Large</option>
+                                <option value="8">8 - Very Large</option>
+                                <option value="13">13 - Extra Large</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Story</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Epic Modal -->
+<div class="modal fade" id="editEpicModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Edit Epic</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEpicForm">
+                    <input type="hidden" id="editEpicId">
+                    <div class="mb-3">
+                        <label for="editEpicTitle" class="form-label text-light">Epic Title</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editEpicTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEpicDescription" class="form-label text-light">Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="editEpicDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateEpic()">Update Epic</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Story Modal -->
+<div class="modal fade" id="createStoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Add User Story</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createStoryForm">
+                    <input type="hidden" id="storyEpicId">
+                    <div class="mb-3">
+                        <label for="storyTitle" class="form-label text-light">Story Title</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="storyTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="storyDescription" class="form-label text-light">Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="storyDescription" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="storyPriority" class="form-label text-light">Priority</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="storyPriority">
+                                <option value="">Select Priority</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="storyEffort" class="form-label text-light">Effort Estimate</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="storyEffort">
+                                <option value="">Select Effort</option>
+                                <option value="1">1 - Very Small</option>
+                                <option value="2">2 - Small</option>
+                                <option value="3">3 - Medium</option>
+                                <option value="5">5 - Large</option>
+                                <option value="8">8 - Very Large</option>
+                                <option value="13">13 - Extra Large</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createStory()">Create Story</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Story Modal -->
+<div class="modal fade" id="editStoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Edit User Story</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStoryForm">
+                    <input type="hidden" id="editStoryId">
+                    <div class="mb-3">
+                        <label for="editStoryTitle" class="form-label text-light">Story Title</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editStoryTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStoryDescription" class="form-label text-light">Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="editStoryDescription" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="editStoryPriority" class="form-label text-light">Priority</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="editStoryPriority">
+                                <option value="">Select Priority</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editStoryEffort" class="form-label text-light">Effort Estimate</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="editStoryEffort">
+                                <option value="">Select Effort</option>
+                                <option value="1">1 - Very Small</option>
+                                <option value="2">2 - Small</option>
+                                <option value="3">3 - Medium</option>
+                                <option value="5">5 - Large</option>
+                                <option value="8">8 - Very Large</option>
+                                <option value="13">13 - Extra Large</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateStory()">Update Story</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Include jQuery for refine_stories.js -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include our story refinement JavaScript -->
+<script src="{{ url_for('static', filename='js/refine_stories.js') }}"></script>
+{% endblock %}

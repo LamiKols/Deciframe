@@ -1,0 +1,1370 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Templates - Admin Center{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-light">Workflow Management</h2>
+                <div id="actionButtons">
+                    <!-- Action buttons will be updated based on active tab -->
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs nav-fill mb-4" id="workflowTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active bg-secondary text-light border-secondary" 
+                            id="library-tab" data-bs-toggle="tab" data-bs-target="#library-pane" 
+                            type="button" role="tab" onclick="updateActionButtons('library')">
+                        <i class="fas fa-book me-2"></i>Library
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link bg-dark text-light border-secondary" 
+                            id="my-workflows-tab" data-bs-toggle="tab" data-bs-target="#my-workflows-pane" 
+                            type="button" role="tab" onclick="updateActionButtons('my-workflows')">
+                        <i class="fas fa-cogs me-2"></i>My Workflows
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="workflowTabContent">
+                <!-- Library Tab -->
+                <div class="tab-pane fade show active" id="library-pane" role="tabpanel">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header border-secondary">
+                            <h5 class="text-light mb-0">Workflow Template Library</h5>
+                            <small class="text-muted">Pre-built workflow templates ready to import and customize</small>
+                        </div>
+                        <div class="card-body">
+                            {% if library_workflows %}
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Category</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for workflow in library_workflows %}
+                                                <tr>
+                                                    <td>
+                                                        <strong class="text-info">{{ workflow.name }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">{{ workflow.description[:80] }}{% if workflow.description|length > 80 %}...{% endif %}</small>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-primary">{{ workflow.category or 'General' }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-sm btn-outline-info me-1" 
+                                                                data-bs-toggle="modal" data-bs-target="#previewLibraryModal{{ workflow.id }}" 
+                                                                title="Preview">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-success" 
+                                                                onclick="importFromLibrary({{ workflow.id }})" 
+                                                                title="Import & Edit">
+                                                            <i class="fas fa-download me-1"></i>Import
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No workflow templates in library.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Workflows Tab -->
+                <div class="tab-pane fade" id="my-workflows-pane" role="tabpanel">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header border-secondary">
+                            <h5 class="text-light mb-0">My Workflow Templates</h5>
+                            <small class="text-muted">Your custom and imported workflow templates</small>
+                        </div>
+                        <div class="card-body">
+                            {% if workflows %}
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Status</th>
+                                                <th>Created</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for workflow in workflows %}
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ workflow.name }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">{{ workflow.description or 'No description' }}</small>
+                                                    </td>
+                                                    <td>
+                                                        {% if workflow.is_active %}
+                                                            <span class="badge bg-success">Active</span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning">Inactive</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">{{ workflow.created_at.strftime('%Y-%m-%d') if workflow.created_at else 'N/A' }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-sm btn-outline-info me-1" 
+                                                                data-bs-toggle="modal" data-bs-target="#viewWorkflowModal{{ workflow.id }}" 
+                                                                title="View Template">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-warning me-1" 
+                                                                data-bs-toggle="modal" data-bs-target="#editWorkflowModal{{ workflow.id }}" 
+                                                                onclick="initializeEditModal({{ workflow.id }})"
+                                                                title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-{{ 'secondary' if workflow.is_active else 'success' }} me-1"
+                                                                onclick="toggleWorkflow({{ workflow.id }}, {{ 'true' if workflow.is_active else 'false' }})"
+                                                                title="{{ 'Deactivate' if workflow.is_active else 'Activate' }}">
+                                                            <i class="fas fa-{{ 'pause' if workflow.is_active else 'play' }}"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                                onclick="deleteWorkflow({{ workflow.id }}, '{{ workflow.name|replace("'", "\\'") }}')"
+                                                                title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                        
+                        <!-- View and Edit Workflow Modals -->
+                        {% for workflow in workflows %}
+                        <!-- View Modal -->
+                        <div class="modal fade" id="viewWorkflowModal{{ workflow.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content bg-dark">
+                                    <div class="modal-header border-secondary">
+                                        <h5 class="modal-title text-light">View Workflow Template</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label text-light">Name</label>
+                                            <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                                                   value="{{ workflow.name }}" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-light">Description</label>
+                                            <textarea class="form-control bg-secondary text-light border-secondary" 
+                                                      rows="3" readonly>{{ workflow.description }}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-light">Workflow Configuration</label>
+                                            <div class="bg-secondary text-light p-3 rounded">
+                                                <!-- Triggers Section -->
+                                                <div class="mb-3">
+                                                    <h6 class="text-info mb-2">
+                                                        <i class="fas fa-bolt me-1"></i>Trigger Events
+                                                    </h6>
+                                                    {% if workflow.definition.get('triggers') %}
+                                                        {% for trigger in workflow.definition.get('triggers', []) %}
+                                                            <span class="badge bg-primary me-1 mb-1">{{ trigger.replace('_', ' ').title() }}</span>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <small class="text-muted">No triggers defined</small>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <!-- Steps Section -->
+                                                <div class="mb-3">
+                                                    <h6 class="text-success mb-2">
+                                                        <i class="fas fa-list-ol me-1"></i>Workflow Steps
+                                                    </h6>
+                                                    {% if workflow.definition.get('steps') %}
+                                                        {% for step in workflow.definition.get('steps', []) %}
+                                                            <div class="bg-dark rounded p-2 mb-2 border-start border-3 border-success">
+                                                                <div class="d-flex align-items-center mb-1">
+                                                                    <span class="badge bg-success me-2">{{ loop.index }}</span>
+                                                                    <strong class="text-light">{{ step.get('action', 'Unknown Action').replace('_', ' ').title() }}</strong>
+                                                                </div>
+                                                                
+                                                                {% if step.get('target') %}
+                                                                    <div class="small text-info mb-1">
+                                                                        <i class="fas fa-arrow-right me-1"></i>
+                                                                        Target: {{ step.get('target').replace('_', ' ').title() }}
+                                                                    </div>
+                                                                {% endif %}
+                                                                
+                                                                {% if step.get('template') %}
+                                                                    <div class="small text-warning mb-1">
+                                                                        <i class="fas fa-file-alt me-1"></i>
+                                                                        Template: {{ step.get('template') }}
+                                                                    </div>
+                                                                {% endif %}
+                                                                
+                                                                {% if step.get('assignee') %}
+                                                                    <div class="small text-info mb-1">
+                                                                        <i class="fas fa-user me-1"></i>
+                                                                        Assignee: {{ step.get('assignee').replace('_', ' ').title() }}
+                                                                    </div>
+                                                                {% endif %}
+                                                                
+                                                                {% if step.get('due_days') %}
+                                                                    <div class="small text-warning mb-1">
+                                                                        <i class="fas fa-clock me-1"></i>
+                                                                        Due in: {{ step.get('due_days') }} days
+                                                                    </div>
+                                                                {% endif %}
+                                                                
+                                                                {% if step.get('conditions') %}
+                                                                    <div class="small text-muted">
+                                                                        <i class="fas fa-filter me-1"></i>
+                                                                        Conditions: {{ step.get('conditions') | join(', ') }}
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <small class="text-muted">No steps defined</small>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <!-- Raw JSON Toggle -->
+                                                <div class="mt-3">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                            onclick="toggleRawJson('{{ workflow.id }}')">
+                                                        <i class="fas fa-code me-1"></i>Show Raw JSON
+                                                    </button>
+                                                    <div id="rawJson{{ workflow.id }}" class="mt-2" style="display: none;">
+                                                        <pre class="bg-dark text-light p-2 rounded small"><code>{{ workflow.definition | tojson(indent=2) }}</code></pre>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-light">Status</label>
+                                            <span class="badge {% if workflow.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ 'Active' if workflow.is_active else 'Inactive' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-secondary">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="editWorkflowModal{{ workflow.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content bg-dark">
+                                    <div class="modal-header border-secondary">
+                                        <h5 class="modal-title text-light">Edit Workflow: {{ workflow.name }}</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <!-- Basic Info -->
+                                                <div class="mb-3">
+                                                    <label class="form-label text-light">Name</label>
+                                                    <input value="{{ workflow.name }}" class="form-control bg-secondary text-light border-secondary" 
+                                                           id="workflowName{{ workflow.id }}" required />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label text-light">Description</label>
+                                                    <textarea class="form-control bg-secondary text-light border-secondary" 
+                                                              id="workflowDescription{{ workflow.id }}" rows="3">{{ workflow.description }}</textarea>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="workflowActive{{ workflow.id }}" 
+                                                           {% if workflow.is_active %}checked{% endif %}>
+                                                    <label class="form-check-label text-light" for="workflowActive{{ workflow.id }}">
+                                                        Active
+                                                    </label>
+                                                </div>
+                                                
+                                                <!-- Trigger Events -->
+                                                <div class="mb-3">
+                                                    <label class="form-label text-light">Trigger Events</label>
+                                                    <select id="triggersSelect{{ workflow.id }}" multiple class="form-select bg-secondary text-light border-secondary">
+                                                        {% for ev in ['problem_created', 'case_approved', 'project_started', 'milestone_due_soon', 'milestone_overdue', 'case_rejected', 'user_assigned'] %}
+                                                            <option value="{{ ev }}" {% if ev in workflow.definition.get('triggers', []) %}selected{% endif %}>
+                                                                {{ ev.replace('_',' ').title() }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <small class="text-muted">Hold Ctrl/Cmd to select multiple triggers</small>
+                                                </div>
+
+                                                <!-- Steps Container -->
+                                                <div class="mb-3">
+                                                    <label class="form-label text-light">Workflow Steps</label>
+                                                    <div id="stepsContainer{{ workflow.id }}" class="border border-secondary rounded p-3 bg-dark">
+                                                        <!-- Steps will be populated by JavaScript -->
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-light mt-2" onclick="addEditStep({{ workflow.id }})">
+                                                        <i class="fas fa-plus me-1"></i>Add Step
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label text-light">JSON Preview</label>
+                                                <pre id="jsonPreview{{ workflow.id }}" class="bg-secondary text-light p-3 rounded font-monospace" 
+                                                     style="height: 400px; overflow-y: auto;">{{ workflow.definition | tojson(indent=2) }}</pre>
+                                                <div id="validationStatus{{ workflow.id }}" class="mt-2"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Hidden field for JSON data -->
+                                        <input type="hidden" id="template_content{{ workflow.id }}" name="template_content" 
+                                               value="{{ workflow.definition | tojson }}">
+                                        <!-- Store original workflow data for initialization -->
+                                        <script type="application/json" id="workflowData{{ workflow.id }}">{{ workflow.definition | tojson }}</script>
+                                    </div>
+                                    <div class="modal-footer border-secondary">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-success" onclick="saveWorkflow({{ workflow.id }})">
+                                            <i class="fas fa-save me-1"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-sitemap fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No workflow templates configured yet.</p>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkflowModal">
+                                Create First Workflow Template
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Library workflow preview modals -->
+    {% for workflow in library_workflows %}
+        <div class="modal fade" id="previewLibraryModal{{ workflow.id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title text-light">Preview: {{ workflow.name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label text-light">Description</label>
+                            <textarea class="form-control bg-secondary text-light border-secondary" 
+                                      rows="3" readonly>{{ workflow.description }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-light">Category</label>
+                            <input class="form-control bg-secondary text-light border-secondary" 
+                                   value="{{ workflow.category or 'General' }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-light">Workflow Configuration</label>
+                            <div class="bg-secondary text-light p-3 rounded">
+                                <!-- Triggers Section -->
+                                <div class="mb-3">
+                                    <h6 class="text-info mb-2">
+                                        <i class="fas fa-bolt me-1"></i>Trigger Events
+                                    </h6>
+                                    {% if workflow.definition.get('triggers') %}
+                                        {% for trigger in workflow.definition.get('triggers', []) %}
+                                            <span class="badge bg-primary me-1 mb-1">{{ trigger.replace('_', ' ').title() }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <small class="text-muted">No triggers defined</small>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Steps Section -->
+                                <div class="mb-3">
+                                    <h6 class="text-success mb-2">
+                                        <i class="fas fa-list-ol me-1"></i>Workflow Steps
+                                    </h6>
+                                    {% if workflow.definition.get('steps') %}
+                                        {% for step in workflow.definition.get('steps', []) %}
+                                            <div class="bg-dark rounded p-2 mb-2 border-start border-3 border-success">
+                                                <div class="d-flex align-items-center mb-1">
+                                                    <span class="badge bg-success me-2">{{ loop.index }}</span>
+                                                    <strong class="text-light">{{ step.get('action', 'Unknown Action').replace('_', ' ').title() }}</strong>
+                                                </div>
+                                                
+                                                {% if step.get('target') %}
+                                                    <div class="small text-info mb-1">
+                                                        <i class="fas fa-arrow-right me-1"></i>
+                                                        Target: {{ step.get('target').replace('_', ' ').title() }}
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                {% if step.get('condition') %}
+                                                    <div class="small text-warning mb-1">
+                                                        <i class="fas fa-filter me-1"></i>
+                                                        Condition: {{ step.get('condition') }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <small class="text-muted">No steps defined</small>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Raw JSON Toggle -->
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                            onclick="toggleRawJson('library{{ workflow.id }}')">
+                                        <i class="fas fa-code me-1"></i>Show Raw JSON
+                                    </button>
+                                    <div id="rawJsonlibrary{{ workflow.id }}" class="mt-2" style="display: none;">
+                                        <pre class="bg-dark text-light p-2 rounded small"><code>{{ workflow.definition | tojson(indent=2) }}</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success" 
+                                onclick="importFromLibrary({{ workflow.id }})">
+                            <i class="fas fa-download me-1"></i>Import & Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Add Workflow Template Modal -->
+<div class="modal fade" id="addWorkflowModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Add Workflow Template</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label text-light">Template Name</label>
+                        <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                               id="name" name="name" placeholder="e.g., Problem Escalation Workflow" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label text-light">Description</label>
+                        <textarea class="form-control bg-secondary text-light border-secondary" 
+                                  id="description" name="description" rows="3" 
+                                  placeholder="Describe what this workflow does..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="trigger_event" class="form-label text-light">Trigger Event</label>
+                        <select class="form-control bg-secondary text-light border-secondary" id="trigger_event" name="trigger_event" required>
+                            <option value="">Select Trigger Event</option>
+                            <option value="problem_created">Problem Created</option>
+                            <option value="case_approved">Business Case Approved</option>
+                            <option value="project_created">Project Created</option>
+                            <option value="milestone_overdue">Milestone Overdue</option>
+                            <option value="case_rejected">Business Case Rejected</option>
+                            <option value="user_assigned">User Assigned</option>
+                        </select>
+                    </div>
+                    <!-- Visual Step Builder -->
+                    <div class="mb-3">
+                        <label class="form-label text-light">Workflow Steps</label>
+                        <div id="stepBuilder" class="border border-secondary rounded p-3 bg-dark">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-light mb-0">Build Your Workflow</h6>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="addWorkflowStep()">
+                                    <i class="fas fa-plus me-1"></i>Add Step
+                                </button>
+                            </div>
+                            <div id="workflowSteps">
+                                <!-- Steps will be added here dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- JSON Preview -->
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-label text-light">JSON Preview</label>
+                                <pre id="jsonPreview" class="bg-secondary text-light p-3 rounded font-monospace" style="max-height: 200px; overflow-y: auto;">{}</pre>
+                                <div id="validationStatus" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden field for actual JSON submission -->
+                    <input type="hidden" id="template_content" name="template_content" value="{}"">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                        <label class="form-check-label text-light" for="is_active">
+                            Activate immediately
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Template</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Template Preview Modal -->
+<div class="modal fade" id="templatePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light" id="previewTitle">Template Preview</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label text-light">Description</label>
+                    <p id="previewDescription" class="text-muted"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-light">Workflow Definition</label>
+                    <pre id="previewDefinition" class="bg-secondary text-light p-3 rounded"></pre>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="importFromPreview" onclick="importAndEditFromPreview()">
+                    <i class="fas fa-download me-1"></i>Import & Edit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let workflowDefinition = { triggers: [], steps: [] };
+let stepCounter = 0;
+
+// Workflow step builder functions
+function addWorkflowStep() {
+    stepCounter++;
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'workflow-step border border-secondary rounded p-3 mb-3 bg-secondary';
+    stepDiv.id = `step-${stepCounter}`;
+    
+    stepDiv.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="text-light mb-0">Step ${stepCounter}</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeWorkflowStep(${stepCounter})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label text-light">Action</label>
+                <select class="form-control bg-dark text-light border-secondary" onchange="updateStepFields(${stepCounter})">
+                    <option value="">Select Action</option>
+                    <option value="send_notification">Send Notification</option>
+                    <option value="create_task">Create Task</option>
+                    <option value="update_status">Update Status</option>
+                    <option value="assign_user">Assign User</option>
+                    <option value="conditional_approval">Conditional Approval</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-light">Conditions (optional)</label>
+                <input type="text" class="form-control bg-dark text-light border-secondary" 
+                       placeholder="e.g., priority == 'High'" onchange="updateWorkflowJSON()">
+            </div>
+        </div>
+        
+        <div id="stepFields-${stepCounter}" class="mt-3">
+            <!-- Dynamic fields will appear here -->
+        </div>
+    `;
+    
+    document.getElementById('workflowSteps').appendChild(stepDiv);
+    updateWorkflowJSON();
+}
+
+function removeWorkflowStep(stepId) {
+    const stepElement = document.getElementById(`step-${stepId}`);
+    if (stepElement) {
+        stepElement.remove();
+        updateWorkflowJSON();
+    }
+}
+
+function updateStepFields(stepId) {
+    const stepDiv = document.getElementById(`step-${stepId}`);
+    const actionSelect = stepDiv.querySelector('select');
+    const fieldsDiv = document.getElementById(`stepFields-${stepId}`);
+    const action = actionSelect.value;
+    
+    let fieldsHTML = '';
+    
+    switch (action) {
+        case 'send_notification':
+            fieldsHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label text-light">Target</label>
+                        <select class="form-control bg-dark text-light border-secondary" onchange="updateWorkflowJSON()">
+                            <option value="department_manager">Department Manager</option>
+                            <option value="project_manager">Project Manager</option>
+                            <option value="business_analyst">Business Analyst</option>
+                            <option value="problem_reporter">Problem Reporter</option>
+                            <option value="case_creator">Case Creator</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-light">Template</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" 
+                               placeholder="e.g., problem_escalation" onchange="updateWorkflowJSON()">
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 'create_task':
+            fieldsHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label text-light">Assignee</label>
+                        <select class="form-control bg-dark text-light border-secondary" onchange="updateWorkflowJSON()">
+                            <option value="business_analyst">Business Analyst</option>
+                            <option value="project_manager">Project Manager</option>
+                            <option value="department_manager">Department Manager</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-light">Due Days</label>
+                        <input type="number" class="form-control bg-dark text-light border-secondary" 
+                               value="3" min="1" onchange="updateWorkflowJSON()">
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 'update_status':
+            fieldsHTML = `
+                <div class="col-md-6">
+                    <label class="form-label text-light">New Status</label>
+                    <select class="form-control bg-dark text-light border-secondary" onchange="updateWorkflowJSON()">
+                        <option value="In Progress">In Progress</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+            `;
+            break;
+    }
+    
+    fieldsDiv.innerHTML = fieldsHTML;
+    updateWorkflowJSON();
+}
+
+function updateWorkflowJSON() {
+    const steps = [];
+    const stepElements = document.querySelectorAll('.workflow-step');
+    
+    stepElements.forEach((stepDiv, index) => {
+        const actionSelect = stepDiv.querySelector('select');
+        const conditionInput = stepDiv.querySelector('input[placeholder*="priority"]');
+        
+        if (actionSelect && actionSelect.value) {
+            const step = {
+                action: actionSelect.value
+            };
+            
+            // Add conditions if specified
+            if (conditionInput && conditionInput.value.trim()) {
+                step.conditions = [conditionInput.value.trim()];
+            }
+            
+            // Add action-specific fields
+            const fieldsDiv = stepDiv.querySelector('[id^="stepFields-"]');
+            if (fieldsDiv) {
+                const inputs = fieldsDiv.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    if (input.value) {
+                        const fieldName = input.previousElementSibling.textContent.toLowerCase().replace(' ', '_');
+                        step[fieldName] = input.type === 'number' ? parseInt(input.value) : input.value;
+                    }
+                });
+            }
+            
+            steps.push(step);
+        }
+    });
+    
+    // Update triggers from the trigger dropdown
+    const triggerSelect = document.getElementById('trigger_event');
+    const triggers = triggerSelect && triggerSelect.value ? [triggerSelect.value] : [];
+    
+    workflowDefinition = { triggers, steps };
+    
+    // Update preview
+    document.getElementById('jsonPreview').textContent = JSON.stringify(workflowDefinition, null, 2);
+    document.getElementById('template_content').value = JSON.stringify(workflowDefinition);
+    
+    // Validate
+    validateWorkflowDefinition();
+}
+
+function validateWorkflowDefinition() {
+    const statusDiv = document.getElementById('validationStatus');
+    
+    if (workflowDefinition.steps.length === 0) {
+        statusDiv.innerHTML = '<small class="text-warning"><i class="fas fa-exclamation-triangle"></i> No steps defined</small>';
+        return false;
+    }
+    
+    if (workflowDefinition.triggers.length === 0) {
+        statusDiv.innerHTML = '<small class="text-warning"><i class="fas fa-exclamation-triangle"></i> No trigger selected</small>';
+        return false;
+    }
+    
+    statusDiv.innerHTML = '<small class="text-success"><i class="fas fa-check"></i> Workflow definition is valid</small>';
+    return true;
+}
+
+// Library search and import functions
+function filterLibraryTemplates() {
+    const searchTerm = document.getElementById('librarySearch').value.toLowerCase();
+    const items = document.querySelectorAll('.library-item');
+    
+    items.forEach(item => {
+        const name = item.dataset.name;
+        const description = item.dataset.description;
+        const category = item.dataset.category;
+        
+        if (name.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+let currentPreviewId = null;
+
+function previewLibraryTemplate(id, name, description, definition) {
+    currentPreviewId = id;
+    document.getElementById('previewTitle').textContent = name;
+    document.getElementById('previewDescription').textContent = description;
+    document.getElementById('previewDefinition').textContent = JSON.stringify(definition, null, 2);
+    
+    new bootstrap.Modal(document.getElementById('templatePreviewModal')).show();
+}
+
+function importAndEditFromPreview() {
+    if (currentPreviewId) {
+        importAndEdit(currentPreviewId);
+    }
+}
+
+function importLibraryTemplate(libraryId) {
+    fetch(`/admin/workflows/library/${libraryId}/import`, {
+        method: 'POST',
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close library modal
+            bootstrap.Modal.getInstance(document.getElementById('importLibraryModal')).hide();
+            bootstrap.Modal.getInstance(document.getElementById('templatePreviewModal'))?.hide();
+            
+            // Open edit modal with imported data
+            openEditModal(data.workflow_id, data.name, data.description, data.definition, data.is_active);
+        }
+    })
+    .catch(error => {
+        console.error('Import failed:', error);
+        alert('Failed to import template');
+    });
+}
+
+function openEditModal(workflowId, name, description, definition, isActive) {
+    // Find the existing edit modal for this workflow
+    const editModal = document.getElementById(`editWorkflowModal${workflowId}`);
+    if (editModal) {
+        // Open the existing edit modal
+        new bootstrap.Modal(editModal).show();
+    } else {
+        // If modal doesn't exist yet (new workflow), reload to generate the modal
+        location.reload();
+    }
+}
+
+// Enhanced import function that immediately opens edit modal
+function importAndEdit(libraryId) {
+    fetch(`/admin/workflows/library/${libraryId}/import`, {
+        method: 'POST',
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close library modals
+            bootstrap.Modal.getInstance(document.getElementById('importLibraryModal')).hide();
+            bootstrap.Modal.getInstance(document.getElementById('templatePreviewModal'))?.hide();
+            
+            // Show success message
+            showSuccessMessage(`Imported "${data.name}" successfully! Opening editor...`);
+            
+            // Reload page to show new workflow and enable editing
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+    })
+    .catch(error => {
+        console.error('Import failed:', error);
+        showErrorMessage('Failed to import template. Please try again.');
+    });
+}
+
+function showSuccessMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 3000);
+}
+
+function showErrorMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 5000);
+}
+
+// Tab and search functionality
+function updateActionButtons(activeTab) {
+    const actionButtonsDiv = document.getElementById('actionButtons');
+    
+    if (activeTab === 'library') {
+        actionButtonsDiv.innerHTML = `
+            <div class="d-flex align-items-center">
+                <small class="text-muted me-3">Browse and import proven workflow patterns</small>
+                <button type="button" class="btn btn-outline-info" onclick="refreshLibrary()">
+                    <i class="fas fa-sync me-1"></i>Refresh
+                </button>
+            </div>
+        `;
+    } else if (activeTab === 'my-workflows') {
+        actionButtonsDiv.innerHTML = `
+            <div>
+                <button type="button" class="btn btn-info me-2" onclick="switchToLibraryTab()">
+                    <i class="fas fa-download me-1"></i>Import from Library
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkflowModal">
+                    <i class="fas fa-plus me-1"></i>Create New Workflow
+                </button>
+            </div>
+        `;
+    }
+}
+
+function filterLibraryItems() {
+    const searchTerm = document.getElementById('librarySearchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.library-card');
+    const categories = document.querySelectorAll('.category-section');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const name = card.dataset.name;
+        const description = card.dataset.description;
+        const category = card.dataset.category;
+        
+        if (name.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+            card.closest('.col-lg-6').style.display = 'block';
+            visibleCount++;
+        } else {
+            card.closest('.col-lg-6').style.display = 'none';
+        }
+    });
+    
+    // Show/hide categories and no results message
+    categories.forEach(categoryDiv => {
+        const visibleCards = categoryDiv.querySelectorAll('.col-lg-6[style="display: block;"], .col-lg-6:not([style*="display: none"])');
+        categoryDiv.style.display = visibleCards.length > 0 ? 'block' : 'none';
+    });
+    
+    document.getElementById('noLibraryResults').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function filterMyWorkflows() {
+    const searchTerm = document.getElementById('myWorkflowsSearchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.workflow-row');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const name = row.dataset.name;
+        const description = row.dataset.description;
+        
+        if (name.includes(searchTerm) || description.includes(searchTerm)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    document.getElementById('noWorkflowResults').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function refreshLibrary() {
+    location.reload();
+}
+
+// Essential workflow management functions
+function updateActionButtons(activeTab) {
+    const libraryTab = document.getElementById('library-tab');
+    const myWorkflowsTab = document.getElementById('my-workflows-tab');
+    const importActions = document.getElementById('import-actions');
+    const workflowActions = document.getElementById('workflow-actions');
+    
+    if (activeTab === 'library') {
+        if (libraryTab) libraryTab.classList.add('active');
+        if (myWorkflowsTab) myWorkflowsTab.classList.remove('active');
+        if (importActions) importActions.style.display = 'block';
+        if (workflowActions) workflowActions.style.display = 'none';
+    } else {
+        if (libraryTab) libraryTab.classList.remove('active');
+        if (myWorkflowsTab) myWorkflowsTab.classList.add('active');
+        if (importActions) importActions.style.display = 'none';
+        if (workflowActions) workflowActions.style.display = 'block';
+    }
+}
+
+function addWorkflowStep() {
+    const stepsContainer = document.getElementById('workflowSteps');
+    if (!stepsContainer) return;
+    
+    const stepCount = stepsContainer.children.length + 1;
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'workflow-step border border-secondary rounded p-3 mb-3 bg-secondary';
+    stepDiv.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="text-light mb-0">Step ${stepCount}</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeWorkflowStep(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label text-light">Action</label>
+                <select class="form-control bg-dark text-light border-secondary" name="step_action[]" onchange="updateWorkflowJSON()">
+                    <option value="">Select Action</option>
+                    <option value="send_notification">Send Notification</option>
+                    <option value="create_task">Create Task</option>
+                    <option value="update_status">Update Status</option>
+                    <option value="assign_user">Assign User</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-light">Target</label>
+                <select class="form-control bg-dark text-light border-secondary" name="step_target[]" onchange="updateWorkflowJSON()">
+                    <option value="">Select Target</option>
+                    <option value="department_manager">Department Manager</option>
+                    <option value="project_manager">Project Manager</option>
+                    <option value="business_analyst">Business Analyst</option>
+                    <option value="problem_reporter">Problem Reporter</option>
+                </select>
+            </div>
+        </div>
+    `;
+    stepsContainer.appendChild(stepDiv);
+    updateWorkflowJSON();
+}
+
+function removeWorkflowStep(button) {
+    const stepDiv = button.closest('.workflow-step');
+    stepDiv.remove();
+    updateWorkflowJSON();
+}
+
+function updateWorkflowJSON() {
+    // Basic JSON update function
+    const definition = { triggers: [], steps: [] };
+    const preview = document.getElementById('jsonPreview');
+    if (preview) {
+        preview.textContent = JSON.stringify(definition, null, 2);
+    }
+}
+
+function refreshLibrary() {
+    location.reload();
+}
+
+// Toggle raw JSON display
+function toggleRawJson(workflowId) {
+    const jsonDiv = document.getElementById(`rawJson${workflowId}`);
+    const button = event.target.closest('button');
+    
+    if (jsonDiv.style.display === 'none') {
+        jsonDiv.style.display = 'block';
+        button.innerHTML = '<i class="fas fa-eye-slash me-1"></i>Hide Raw JSON';
+    } else {
+        jsonDiv.style.display = 'none';
+        button.innerHTML = '<i class="fas fa-code me-1"></i>Show Raw JSON';
+    }
+}
+
+// Initialize edit modal with existing workflow data
+function initializeEditModal(workflowId) {
+    setTimeout(() => {
+        try {
+            // Get original workflow data
+            const dataScript = document.getElementById(`workflowData${workflowId}`);
+            if (!dataScript) return;
+            
+            const workflowData = JSON.parse(dataScript.textContent);
+            
+            // Clear and populate steps container
+            const container = document.getElementById(`stepsContainer${workflowId}`);
+            container.innerHTML = '';
+            
+            // Add existing steps
+            if (workflowData.steps && workflowData.steps.length > 0) {
+                workflowData.steps.forEach((step, index) => {
+                    addEditStepWithData(workflowId, step, index + 1);
+                });
+            }
+            
+            // Update JSON preview
+            updateEditWorkflowJSON(workflowId);
+        } catch (e) {
+            console.error('Error initializing edit modal:', e);
+        }
+    }, 100); // Small delay to ensure modal is fully opened
+}
+
+// Add step to edit modal with optional data
+function addEditStepWithData(workflowId, stepData = null, stepNumber = null) {
+    const container = document.getElementById(`stepsContainer${workflowId}`);
+    const stepCount = stepNumber || (container.children.length + 1);
+    
+    const action = stepData?.action || '';
+    const target = stepData?.target || '';
+    const actionTitle = action ? action.replace('_', ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'New Step';
+    
+    const stepHtml = `
+        <div class="step-item bg-secondary rounded p-3 mb-2 border-start border-3 border-success">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="badge bg-success me-2">${stepCount}</span>
+                <strong class="text-light flex-grow-1">${actionTitle}</strong>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeStep(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <select class="form-select form-select-sm bg-dark text-light border-secondary mb-2" onchange="updateStepPreview(this)">
+                        <option value="">Select Action</option>
+                        <option value="send_notification" ${action === 'send_notification' ? 'selected' : ''}>Send Notification</option>
+                        <option value="notify_manager" ${action === 'notify_manager' ? 'selected' : ''}>Notify Manager</option>
+                        <option value="create_task" ${action === 'create_task' ? 'selected' : ''}>Create Task</option>
+                        <option value="assign_user" ${action === 'assign_user' ? 'selected' : ''}>Assign User</option>
+                        <option value="update_status" ${action === 'update_status' ? 'selected' : ''}>Update Status</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <select class="form-select form-select-sm bg-dark text-light border-secondary mb-2" onchange="updateEditWorkflowJSON(${workflowId})">
+                        <option value="">Select Target</option>
+                        <option value="problem_owner" ${target === 'problem_owner' ? 'selected' : ''}>Problem Owner</option>
+                        <option value="department_manager" ${target === 'department_manager' ? 'selected' : ''}>Department Manager</option>
+                        <option value="project_manager" ${target === 'project_manager' ? 'selected' : ''}>Project Manager</option>
+                        <option value="business_analyst" ${target === 'business_analyst' ? 'selected' : ''}>Business Analyst</option>
+                    </select>
+                </div>
+            </div>
+            ${stepData?.condition ? `<div class="mt-2"><small class="text-info">Condition: ${stepData.condition}</small></div>` : ''}
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', stepHtml);
+}
+
+// Add step to edit modal (wrapper for compatibility)
+function addEditStep(workflowId) {
+    addEditStepWithData(workflowId);
+    updateEditWorkflowJSON(workflowId);
+}
+
+// Remove step from edit modal
+function removeStep(button) {
+    const stepItem = button.closest('.step-item');
+    const container = stepItem.parentElement;
+    stepItem.remove();
+    
+    // Re-number remaining steps
+    const steps = container.querySelectorAll('.step-item');
+    steps.forEach((step, index) => {
+        const badge = step.querySelector('.badge');
+        if (badge) badge.textContent = index + 1;
+    });
+    
+    // Update JSON if in edit modal
+    const workflowId = container.id.replace('stepsContainer', '');
+    if (workflowId) {
+        updateEditWorkflowJSON(workflowId);
+    }
+}
+
+// Update step preview text
+function updateStepPreview(select) {
+    const stepItem = select.closest('.step-item');
+    const title = stepItem.querySelector('strong');
+    if (title && select.value) {
+        title.textContent = select.value.replace('_', ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+    
+    // Update JSON if in edit modal
+    const container = stepItem.parentElement;
+    const workflowId = container.id.replace('stepsContainer', '');
+    if (workflowId) {
+        updateEditWorkflowJSON(workflowId);
+    }
+}
+
+// Update JSON preview in edit modal
+function updateEditWorkflowJSON(workflowId) {
+    try {
+        // Get triggers
+        const triggersSelect = document.getElementById(`triggersSelect${workflowId}`);
+        const triggers = Array.from(triggersSelect.selectedOptions).map(option => option.value);
+        
+        // Get steps
+        const stepsContainer = document.getElementById(`stepsContainer${workflowId}`);
+        const steps = [];
+        
+        stepsContainer.querySelectorAll('.step-item').forEach(stepElement => {
+            const actionSelect = stepElement.querySelector('select[onchange="updateStepPreview(this)"]');
+            const targetSelect = stepElement.querySelectorAll('select')[1];
+            
+            if (actionSelect) {
+                const step = {};
+                if (actionSelect.value) {
+                    step.action = actionSelect.value;
+                }
+                if (targetSelect && targetSelect.value) {
+                    step.target = targetSelect.value;
+                }
+                
+                // Only add step if it has an action
+                if (step.action) {
+                    steps.push(step);
+                }
+            }
+        });
+        
+        // Create definition
+        const definition = { triggers, steps };
+        
+        // Update preview
+        const preview = document.getElementById(`jsonPreview${workflowId}`);
+        if (preview) {
+            preview.textContent = JSON.stringify(definition, null, 2);
+        }
+        
+        // Update hidden field
+        const hiddenField = document.getElementById(`template_content${workflowId}`);
+        if (hiddenField) {
+            hiddenField.value = JSON.stringify(definition);
+        }
+    } catch (e) {
+        console.error('Error updating JSON preview:', e);
+    }
+}
+
+// Save workflow via JavaScript
+function saveWorkflow(workflowId) {
+    // Update JSON before saving
+    updateEditWorkflowJSON(workflowId);
+    
+    // Get form data
+    const workflowData = {
+        name: document.getElementById(`workflowName${workflowId}`).value,
+        description: document.getElementById(`workflowDescription${workflowId}`).value,
+        is_active: document.getElementById(`workflowActive${workflowId}`).checked
+    };
+    
+    // Get workflow definition from hidden field
+    const definitionField = document.getElementById(`template_content${workflowId}`);
+    if (definitionField && definitionField.value) {
+        try {
+            workflowData.definition = JSON.parse(definitionField.value);
+        } catch (e) {
+            alert('Invalid workflow definition. Please check the JSON format.');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const saveBtn = event.target;
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+    
+    // Send request
+    fetch(`/admin/workflows/${workflowId}/edit`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(workflowData),
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Close modal and reload page
+            const modal = bootstrap.Modal.getInstance(document.getElementById(`editWorkflowModal${workflowId}`));
+            if (modal) modal.hide();
+            location.reload();
+        } else {
+            throw new Error(result.error || 'Failed to save workflow');
+        }
+    })
+    .catch(error => {
+        alert('Error saving workflow: ' + error.message);
+    })
+    .finally(() => {
+        // Restore button
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+    });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial action buttons
+    updateActionButtons('library');
+    
+    // Add tab change listeners
+    const libraryTab = document.getElementById('library-tab');
+    const myWorkflowsTab = document.getElementById('my-workflows-tab');
+    
+    if (libraryTab) {
+        libraryTab.addEventListener('click', () => updateActionButtons('library'));
+    }
+    if (myWorkflowsTab) {
+        myWorkflowsTab.addEventListener('click', () => updateActionButtons('my-workflows'));
+    }
+    
+    // Fix tab targets
+    if (libraryTab) {
+        libraryTab.setAttribute('data-bs-target', '#library-pane');
+    }
+    if (myWorkflowsTab) {
+        myWorkflowsTab.setAttribute('data-bs-target', '#my-workflows-pane');
+    }
+    
+    // Add event listeners for trigger selects in edit modals
+    document.querySelectorAll('[id^="triggersSelect"]').forEach(select => {
+        select.addEventListener('change', function() {
+            const workflowId = this.id.replace('triggersSelect', '');
+            updateEditWorkflowJSON(workflowId);
+        });
+    });
+});
+
+// Import from library function - global scope
+function importFromLibrary(libraryId) {
+    if (confirm('Import this workflow template to your workspace?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/workflows/import/${libraryId}`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Toggle raw JSON display
+function toggleRawJson(elementId) {
+    const element = document.getElementById('rawJson' + elementId);
+    if (element) {
+        element.style.display = element.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Switch to library tab for import
+function switchToLibraryTab() {
+    const libraryTab = document.getElementById('library-tab');
+    if (libraryTab) {
+        libraryTab.click();
+    }
+}
+
+// Refresh functions
+function refreshLibrary() {
+    location.reload();
+}
+
+function refreshWorkflows() {
+    location.reload();
+}
+
+</script>
+
+<script src="{{ url_for('static', filename='js/admin_workflow_builder.js') }}"></script>
+
+{% endblock %}

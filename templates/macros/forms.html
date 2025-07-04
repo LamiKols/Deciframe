@@ -1,0 +1,95 @@
+{#
+Reusable Form Macros for DeciFrame
+Provides consistent custom dropdown styling and functionality across all templates
+#}
+
+{# Custom Dropdown Macro with Professional Styling #}
+{% macro dropdown(name, options, selected=None, placeholder='Select...', class='form-select', id=None, required=False, multiple=False, onchange=None) %}
+  <div class="custom-dropdown{% if multiple %} multiple{% endif %}">
+    <select name="{{ name }}" 
+            class="{{ class }}"
+            {% if id %}id="{{ id }}"{% endif %}
+            {% if required %}required{% endif %}
+            {% if multiple %}multiple{% endif %}
+            {% if onchange %}onchange="{{ onchange }}"{% endif %}>
+      {% if not multiple %}
+        <option value="">{{ placeholder }}</option>
+      {% endif %}
+      {% for val, label in options %}
+        <option value="{{ val }}" {% if val == selected %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+{% endmacro %}
+
+{# WTForms Compatible Dropdown Wrapper #}
+{% macro wtf_dropdown(field, class='form-select', id=None, required=False, disabled=False) %}
+  <div class="custom-dropdown">
+    {{ field(class=class, id=id, required=required, disabled=disabled) }}
+  </div>
+{% endmacro %}
+
+{# Department Hierarchy Dropdown #}
+{% macro department_dropdown(name, departments, selected=None, placeholder='Select Department', show_hierarchy=True, class='form-select', id=None, required=False) %}
+  {% if show_hierarchy %}
+    {% set dept_options = departments.get_hierarchical_choices() if departments and hasattr(departments, 'get_hierarchical_choices') else [] %}
+  {% else %}
+    {% set dept_options = [] %}
+    {% if departments %}
+      {% for dept in departments %}
+        {% set dept_options = dept_options + [(dept.id, dept.name)] %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+  
+  {{ dropdown(name, dept_options, selected, placeholder, class=class, id=id, required=required) }}
+{% endmacro %}
+
+{# User/Manager Dropdown #}
+{% macro user_dropdown(name, users, selected=None, placeholder='Select User', show_role=False, class='form-select', id=None, multiple=False) %}
+  {% set user_options = [] %}
+  {% if users %}
+    {% for user in users %}
+      {% if show_role %}
+        {% set display_name = user.full_name + ' (' + user.role.value + ')' %}
+      {% else %}
+        {% set display_name = user.full_name %}
+      {% endif %}
+      {% set user_options = user_options + [(user.id, display_name)] %}
+    {% endfor %}
+  {% endif %}
+  
+  {{ dropdown(name, user_options, selected, placeholder, class=class, id=id, multiple=multiple) }}
+{% endmacro %}
+
+{# Status Dropdown with Standard Options #}
+{% macro status_dropdown(name, statuses, selected=None, placeholder='Select Status', class='form-select', id=None, multiple=False) %}
+  {% set status_options = [] %}
+  {% if statuses %}
+    {% for status in statuses %}
+      {% set status_options = status_options + [(status, status)] %}
+    {% endfor %}
+  {% endif %}
+  {{ dropdown(name, status_options, selected, placeholder, class=class, id=id, multiple=multiple) }}
+{% endmacro %}
+
+{# Priority Dropdown with Standard Values #}
+{% macro priority_dropdown(name, selected=None, placeholder='Select Priority', class='form-select', id=None, multiple=False) %}
+  {% set priority_options = [
+    ('High', 'High'),
+    ('Medium', 'Medium'),
+    ('Low', 'Low')
+  ] %}
+  {{ dropdown(name, priority_options, selected, placeholder, class=class, id=id, multiple=multiple) }}
+{% endmacro %}
+
+{# Role Dropdown with Enum Values #}
+{% macro role_dropdown(name, roles, selected=None, placeholder='Select Role', class='form-select', id=None, multiple=False) %}
+  {% set role_options = [] %}
+  {% if roles %}
+    {% for role in roles %}
+      {% set role_options = role_options + [(role.name, role.value)] %}
+    {% endfor %}
+  {% endif %}
+  {{ dropdown(name, role_options, selected, placeholder, class=class, id=id, multiple=multiple) }}
+{% endmacro %}

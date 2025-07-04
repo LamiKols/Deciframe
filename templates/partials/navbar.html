@@ -1,0 +1,157 @@
+{% if logged_in %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+  <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">DeciFrame</a>
+
+  <!-- Mobile Toggle Button -->
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
+          aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- Collapsible Navigation -->
+  <div class="collapse navbar-collapse" id="navbarMain">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item mx-1">
+        <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="{{ url_for('index') }}">
+          <i class="bi bi-house"></i> Home
+        </a>
+      </li>
+      <li class="nav-item mx-1">
+        <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="{{ url_for('dashboards.dashboard_home') }}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+      </li>
+      {% if user and user.role and user.role.value in ['Director', 'CEO', 'Admin'] %}
+      <li class="nav-item mx-1">
+        <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="{{ url_for('dashboards.executive_dashboard') }}">
+          <i class="bi bi-bar-chart"></i> Executive
+        </a>
+      </li>
+      {% endif %}
+      <li class="nav-item mx-1">
+        <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="{{ url_for('problems.index') }}">
+          <i class="bi bi-exclamation-triangle"></i> Problems
+        </a>
+      </li>
+      <li class="nav-item mx-1">
+        <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="{{ url_for('business.list_cases') }}">
+          <i class="bi bi-briefcase"></i> Cases
+        </a>
+      </li>
+      <li class="nav-item mx-1">
+        <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="{{ url_for('projects.index') }}">
+          <i class="bi bi-kanban"></i> Projects
+        </a>
+      </li>
+      <li class="nav-item mx-1">
+        <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="/help/">
+          <i class="bi bi-question-circle"></i> Help
+        </a>
+      </li>
+    </ul>
+
+    <!-- Search Bar -->
+    <form class="d-flex mx-3" method="GET" action="{{ url_for('search.search_page') }}">
+      <input class="form-control me-2" type="search" name="q" placeholder="Search..." />
+    </form>
+
+    <!-- Right side buttons -->
+    <div class="d-flex align-items-center">
+      {% if user and user.role and user.role.value in ['Manager', 'Director', 'CEO', 'PM'] %}
+      <div class="dropdown me-2">
+        <button class="btn btn-primary dropdown-toggle position-relative" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-clipboard"></i> Management
+          {% if total_pending and total_pending > 0 %}
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ total_pending }}
+          </span>
+          {% endif %}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="{{ url_for('review.review_summary') }}">
+            <i class="bi bi-speedometer2"></i> Review Dashboard
+            {% if total_pending > 0 %}
+              <span class="badge bg-danger ms-2">{{ total_pending }}</span>
+            {% endif %}
+          </a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('review.review_business_cases') }}">
+            <i class="bi bi-briefcase"></i> Business Cases
+            {% if pending_cases > 0 %}
+              <span class="badge bg-danger ms-2">{{ pending_cases }}</span>
+            {% endif %}
+          </a></li>
+          <li><a class="dropdown-item" href="{{ url_for('review.review_projects') }}">
+            <i class="bi bi-kanban"></i> Projects
+            {% if pending_projects > 0 %}
+              <span class="badge bg-danger ms-2">{{ pending_projects }}</span>
+            {% endif %}
+          </a></li>
+          <li><a class="dropdown-item" href="{{ url_for('review.review_epics') }}">
+            <i class="bi bi-list-task"></i> Epics
+            {% if pending_epics > 0 %}
+              <span class="badge bg-danger ms-2">{{ pending_epics }}</span>
+            {% endif %}
+          </a></li>
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if user and user.role and user.role.value == 'Admin' %}
+      <div class="dropdown me-2">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-gear"></i> Admin Center
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="/admin/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+          <li><a class="dropdown-item" href="/admin/users"><i class="bi bi-people"></i> User Management</a></li>
+          <li><a class="dropdown-item" href="/admin/settings"><i class="bi bi-gear"></i> Settings</a></li>
+          <li><a class="dropdown-item" href="/admin/org-structure"><i class="bi bi-diagram-3"></i> Org Structure</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="/admin/import-data"><i class="bi bi-upload"></i> Bulk Import</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('data_management.export_data') }}"><i class="bi bi-download"></i> Export Data</a></li>
+          <li><a class="dropdown-item" href="/admin/workflows"><i class="bi bi-arrow-repeat"></i> Workflows</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('notifications_config.notification_settings') }}"><i class="bi bi-bell"></i> Notifications</a></li>
+          <li><a class="dropdown-item" href="/admin/audit-logs"><i class="bi bi-file-text"></i> Audit Logs</a></li>
+          <li><a class="dropdown-item" href="/monitoring/dashboard"><i class="bi bi-activity"></i> Monitoring</a></li>
+          <li><a class="dropdown-item" href="/admin/help-center"><i class="bi bi-question-circle"></i> Help Center</a></li>
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle"></i> {{ user.name }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form method="post" action="{{ url_for('auth.toggle_theme') }}" class="px-3">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}"/>
+              <button type="submit" class="btn btn-sm btn-outline-secondary w-100" title="Toggle Theme">
+                {% if current_user.theme == 'dark' %}
+                  <i class="bi bi-sun"></i> Switch to Light
+                {% else %}
+                  <i class="bi bi-moon"></i> Switch to Dark
+                {% endif %}
+              </button>
+            </form>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+{% else %}
+<!-- Login/Register Navigation for non-authenticated users -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+  <a class="navbar-brand fw-bold" href="/">DeciFrame</a>
+  <div class="navbar-nav ms-auto">
+    <a class="nav-link" href="{{ url_for('auth.login') }}">Sign In</a>
+    <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+  </div>
+</nav>
+{% endif %}

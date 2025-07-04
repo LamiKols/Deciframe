@@ -1,0 +1,6 @@
+title,description,priority,impact,urgency,status
+System Performance Issues,Database queries are running slowly affecting user experience,High,High,Medium,Open
+Login Authentication Problems,Users unable to login with correct credentials,Critical,High,High,Open
+Report Generation Delays,Monthly reports taking too long to generate,Medium,Medium,Low,In Progress
+Mobile App Crashes,App crashes on older iOS devices during data sync,High,Medium,High,Open
+Email Notification Failures,Users not receiving important system notifications,Medium,Low,Medium,Open

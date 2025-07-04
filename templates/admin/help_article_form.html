@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if article else 'Create' }} Article - Help Center{% endblock %}
+
+{% block head %}
+<!-- EasyMDE CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-header">
+                    <h4>
+                        <i class="fas fa-file-alt me-2"></i>
+                        {{ 'Edit Article' if article else 'Create New Article' }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category_type, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category_type == 'error' else category_type }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Article Title <span class="text-danger">*</span></label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="title" 
+                                           name="title" 
+                                           value="{{ article.title if article else '' }}" 
+                                           required
+                                           maxlength="200"
+                                           placeholder="Enter a descriptive title for your article">
+                                    <div class="form-text">
+                                        A clear, descriptive title that helps users find this article (max 200 characters)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="category_id" name="category_id" required>
+                                        <option value="">Select a category...</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}" 
+                                                {% if article and article.category_id == category.id %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">
+                                        Choose the category this article belongs to
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="sort_order" class="form-label">Sort Order</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="sort_order" 
+                                           name="sort_order" 
+                                           value="{{ article.sort_order if article else 0 }}" 
+                                           min="0"
+                                           max="9999"
+                                           placeholder="0">
+                                    <div class="form-text">
+                                        Articles with lower numbers appear first (0 = highest priority)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {% if article %}
+                                <div class="mb-3">
+                                    <label class="form-label">Article Slug</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           value="{{ article.slug }}" 
+                                           readonly
+                                           style="background-color: var(--bs-secondary); opacity: 0.7;">
+                                    <div class="form-text">
+                                        Auto-generated from title (read-only)
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Article Content <span class="text-danger">*</span></label>
+                            <textarea id="content" 
+                                      name="content" 
+                                      required 
+                                      placeholder="Write your article content here using Markdown...">{{ article.content if article else '' }}</textarea>
+                            <div class="form-text">
+                                Use Markdown formatting for rich text. Preview is available in the editor above.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin_help_center') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                {{ 'Update Article' if article else 'Create Article' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Markdown Help Card -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Markdown Quick Reference
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Basic Formatting</h6>
+                            <ul class="list-unstyled small">
+                                <li><code>**bold text**</code> → <strong>bold text</strong></li>
+                                <li><code>*italic text*</code> → <em>italic text</em></li>
+                                <li><code>`code`</code> → <code>code</code></li>
+                                <li><code>[link text](URL)</code> → <a href="#">link text</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Structure</h6>
+                            <ul class="list-unstyled small">
+                                <li><code># Heading 1</code></li>
+                                <li><code>## Heading 2</code></li>
+                                <li><code>- List item</code></li>
+                                <li><code>1. Numbered item</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- EasyMDE JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize EasyMDE markdown editor
+    const easyMDE = new EasyMDE({
+        element: document.getElementById('content'),
+        spellChecker: false,
+        toolbar: [
+            'bold', 'italic', 'strikethrough', '|',
+            'heading-1', 'heading-2', 'heading-3', '|',
+            'quote', 'unordered-list', 'ordered-list', '|',
+            'link', 'image', 'table', '|',
+            'code', 'horizontal-rule', '|',
+            'preview', 'side-by-side', 'fullscreen', '|',
+            'guide'
+        ],
+        status: ['autosave', 'lines', 'words', 'cursor'],
+        autosave: {
+            enabled: true,
+            uniqueId: 'help-article-{{ article.id if article else "new" }}',
+            delay: 1000,
+        },
+        placeholder: 'Write your article content here using Markdown...\n\nExample:\n# Getting Started\n\nThis is a **bold** statement with *italic* text.\n\n## Steps\n\n1. First step\n2. Second step\n3. Third step\n\n### Code Example\n\n```\nconst example = "Hello World";\nconsole.log(example);\n```',
+        minHeight: '400px',
+        maxHeight: '600px'
+    });
+
+    // Auto-generate slug preview if creating new article
+    {% if not article %}
+    const titleInput = document.getElementById('title');
+    titleInput.addEventListener('input', function() {
+        // Simple slug generation preview
+        const slug = this.value
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+        
+        // Show preview (you could add a preview element if desired)
+        console.log('Generated slug preview:', slug);
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}

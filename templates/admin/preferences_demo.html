@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Organization Preferences Demo - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboards.dashboard_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin Center</a></li>
+                    <li class="breadcrumb-item active">Preferences Demo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">🧩 Organization Preferences System Demo</h3>
+                    <p class="mb-0 text-muted">Demonstration of dynamic currency, date, and timezone formatting</p>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Organization Settings Display -->
+                    <div class="mb-4">
+                        <h5>📊 Current Organization Settings</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <strong>Currency:</strong>
+                                        <span class="badge bg-primary">{{ get_org_preferences()['currency'] }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <strong>Date Format:</strong>
+                                        <span class="badge bg-info">{{ get_org_preferences()['date_format'] }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <strong>Timezone:</strong>
+                                        <span class="badge bg-success">{{ get_org_preferences()['timezone'] }}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Currency Formatting Examples -->
+                    <div class="mb-4">
+                        <h5>💰 Currency Formatting Examples</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Raw Value</th>
+                                        <th>Using Global Function</th>
+                                        <th>Using Template Filter</th>
+                                        <th>Symbol Only</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>25000</td>
+                                        <td>{{ get_currency_symbol() }}25,000.00</td>
+                                        <td>{{ 25000 | format_currency }}</td>
+                                        <td>{{ get_currency_symbol() }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>150000.50</td>
+                                        <td>{{ get_currency_symbol() }}150,000.50</td>
+                                        <td>{{ 150000.50 | format_currency }}</td>
+                                        <td>{{ get_currency_symbol() }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>999.99</td>
+                                        <td>{{ get_currency_symbol() }}999.99</td>
+                                        <td>{{ 999.99 | format_currency }}</td>
+                                        <td>{{ get_currency_symbol() }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Date Formatting Examples -->
+                    <div class="mb-4">
+                        <h5>📅 Date Formatting Examples</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Organization Format</th>
+                                        <th>With Timezone (Full DateTime)</th>
+                                        <th>Date Only</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Current Time</strong></td>
+                                        <td>{{ moment().format_org_datetime() }}</td>
+                                        <td>{{ moment() | format_org_datetime }}</td>
+                                        <td>{{ moment() | format_org_date }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Sample Date</strong></td>
+                                        <td>2024-12-31 15:30:00</td>
+                                        <td>Using org timezone settings</td>
+                                        <td>Using org date format</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Template Usage Examples -->
+                    <div class="mb-4">
+                        <h5>🔧 Template Usage Examples</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">💰 Currency Examples</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <code class="d-block mb-2">{{ "{{ project.budget | format_currency }}" }}</code>
+                                        <code class="d-block mb-2">{{ "{{ get_currency_symbol() }}{{ amount }}" }}</code>
+                                        <code class="d-block">{{ "{{ 25000 | format_currency }}" }}</code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">📅 Date Examples</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <code class="d-block mb-2">{{ "{{ problem.created_at | format_org_datetime }}" }}</code>
+                                        <code class="d-block mb-2">{{ "{{ project.due_date | format_org_date }}" }}</code>
+                                        <code class="d-block">{{ "{{ business_case.approved_date | format_org_date }}" }}</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Implementation Notes -->
+                    <div class="alert alert-info">
+                        <h6><i class="fa fa-info-circle"></i> Implementation Notes</h6>
+                        <ul class="mb-0">
+                            <li><strong>Currency:</strong> Supports USD, EUR, GBP, CAD, AUD, JPY, CNY, INR with proper symbols</li>
+                            <li><strong>Date Formats:</strong> ISO, US, EU, EU dashes, and full month formats</li>
+                            <li><strong>Timezone:</strong> Automatic conversion to organization timezone</li>
+                            <li><strong>Fallbacks:</strong> Graceful degradation when settings unavailable</li>
+                            <li><strong>Global Access:</strong> Available in all templates without imports</li>
+                        </ul>
+                    </div>
+
+                    <!-- Configuration Link -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-0 text-muted">Configure organization preferences through Regional Settings</p>
+                        </div>
+                        <a href="{{ url_for('admin.regional_settings') }}" class="btn btn-primary">
+                            <i class="fa fa-cog"></i> Regional Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📖 Quick Reference</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Global Functions:</h6>
+                    <ul class="list-unstyled">
+                        <li><code>get_org_preferences()</code></li>
+                        <li><code>get_user_preferences()</code></li>
+                        <li><code>get_currency_symbol()</code></li>
+                    </ul>
+
+                    <h6>Template Filters:</h6>
+                    <ul class="list-unstyled">
+                        <li><code>| format_currency</code></li>
+                        <li><code>| format_org_date</code></li>
+                        <li><code>| format_org_datetime</code></li>
+                    </ul>
+
+                    <h6>Configuration Files:</h6>
+                    <ul class="list-unstyled">
+                        <li><code>config.py</code> - Defaults</li>
+                        <li><code>utils/preferences.py</code> - Logic</li>
+                        <li><code>models.py</code> - OrganizationSettings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add current datetime for demonstration
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Organization Preferences Demo loaded');
+    console.log('Currency Symbol:', '{{ get_currency_symbol() }}');
+    console.log('Organization Settings:', {{ get_org_preferences() | tojson }});
+});
+</script>
+{% endblock %}

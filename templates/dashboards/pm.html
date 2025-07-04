@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Project Manager Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-project-diagram me-2"></i>Project Manager Dashboard</h2>
+            <p class="text-muted">Project oversight and milestone tracking for {{ user.first_name }}</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    {% include 'includes/quick_actions.html' %}
+
+    <div class="row mt-4">
+        <!-- My Projects with RAG Status Panel -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-tasks me-2"></i>My Projects</h5>
+                    <a href="{{ url_for('projects.list_projects') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if projects %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>RAG Status</th>
+                                        <th>Progress</th>
+                                        <th>Due Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for project in projects %}
+                                    <tr>
+                                        <td><a href="{{ url_for('projects.project_detail', id=project.id) }}">{{ project.code }}</a></td>
+                                        <td>{{ project.name[:25] }}{% if project.name|length > 25 %}...{% endif %}</td>
+                                        <td>
+                                            {% set rag_status = 'Green' %}
+                                            {% if project.status.value == 'OnHold' %}
+                                                {% set rag_status = 'Red' %}
+                                            {% elif project.status.value == 'InProgress' and project.due_date and project.due_date < (datetime.utcnow() + timedelta(days=7)) %}
+                                                {% set rag_status = 'Amber' %}
+                                            {% endif %}
+                                            <span class="badge bg-{% if rag_status == 'Red' %}danger{% elif rag_status == 'Amber' %}warning{% else %}success{% endif %}">
+                                                {{ rag_status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if project.progress_percentage %}
+                                                <div class="progress" style="height: 18px;">
+                                                    <div class="progress-bar" role="progressbar" style="width: {{ project.progress_percentage }}%">
+                                                        {{ project.progress_percentage }}%
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">0%</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if project.due_date %}
+                                                {{ project.due_date.strftime('%m/%d/%Y') }}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No projects currently assigned to you.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Milestones Panel -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-flag me-2"></i>Upcoming Milestones</h5>
+                    <a href="{{ url_for('projects.milestones_list') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_milestones %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Milestone</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for milestone in upcoming_milestones %}
+                                    <tr class="{% if milestone.due_date < datetime.utcnow() %}table-danger{% elif milestone.due_date < (datetime.utcnow() + timedelta(days=3)) %}table-warning{% endif %}">
+                                        <td>{{ milestone.project.code }}</td>
+                                        <td>{{ milestone.name[:20] }}{% if milestone.name|length > 20 %}...{% endif %}</td>
+                                        <td>{{ milestone.due_date.strftime('%m/%d/%Y') }}</td>
+                                        <td>
+                                            {% if milestone.completed_at %}
+                                                <span class="badge bg-success">Complete</span>
+                                            {% elif milestone.due_date < datetime.utcnow() %}
+                                                <span class="badge bg-danger">Overdue</span>
+                                            {% else %}
+                                                <span class="badge bg-primary">In Progress</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No upcoming milestones in the next 7 days.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Milestones Alert -->
+    {% if overdue_milestones %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-danger">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>Overdue Milestones</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Milestone</th>
+                                <th>Due Date</th>
+                                <th>Days Overdue</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for milestone in overdue_milestones %}
+                            <tr>
+                                <td>{{ milestone.project.code }}</td>
+                                <td>{{ milestone.name }}</td>
+                                <td>{{ milestone.due_date.strftime('%m/%d/%Y') }}</td>
+                                <td>{{ (datetime.utcnow() - milestone.due_date).days }} days</td>
+                                <td>
+                                    <a href="{{ url_for('projects.project_detail', id=milestone.project.id) }}" class="btn btn-xs btn-primary">Review</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- PM Statistics -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar me-2"></i>Portfolio Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-primary">{{ projects|length }}</h4>
+                                <small class="text-muted">Active Projects</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-warning">{{ upcoming_milestones|length }}</h4>
+                                <small class="text-muted">Upcoming Milestones</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-danger">{{ overdue_milestones|length }}</h4>
+                                <small class="text-muted">Overdue Items</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-success">
+                                    {% set total_progress = 0 %}
+                                    {% for project in projects %}
+                                        {% set total_progress = total_progress + (project.progress_percentage or 0) %}
+                                    {% endfor %}
+                                    {% if projects|length > 0 %}
+                                        {{ "%.0f"|format(total_progress / projects|length) }}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </h4>
+                                <small class="text-muted">Avg Progress</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

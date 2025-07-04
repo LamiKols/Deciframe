@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - Help Center - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('help.index') }}">
+                    <i class="fas fa-question-circle me-1"></i>Help Center
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Sidebar with All Categories -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>All Categories
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for cat in category.__class__.query.order_by(category.__class__.sort_order).all() %}
+                        <a href="{{ url_for('help.category', category_id=cat.id) }}" 
+                           class="list-group-item list-group-item-action {% if cat.id == category.id %}active{% endif %}">
+                            <i class="fas fa-folder me-2"></i>{{ cat.name }}
+                            <span class="badge bg-secondary ms-2">{{ cat.articles|length }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('help.index') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Help Center
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="fas fa-folder me-2"></i>{{ category.name }}
+                            </h4>
+                            <small class="text-muted">
+                                {{ articles|length }} article{{ 's' if articles|length != 1 else '' }} in this category
+                            </small>
+                        </div>
+                        <span class="badge bg-primary fs-6">{{ articles|length }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if articles %}
+                        <div class="row">
+                            {% for article in articles %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="{{ url_for('help.article', slug=article.slug) }}" 
+                                               class="text-decoration-none">
+                                                <i class="fas fa-file-alt me-2"></i>{{ article.title }}
+                                            </a>
+                                        </h5>
+                                        <p class="card-text text-muted">
+                                            {% if article.content %}
+                                                {% set preview = article.content[:200] %}
+                                                {{ preview.split('\n')[0][:150] }}{% if preview|length > 150 %}...{% endif %}
+                                            {% else %}
+                                                No preview available.
+                                            {% endif %}
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ article.updated_at.strftime('%b %d, %Y') }}
+                                            </small>
+                                            <a href="{{ url_for('help.article', slug=article.slug) }}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                Read More <i class="fas fa-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-text fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Articles Yet</h5>
+                            <p class="text-muted">
+                                This category doesn't have any articles yet. Check back later for updates.
+                            </p>
+                            <a href="{{ url_for('help.index') }}" class="btn btn-primary">
+                                <i class="fas fa-home me-1"></i>Browse All Categories
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

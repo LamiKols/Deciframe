@@ -1,0 +1,278 @@
+/* 
+ * Inter Font Typography System for DeciFrame
+ * Modern, clean typography using Inter font family
+ */
+
+/* Base Typography */
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background-color: #fff;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+  color: inherit;
+}
+
+h1 { font-size: 2.25rem; font-weight: 700; }
+h2 { font-size: 1.875rem; font-weight: 600; }
+h3 { font-size: 1.5rem; font-weight: 600; }
+h4 { font-size: 1.25rem; font-weight: 600; }
+h5 { font-size: 1.125rem; font-weight: 500; }
+h6 { font-size: 1rem; font-weight: 500; }
+
+/* Form Elements */
+button, input, select, textarea, .form-control, .form-select {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Button Styling */
+.btn {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.btn-primary, .btn-success, .btn-danger, .btn-warning {
+  font-weight: 600;
+}
+
+/* Navigation */
+.navbar, .nav-link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.dropdown-item {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+/* Cards and Components */
+.card-header {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.card-body {
+  font-family: 'Inter', sans-serif;
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* Tables */
+.table th {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+/* Badges and Labels */
+.badge {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.label, label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #374151;
+}
+
+/* Footer */
+.footer {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+/* Alerts and Messages */
+.alert {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.flash-messages .alert {
+  font-weight: 500;
+}
+
+/* Modal Dialogs */
+.modal-header {
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.modal-body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.breadcrumb-item.active {
+  font-weight: 500;
+}
+
+/* Tooltips and Popovers */
+.tooltip, .popover {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+}
+
+/* Dashboard and Statistics */
+.stats-card .card-body {
+  font-family: 'Inter', sans-serif;
+}
+
+.stats-number {
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.stats-label {
+  font-weight: 500;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Search and Filters */
+.search-input, .filter-input {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+/* List Groups */
+.list-group-item {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.list-group-item-heading {
+  font-weight: 600;
+}
+
+/* Progress Bars */
+.progress-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Pagination */
+.pagination {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+/* Tabs */
+.nav-tabs .nav-link, .nav-pills .nav-link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Code and Pre-formatted Text */
+code, pre {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* Dark Theme Adjustments */
+[data-bs-theme="dark"] body {
+  color: #e5e7eb;
+  background-color: #111827;
+}
+
+[data-bs-theme="dark"] h1,
+[data-bs-theme="dark"] h2,
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] h4,
+[data-bs-theme="dark"] h5,
+[data-bs-theme="dark"] h6 {
+  color: #f9fafb;
+}
+
+[data-bs-theme="dark"] label {
+  color: #d1d5db;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  h1 { font-size: 1.875rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+}
+
+/* Text Utilities with Inter Font */
+.text-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-weight-medium {
+  font-weight: 500;
+}
+
+.font-weight-semibold {
+  font-weight: 600;
+}
+
+.font-weight-bold {
+  font-weight: 700;
+}
+
+/* Ensure Inter font loads across all components */
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Override any conflicting font declarations */
+.container, .container-fluid, .row, .col, [class*="col-"] {
+  font-family: 'Inter', sans-serif;
+}

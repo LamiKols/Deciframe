@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Organization Settings - Admin Center{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb Navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboards.dashboard_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Admin Center</a></li>
+                    <li class="breadcrumb-item active">Organization Settings</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">🏢 Organization Settings</h1>
+                    <p class="text-muted mb-0">Configure organization-wide preferences for currency, timezone, date formats, and themes</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin_preferences_demo') }}" class="btn btn-outline-primary">
+                        <i class="fa fa-eye"></i> View Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('admin_organization_settings') }}">
+        <div class="row">
+            <!-- Main Settings Card -->
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">Organization Preferences</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Currency Settings -->
+                            <div class="col-md-6 mb-4">
+                                <label for="currency" class="form-label">💰 Default Currency</label>
+                                <select name="currency" id="currency" class="form-select" required>
+                                    {% for value, label in currency_choices %}
+                                        <option value="{{ value }}" 
+                                                {{ 'selected' if org_settings.currency == value else '' }}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    Used for all financial displays throughout the application
+                                </div>
+                            </div>
+
+                            <!-- Timezone Settings -->
+                            <div class="col-md-6 mb-4">
+                                <label for="timezone" class="form-label">🌍 Default Timezone</label>
+                                <select name="timezone" id="timezone" class="form-select" required>
+                                    {% for value, label in timezone_choices %}
+                                        <option value="{{ value }}" 
+                                                {{ 'selected' if org_settings.timezone == value else '' }}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    Default timezone for new users and system operations
+                                </div>
+                            </div>
+
+                            <!-- Date Format Settings -->
+                            <div class="col-md-6 mb-4">
+                                <label for="date_format" class="form-label">📅 Date Format</label>
+                                <select name="date_format" id="date_format" class="form-select" required>
+                                    {% for value, label in date_format_choices %}
+                                        <option value="{{ value }}" 
+                                                {{ 'selected' if org_settings.date_format == value else '' }}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    How dates are displayed throughout the application
+                                </div>
+                            </div>
+
+                            <!-- Time Format Settings -->
+                            <div class="col-md-6 mb-4">
+                                <label for="time_format" class="form-label">🕐 Time Format</label>
+                                <select name="time_format" id="time_format" class="form-select" required>
+                                    {% for value, label in time_format_choices %}
+                                        <option value="{{ value }}" 
+                                                {{ 'selected' if org_settings.time_format == value else '' }}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    How times are displayed throughout the application
+                                </div>
+                            </div>
+
+                            <!-- Theme Settings -->
+                            <div class="col-md-6 mb-4">
+                                <label for="default_theme" class="form-label">🎨 Default Theme</label>
+                                <select name="default_theme" id="default_theme" class="form-select" required>
+                                    {% for value, label in theme_choices %}
+                                        <option value="{{ value }}" 
+                                                {{ 'selected' if org_settings.default_theme == value else '' }}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    Default theme for new users (users can override in their profile)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fa fa-arrow-left"></i> Back to Admin Center
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save"></i> Save Organization Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Preview Card -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Current Settings</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Currency:</strong><br>
+                            <span class="badge bg-primary">{{ org_settings.get_currency_symbol() }} {{ org_settings.currency }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Timezone:</strong><br>
+                            <span class="badge bg-info">{{ org_settings.timezone }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Date Format:</strong><br>
+                            <span class="badge bg-secondary">{{ org_settings.date_format }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Time Format:</strong><br>
+                            <span class="badge bg-secondary">{{ org_settings.time_format }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Default Theme:</strong><br>
+                            <span class="badge bg-dark">{{ org_settings.default_theme.title() }}</span>
+                        </div>
+
+                        {% if org_settings.updated_at %}
+                        <div class="text-muted small">
+                            <strong>Last Updated:</strong><br>
+                            {{ org_settings.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Settings Info Card -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">💡 Settings Info</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <h6 class="alert-heading">How This Works</h6>
+                            <p class="mb-0">These organization-level settings provide defaults for all users. Individual users can override timezone and theme preferences in their profiles.</p>
+                        </div>
+                        
+                        <div class="alert alert-warning mb-0">
+                            <h6 class="alert-heading">Template Filters</h6>
+                            <p class="mb-0">Use <code>{{ '{{ value | format_currency }}' }}</code>, <code>{{ '{{ date | format_org_date }}' }}</code>, and <code>{{ '{{ datetime | format_org_datetime }}' }}</code> in templates for automatic formatting.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+/* Organization Settings Page Specific Styles */
+.card {
+    border: 2px solid var(--border-color, #2d5aa0);
+    box-shadow: 0 2px 6px rgba(45, 90, 160, 0.2);
+}
+
+.badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-select {
+    border: 1px solid var(--border-color, #2d5aa0);
+}
+
+.form-select:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.alert {
+    border: 1px solid var(--border-color, #2d5aa0);
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+</style>
+{% endblock %}

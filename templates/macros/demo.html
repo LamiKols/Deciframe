@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% from 'macros/forms.html' import dropdown, wtf_dropdown, department_dropdown, user_dropdown, priority_dropdown, status_dropdown, role_dropdown %}
+
+{% block title %}Dropdown Macro Demonstration - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-list"></i> Dropdown Macro Demonstration</h2>
+            <p class="text-muted">Examples of using reusable dropdown macros for consistent styling across DeciFrame.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Basic Dropdown Macro</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="basic-dropdown" class="form-label">Basic Dropdown</label>
+                            {{ dropdown('category', [('tech', 'Technology'), ('sales', 'Sales'), ('hr', 'Human Resources')], placeholder='Select Category', id='basic-dropdown') }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="multiple-dropdown" class="form-label">Multiple Selection</label>
+                            {{ dropdown('skills', [('python', 'Python'), ('javascript', 'JavaScript'), ('html', 'HTML/CSS')], placeholder='Select Skills', multiple=True, id='multiple-dropdown') }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="onchange-dropdown" class="form-label">With onchange Event</label>
+                            {{ dropdown('trigger', [('option1', 'Option 1'), ('option2', 'Option 2')], placeholder='Select Option', onchange='alert("Changed!")', id='onchange-dropdown') }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Specialized Dropdown Macros</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="priority-dropdown" class="form-label">Priority Dropdown</label>
+                            {{ priority_dropdown('priority', selected='Medium', id='priority-dropdown') }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status-dropdown" class="form-label">Status Dropdown</label>
+                            {{ status_dropdown('status', ['Open', 'In Progress', 'Completed', 'Cancelled'], selected='Open', id='status-dropdown') }}
+                        </div>
+
+                        {# Example with department hierarchy (if departments are available) #}
+                        {% if departments %}
+                        <div class="mb-3">
+                            <label for="dept-dropdown" class="form-label">Department Hierarchy</label>
+                            {{ department_dropdown('department_id', departments, placeholder='— Select Department —', id='dept-dropdown') }}
+                        </div>
+                        {% endif %}
+
+                        {# Example with user selection (if users are available) #}
+                        {% if users %}
+                        <div class="mb-3">
+                            <label for="user-dropdown" class="form-label">User Selection with Roles</label>
+                            {{ user_dropdown('assigned_to', users, placeholder='— Select User —', show_role=True, id='user-dropdown') }}
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Usage Examples</h5>
+                </div>
+                <div class="card-body">
+                    <h6>1. Basic Dropdown Macro</h6>
+                    <pre><code>{% raw %}{{ dropdown('name', [('val1', 'Label 1'), ('val2', 'Label 2')], selected='val1', placeholder='Select...') }}{% endraw %}</code></pre>
+
+                    <h6>2. WTForms Integration</h6>
+                    <pre><code>{% raw %}{% from 'macros/forms.html' import wtf_dropdown %}
+{{ wtf_dropdown(form.field_name, class="form-select") }}{% endraw %}</code></pre>
+
+                    <h6>3. Department Hierarchy</h6>
+                    <pre><code>{% raw %}{{ department_dropdown('parent_id', departments, selected_id, '— Top Level —') }}{% endraw %}</code></pre>
+
+                    <h6>4. Priority Selection</h6>
+                    <pre><code>{% raw %}{{ priority_dropdown('priority', selected='High') }}{% endraw %}</code></pre>
+
+                    <h6>5. User Selection with Roles</h6>
+                    <pre><code>{% raw %}{{ user_dropdown('assigned_to', users, show_role=True, placeholder='— Select User —') }}{% endraw %}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

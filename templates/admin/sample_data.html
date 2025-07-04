@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Sample Data - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-download"></i>
+                    Sample Data Files
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/?auth_token={{ auth_token }}">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/admin/import-data?auth_token={{ auth_token }}">Import Data</a>
+                        </li>
+                        <li class="breadcrumb-item active">Sample Data</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle"></i> Test the Bulk Import System</h6>
+                        <p>Download these sample CSV files to test the bulk data import functionality. Each file contains realistic test data that you can import into DeciFrame.</p>
+                    </div>
+
+                    <!-- Problems Sample Data -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5><i class="bi bi-exclamation-triangle"></i> Problems Sample Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Contains:</strong> 5 sample problem entries with various priority levels and statuses</p>
+                            <p><strong>Fields:</strong> title, description, priority, impact, urgency, status</p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('static', filename='sample_data/sample_data_problems.csv') }}" 
+                                   class="btn btn-primary" download>
+                                    <i class="bi bi-download"></i> Download Problems CSV
+                                </a>
+                                <a href="/admin/import-data?auth_token={{ auth_token }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-upload"></i> Import This Data
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Cases Sample Data -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5><i class="bi bi-briefcase"></i> Business Cases Sample Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Contains:</strong> 5 sample business case entries with cost/benefit analysis</p>
+                            <p><strong>Fields:</strong> title, summary, cost_estimate, benefit_estimate, case_type, status</p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('static', filename='sample_data/sample_data_business_cases.csv') }}" 
+                                   class="btn btn-primary" download>
+                                    <i class="bi bi-download"></i> Download Business Cases CSV
+                                </a>
+                                <a href="/admin/import-data?auth_token={{ auth_token }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-upload"></i> Import This Data
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projects Sample Data -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5><i class="bi bi-diagram-3"></i> Projects Sample Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Contains:</strong> 5 sample project entries with dates and budget information</p>
+                            <p><strong>Fields:</strong> name, description, budget, status, start_date, target_end_date</p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('static', filename='sample_data/sample_data_projects.csv') }}" 
+                                   class="btn btn-primary" download>
+                                    <i class="bi bi-download"></i> Download Projects CSV
+                                </a>
+                                <a href="/admin/import-data?auth_token={{ auth_token }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-upload"></i> Import This Data
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Import Instructions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-list-check"></i> How to Use These Files</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>Download</strong> one of the CSV files above</li>
+                                <li><strong>Navigate</strong> to <a href="/admin/import-data?auth_token={{ auth_token }}">Bulk Data Import</a></li>
+                                <li><strong>Select</strong> the corresponding data type (Problems, Business Cases, or Projects)</li>
+                                <li><strong>Upload</strong> the downloaded CSV file</li>
+                                <li><strong>Map</strong> the columns to system fields (auto-suggestions will help)</li>
+                                <li><strong>Execute</strong> the import and review results</li>
+                            </ol>
+                            
+                            <div class="alert alert-success mt-3">
+                                <strong>Tip:</strong> These files are designed to test all aspects of the import system including field mapping, validation, and error handling.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

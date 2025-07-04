@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Search - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-search me-2"></i>Search DeciFrame
+            </h2>
+            
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('search.search_page') }}">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           name="q" 
+                                           value="{{ query }}" 
+                                           placeholder="Search problems, business cases, and projects..."
+                                           autocomplete="off"
+                                           id="searchInput">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" name="type">
+                                    <option value="all" {{ 'selected' if search_type == 'all' else '' }}>All Types</option>
+                                    <option value="problems" {{ 'selected' if search_type == 'problems' else '' }}>Problems</option>
+                                    <option value="business_cases" {{ 'selected' if search_type == 'business_cases' else '' }}>Business Cases</option>
+                                    <option value="projects" {{ 'selected' if search_type == 'projects' else '' }}>Projects</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Search Results -->
+            {% if query %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Search Results</h4>
+                    <span class="badge bg-secondary">{{ total_results }} results for "{{ query }}"</span>
+                </div>
+                
+                {% if results %}
+                    <div class="row">
+                        {% for result in results %}
+                            <div class="col-12 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    {% if result.type == 'problem' %}
+                                                        <span class="badge bg-warning text-dark me-2">
+                                                            <i class="fas fa-exclamation-triangle"></i> Problem
+                                                        </span>
+                                                        <h5 class="mb-0">
+                                                            <a href="{{ url_for('problems.problem_detail', id=result.id) }}" class="text-decoration-none">
+                                                                {{ result.code }} - {{ result.title }}
+                                                            </a>
+                                                        </h5>
+                                                    {% elif result.type == 'business_case' %}
+                                                        <span class="badge bg-info me-2">
+                                                            <i class="fas fa-briefcase"></i> Business Case
+                                                        </span>
+                                                        <h5 class="mb-0">
+                                                            <a href="{{ url_for('business.case_detail', id=result.id) }}" class="text-decoration-none">
+                                                                {{ result.code }} - {{ result.title }}
+                                                            </a>
+                                                        </h5>
+                                                    {% elif result.type == 'project' %}
+                                                        <span class="badge bg-success me-2">
+                                                            <i class="fas fa-project-diagram"></i> Project
+                                                        </span>
+                                                        <h5 class="mb-0">
+                                                            <a href="{{ url_for('projects.project_detail', id=result.id) }}" class="text-decoration-none">
+                                                                {{ result.code }} - {{ result.name or result.title }}
+                                                            </a>
+                                                        </h5>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <p class="text-muted mb-2">
+                                                    {{ result.description[:200] }}{% if result.description|length > 200 %}...{% endif %}
+                                                </p>
+                                                
+                                                <div class="row text-sm">
+                                                    <div class="col-md-6">
+                                                        {% if result.department_name %}
+                                                            <i class="fas fa-building me-1"></i>{{ result.department_name }}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        {% if result.type == 'problem' and result.reporter_name %}
+                                                            <i class="fas fa-user me-1"></i>{{ result.reporter_name }}
+                                                        {% elif result.type == 'business_case' and result.creator_name %}
+                                                            <i class="fas fa-user me-1"></i>{{ result.creator_name }}
+                                                        {% elif result.type == 'project' and result.manager_name %}
+                                                            <i class="fas fa-user me-1"></i>{{ result.manager_name }}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-4 text-end">
+                                                <div class="mb-2">
+                                                    {% if result.status %}
+                                                        {% if result.status == 'Open' %}
+                                                            <span class="badge bg-primary">{{ result.status }}</span>
+                                                        {% elif result.status == 'In Progress' or result.status == 'InProgress' %}
+                                                            <span class="badge bg-warning text-dark">In Progress</span>
+                                                        {% elif result.status == 'Resolved' or result.status == 'Approved' %}
+                                                            <span class="badge bg-success">{{ result.status }}</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">{{ result.status }}</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    
+                                                    {% if result.priority %}
+                                                        {% if result.priority == 'High' %}
+                                                            <span class="badge bg-danger ms-1">High Priority</span>
+                                                        {% elif result.priority == 'Medium' %}
+                                                            <span class="badge bg-warning text-dark ms-1">Medium Priority</span>
+                                                        {% elif result.priority == 'Low' %}
+                                                            <span class="badge bg-success ms-1">Low Priority</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    {{ result.created_at.strftime('%b %d, %Y') }}
+                                                </small>
+                                                
+                                                {% if result.rank %}
+                                                    <div class="mt-1">
+                                                        <small class="text-muted">
+                                                            Relevance: {{ "%.2f"|format(result.rank) }}
+                                                        </small>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4>No results found</h4>
+                        <p class="text-muted">Try adjusting your search terms or changing the search type filter.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>Search DeciFrame</h4>
+                    <p class="text-muted">Search across problems, business cases, and projects using full-text search.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                    <h5>Problems</h5>
+                                    <p class="text-muted small">Search reported issues and problems</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-briefcase fa-2x text-info mb-2"></i>
+                                    <h5>Business Cases</h5>
+                                    <p class="text-muted small">Find business cases and initiatives</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-project-diagram fa-2x text-success mb-2"></i>
+                                    <h5>Projects</h5>
+                                    <p class="text-muted small">Locate active and completed projects</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

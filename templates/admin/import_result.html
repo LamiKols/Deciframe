@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Import Results - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-check-circle"></i>
+                    Import Results
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/?auth_token={{ auth_token }}">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/admin/import-data?auth_token={{ auth_token }}">Import Data</a>
+                        </li>
+                        <li class="breadcrumb-item active">Results</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <!-- Import Summary -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Import Summary</h5>
+                            <small class="text-muted">Job ID: {{ job.id }} | File: {{ job.filename }} | Data Type: {{ job.data_type }}</small>
+                        </div>
+                        <div class="card-body">
+                            <!-- Status Badge -->
+                            <div class="mb-3">
+                                {% if job.status == 'Complete' %}
+                                    <span class="badge bg-success fs-6">
+                                        <i class="bi bi-check-circle"></i> Import Completed Successfully
+                                    </span>
+                                {% elif job.status == 'Failed' %}
+                                    <span class="badge bg-danger fs-6">
+                                        <i class="bi bi-exclamation-circle"></i> Import Failed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning fs-6">
+                                        <i class="bi bi-hourglass-split"></i> {{ job.status }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Statistics -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card border-success">
+                                        <div class="card-body text-center">
+                                            <div class="display-6 text-success">{{ job.rows_success or 0 }}</div>
+                                            <div class="text-muted">Successful Records</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-danger">
+                                        <div class="card-body text-center">
+                                            <div class="display-6 text-danger">{{ job.rows_failed or 0 }}</div>
+                                            <div class="text-muted">Failed Records</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-info">
+                                        <div class="card-body text-center">
+                                            <div class="display-6 text-info">{{ (job.rows_success or 0) + (job.rows_failed or 0) }}</div>
+                                            <div class="text-muted">Total Processed</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Success Rate -->
+                            {% set total_rows = (job.rows_success or 0) + (job.rows_failed or 0) %}
+                            {% if total_rows > 0 %}
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Success Rate</span>
+                                    <span>{{ "%.1f"|format((job.rows_success or 0) / total_rows * 100) }}%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ (job.rows_success or 0) / total_rows * 100 }}%">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Import Details -->
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <strong>Started:</strong> {{ job.created_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>
+                                    <strong>Data Type:</strong> {{ job.data_type }}<br>
+                                    <strong>Filename:</strong> {{ job.filename }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Details -->
+                    {% if job.error_details and job.error_details|length > 0 %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="text-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Error Details ({{ job.error_details|length }} errors)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-striped table-sm">
+                                    <thead class="table-dark sticky-top">
+                                        <tr>
+                                            <th style="width: 80px;">Row #</th>
+                                            <th>Error Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for error in job.error_details %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-danger">{{ error.row or 'N/A' }}</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-danger">{{ error.error }}</small>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            {% if job.error_details|length > 10 %}
+                            <div class="alert alert-info mt-3">
+                                <small>
+                                    <i class="bi bi-info-circle"></i>
+                                    Showing all {{ job.error_details|length }} errors. 
+                                    Consider reviewing your data and column mappings for common issues.
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Column Mapping Used -->
+                    {% if job.mapping %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Column Mapping Used</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for csv_field, model_field in job.mapping.items() %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-secondary me-2">{{ csv_field }}</span>
+                                        <i class="bi bi-arrow-right mx-2"></i>
+                                        <span class="badge bg-primary">{{ model_field }}</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Next Steps</h6>
+                            <div class="btn-group" role="group">
+                                <a href="/admin/import-data?auth_token={{ auth_token }}" class="btn btn-primary">
+                                    <i class="bi bi-arrow-repeat"></i> Start New Import
+                                </a>
+                                
+                                {% if job.data_type == 'Problem' %}
+                                <a href="/problems/?auth_token={{ auth_token }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-list"></i> View Problems
+                                </a>
+                                {% elif job.data_type == 'BusinessCase' %}
+                                <a href="/business/?auth_token={{ auth_token }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-list"></i> View Business Cases
+                                </a>
+                                {% elif job.data_type == 'Project' %}
+                                <a href="/projects/?auth_token={{ auth_token }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-list"></i> View Projects
+                                </a>
+                                {% endif %}
+                                
+                                <a href="/admin/users?auth_token={{ auth_token }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-gear"></i> Admin Panel
+                                </a>
+                            </div>
+                            
+                            {% if job.rows_failed > 0 %}
+                            <div class="alert alert-warning mt-3">
+                                <h6><i class="bi bi-lightbulb"></i> Tips for Fixing Import Errors</h6>
+                                <ul class="mb-0">
+                                    <li>Check that email addresses match existing users in the system</li>
+                                    <li>Verify department names match existing departments</li>
+                                    <li>Ensure date fields are in YYYY-MM-DD format</li>
+                                    <li>Check that numeric fields contain only numbers</li>
+                                    <li>Make sure all required fields have values</li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

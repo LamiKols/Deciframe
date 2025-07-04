@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>System Settings</h2>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Admin
+                    </a>
+                    <a href="{{ url_for('admin.create_setting') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Setting
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">System Configuration</h5>
+                    <small class="text-muted">
+                        {{ settings|length }} setting(s)
+                    </small>
+                </div>
+                <div class="card-body">
+                    {% if settings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for setting in settings %}
+                                <tr>
+                                    <td>
+                                        <code class="text-primary">{{ setting.key }}</code>
+                                    </td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 200px;" title="{{ setting.value }}">
+                                            {{ setting.value }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 250px;" title="{{ setting.description or 'No description' }}">
+                                            {{ setting.description or 'No description' }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if setting.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('admin.edit_setting', id=setting.id) }}" 
+                                               class="btn btn-outline-primary" title="Edit Setting">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            <form method="post" action="{{ url_for('admin.delete_setting', id=setting.id) }}" 
+                                                  class="d-inline">
+                                                <button type="submit" 
+                                                        class="btn btn-outline-danger"
+                                                        title="Delete Setting"
+                                                        onclick="return confirm('Are you sure you want to delete this setting?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-cog fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No settings configured</h5>
+                        <p class="text-muted">Create your first system setting to get started.</p>
+                        <a href="{{ url_for('admin.create_setting') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add First Setting
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: var(--bs-dark);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.table-responsive {
+    border-radius: 0.375rem;
+}
+
+.text-truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+code {
+    font-size: 0.875em;
+}
+</style>
+{% endblock %}

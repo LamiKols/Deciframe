@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}AI Admin Interface Demo - DeciFrame{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb" class="mt-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active">AI Admin Demo</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h4 class="text-white mb-0"><i class="fas fa-robot me-2"></i>AI Workflow Automation Settings</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            This is a demonstration of the AI admin interface. In production, this would require Admin/CEO/Director authentication.
+                        </div>
+                        
+                        <form>
+                            <div class="mb-4">
+                                <label for="SUCCESS_ALERT_THRESHOLD" class="form-label">
+                                    <strong>Success Alert Threshold</strong>
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="SUCCESS_ALERT_THRESHOLD" 
+                                       value="0.5" 
+                                       step="0.01" 
+                                       min="0" max="1">
+                                <div class="form-text">Success probability threshold for risk escalation (0.0-1.0)</div>
+                                <small class="text-muted">Last updated: 2025-06-24 08:00 by Admin User</small>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="CYCLE_TIME_ALERT_FACTOR" class="form-label">
+                                    <strong>Cycle Time Alert Factor</strong>
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="CYCLE_TIME_ALERT_FACTOR" 
+                                       value="1.25" 
+                                       step="0.01" 
+                                       min="1" max="5">
+                                <div class="form-text">Cycle time multiplier for milestone rescheduling (e.g., 1.25 = 25% over planned)</div>
+                                <small class="text-muted">Last updated: 2025-06-24 08:00 by Admin User</small>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary" onclick="updateSettings()">
+                                    <i class="fas fa-save me-1"></i>Update Settings
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="checkStatus()">
+                                    <i class="fas fa-sync me-1"></i>Check Status
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>AI System Status</h5>
+                    </div>
+                    <div class="card-body" id="ai-status">
+                        <h6>ML Scheduler</h6>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Status</span>
+                            <span class="badge bg-success">Running</span>
+                        </div>
+                        
+                        <h6>ML Models</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span>success</span>
+                            <div><span class="badge bg-success">Available</span></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span>cycle_time</span>
+                            <div><span class="badge bg-success">Available</span></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span>anomaly</span>
+                            <div><span class="badge bg-success">Available</span></div>
+                        </div>
+                        
+                        <h6>Current Thresholds</h6>
+                        <div class="small">
+                            <div class="d-flex justify-content-between">
+                                <span>Success Alert:</span>
+                                <span>0.5</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Cycle Time Factor:</span>
+                                <span>1.25</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-vial me-2"></i>Test AI Workflows</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="test-project-id" class="form-label">Project ID</label>
+                            <input type="number" class="form-control" id="test-project-id" placeholder="Enter project ID" value="1">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="testWorkflow('risk_escalation')">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Test Risk Escalation
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="testWorkflow('milestone_reschedule')">
+                                <i class="fas fa-calendar-alt me-1"></i>Test Milestone Reschedule
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="testWorkflow('anomaly_investigation')">
+                                <i class="fas fa-search me-1"></i>Test Anomaly Investigation
+                            </button>
+                        </div>
+                        
+                        <div id="test-results" class="mt-3" style="display: none;">
+                            <div class="alert alert-info">
+                                <strong>Test Results:</strong>
+                                <div id="test-output"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-book me-2"></i>Threshold Guidelines</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Success Alert Threshold</h6>
+                        <ul class="small">
+                            <li><strong>0.3-0.4:</strong> Aggressive intervention</li>
+                            <li><strong>0.5:</strong> Balanced approach (recommended)</li>
+                            <li><strong>0.6-0.7:</strong> Conservative alerts</li>
+                        </ul>
+                        
+                        <h6>Cycle Time Alert Factor</h6>
+                        <ul class="small">
+                            <li><strong>1.2:</strong> Early milestone adjustment</li>
+                            <li><strong>1.25:</strong> Standard buffer (recommended)</li>
+                            <li><strong>1.5+:</strong> Extended tolerance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+        <div id="success-toast" class="toast hide" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="success-message"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateSettings() {
+            const successThreshold = document.getElementById('SUCCESS_ALERT_THRESHOLD').value;
+            const cycleTimeFactor = document.getElementById('CYCLE_TIME_ALERT_FACTOR').value;
+            
+            // Simulate update
+            showSuccess(`AI thresholds updated successfully!<br>Success Alert: ${successThreshold}<br>Cycle Time Factor: ${cycleTimeFactor}`);
+            
+            // Update status display
+            setTimeout(() => {
+                document.querySelector('#ai-status .small .d-flex:first-child span:last-child').textContent = successThreshold;
+                document.querySelector('#ai-status .small .d-flex:last-child span:last-child').textContent = cycleTimeFactor;
+            }, 500);
+        }
+        
+        function checkStatus() {
+            showSuccess('AI system status refreshed - all models operational');
+        }
+        
+        function testWorkflow(testType) {
+            const projectId = document.getElementById('test-project-id').value;
+            if (!projectId) {
+                alert('Please enter a project ID to test');
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('test-results');
+            const outputDiv = document.getElementById('test-output');
+            
+            let resultMessage = '';
+            
+            switch(testType) {
+                case 'risk_escalation':
+                    resultMessage = `
+                        <div class="text-success">Risk escalation workflow triggered successfully</div>
+                        <pre class="mt-2 small">{
+  "risk_escalation": {
+    "triggered": true,
+    "test_probability": 0.3,
+    "threshold": 0.5,
+    "notifications_sent": 2,
+    "stakeholders_alerted": ["PM", "Case Creator"]
+  }
+}</pre>
+                    `;
+                    break;
+                case 'milestone_reschedule':
+                    resultMessage = `
+                        <div class="text-success">Milestone rescheduling workflow completed</div>
+                        <pre class="mt-2 small">{
+  "milestone_reschedule": {
+    "triggered": true,
+    "original_end_date": "2025-07-15",
+    "new_end_date": "2025-08-01",
+    "milestones_adjusted": 3,
+    "pm_notified": true
+  }
+}</pre>
+                    `;
+                    break;
+                case 'anomaly_investigation':
+                    resultMessage = `
+                        <div class="text-success">Anomaly investigation initiated</div>
+                        <pre class="mt-2 small">{
+  "anomaly_investigation": {
+    "triggered": true,
+    "anomaly_score": 0.8,
+    "contributing_factors": ["High complexity", "Cost variance"],
+    "stakeholders_notified": ["PM", "BA"],
+    "investigation_id": "INV-2025-001"
+  }
+}</pre>
+                    `;
+                    break;
+            }
+            
+            outputDiv.innerHTML = resultMessage;
+            resultsDiv.style.display = 'block';
+            
+            showSuccess(`${testType.replace('_', ' ')} test completed successfully`);
+        }
+        
+        function showSuccess(message) {
+            document.getElementById('success-message').innerHTML = message;
+            const toast = new bootstrap.Toast(document.getElementById('success-toast'));
+            toast.show();
+        }
+    </script>
+{% endblock %}

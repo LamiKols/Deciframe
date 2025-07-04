@@ -1,0 +1,389 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Organizational Reports{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white mb-0">📊 Organizational Reports</h2>
+        <div>
+          <a href="{{ url_for('view_org_chart') }}" class="btn btn-outline-secondary me-2">← Back to Structure</a>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+              📥 Download Reports
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" onclick="downloadReport('pdf')">📄 PDF Report</a></li>
+              <li><a class="dropdown-item" href="#" onclick="downloadReport('excel')">📊 Excel Spreadsheet</a></li>
+              <li><a class="dropdown-item" href="#" onclick="downloadReport('csv')">📋 CSV Data</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="downloadChart('png')">🖼️ PNG Chart</a></li>
+              <li><a class="dropdown-item" href="#" onclick="downloadChart('svg')">🎯 SVG Chart</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Summary Cards -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+              <h3 class="text-primary mb-1" id="totalUnits">{{ org_stats.total_units }}</h3>
+              <p class="text-muted mb-0">Total Units</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+              <h3 class="text-success mb-1" id="maxDepth">{{ org_stats.max_depth }}</h3>
+              <p class="text-muted mb-0">Max Hierarchy Levels</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+              <h3 class="text-info mb-1" id="managedUnits">{{ org_stats.managed_units }}</h3>
+              <p class="text-muted mb-0">Units with Managers</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+              <h3 class="text-warning mb-1" id="rootUnits">{{ org_stats.root_units }}</h3>
+              <p class="text-muted mb-0">Root Level Units</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hierarchy Table -->
+      <div class="card bg-dark border-secondary mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">📋 Complete Organizational Hierarchy</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-dark table-striped" id="hierarchyTable">
+              <thead>
+                <tr>
+                  <th>Unit Name</th>
+                  <th>Hierarchy Level</th>
+                  <th>Manager</th>
+                  <th>Parent Unit</th>
+                  <th>Direct Reports</th>
+                  <th>Full Path</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for unit in hierarchy_data %}
+                <tr>
+                  <td>
+                    <span style="margin-left: {{ unit.level * 20 }}px;">
+                      {% if unit.level > 0 %}└─ {% endif %}
+                      <strong>{{ unit.name }}</strong>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge bg-{% if unit.level == 0 %}primary{% elif unit.level == 1 %}success{% elif unit.level == 2 %}info{% else %}warning{% endif %}">
+                      Level {{ unit.level + 1 }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if unit.manager %}
+                      {{ unit.manager.name }}
+                      <br><small class="text-muted">{{ unit.manager.email }}</small>
+                    {% else %}
+                      <span class="text-muted">No Manager</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if unit.parent %}
+                      {{ unit.parent.name }}
+                    {% else %}
+                      <span class="text-muted">Root Unit</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge bg-secondary">{{ unit.children|length }}</span>
+                  </td>
+                  <td>
+                    <small class="text-muted">{{ unit.full_path_str }}</small>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Org Chart -->
+      <div class="card bg-dark border-secondary">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">🌳 Visual Organizational Chart</h5>
+          <div>
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="expandAllNodes()">Expand All</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="collapseAllNodes()">Collapse All</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="orgChartContainer" style="width: 100%; height: 600px; overflow: auto;">
+            <svg id="orgChart" width="100%" height="600"></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content bg-dark border-secondary">
+      <div class="modal-body text-center py-4">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mb-0">Generating report...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// Organizational data with error handling
+let orgData;
+try {
+  orgData = {{ org_tree_data|tojsonfilter|safe }};
+  console.log('Org data loaded:', orgData);
+} catch (e) {
+  console.error('Error loading org data:', e);
+  orgData = {
+    id: 1,
+    name: "Sample Organization",
+    manager: null,
+    children: []
+  };
+}
+
+// Download functions
+async function downloadReport(format) {
+  showLoadingModal();
+  try {
+    const response = await fetch(`/admin/org-reports/download/${format}`, {
+      credentials: 'same-origin'
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      
+      let filename = 'organizational_report';
+      if (format === 'pdf') filename += '.pdf';
+      else if (format === 'excel') filename += '.xlsx';
+      else if (format === 'csv') filename += '.csv';
+      
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } else {
+      alert('Error generating report');
+    }
+  } catch (error) {
+    console.error('Error downloading report:', error);
+    alert('Error downloading report');
+  }
+  hideLoadingModal();
+}
+
+async function downloadChart(format) {
+  showLoadingModal();
+  try {
+    const response = await fetch(`/admin/org-reports/chart/${format}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        svg_data: document.getElementById('orgChart').outerHTML
+      })
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `organizational_chart.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } else {
+      alert('Error generating chart');
+    }
+  } catch (error) {
+    console.error('Error downloading chart:', error);
+    alert('Error downloading chart');
+  }
+  hideLoadingModal();
+}
+
+function showLoadingModal() {
+  const modal = new bootstrap.Modal(document.getElementById('loadingModal'));
+  modal.show();
+}
+
+function hideLoadingModal() {
+  const modal = bootstrap.Modal.getInstance(document.getElementById('loadingModal'));
+  if (modal) modal.hide();
+}
+
+// D3.js Organizational Chart
+function createOrgChart() {
+  const svg = d3.select("#orgChart");
+  const width = 1200;
+  const height = 600;
+  
+  svg.attr("width", width).attr("height", height);
+  svg.selectAll("*").remove(); // Clear any existing content
+  
+  // Add debugging
+  console.log('Creating chart with orgData:', orgData);
+  
+  if (!orgData || typeof orgData !== 'object') {
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height / 2)
+      .attr("text-anchor", "middle")
+      .style("fill", "#fff")
+      .style("font-size", "16px")
+      .text("No organizational data available");
+    return;
+  }
+  
+  const g = svg.append("g");
+  
+  // Create tree layout
+  const tree = d3.tree().size([height - 100, width - 200]);
+  
+  // Create hierarchy from data
+  const root = d3.hierarchy(orgData);
+  const treeData = tree(root);
+  
+  // Add links (lines between nodes)
+  g.selectAll(".link")
+    .data(treeData.links())
+    .enter().append("path")
+    .attr("class", "link")
+    .attr("d", d3.linkHorizontal()
+      .x(d => d.y + 100)
+      .y(d => d.x + 50))
+    .style("fill", "none")
+    .style("stroke", "#6c757d")
+    .style("stroke-width", 2);
+  
+  // Add nodes
+  const node = g.selectAll(".node")
+    .data(treeData.descendants())
+    .enter().append("g")
+    .attr("class", "node")
+    .attr("transform", d => `translate(${d.y + 100},${d.x + 50})`);
+  
+  // Add larger rectangles for better visibility
+  node.append("rect")
+    .attr("x", -70)
+    .attr("y", -18)
+    .attr("width", 140)
+    .attr("height", 36)
+    .attr("rx", 6)
+    .style("fill", d => d.children ? "#0d6efd" : "#20c997")
+    .style("stroke", "#fff")
+    .style("stroke-width", 2)
+    .style("opacity", 0.9);
+  
+  // Add department names (white text for visibility)
+  node.append("text")
+    .attr("dy", -3)
+    .style("text-anchor", "middle")
+    .style("font-size", "11px")
+    .style("fill", "#ffffff")
+    .style("font-weight", "bold")
+    .text(d => {
+      const name = d.data.name;
+      return name.length > 16 ? name.substring(0, 16) + "..." : name;
+    });
+  
+  // Add manager names (light gray text)
+  node.append("text")
+    .attr("dy", 12)
+    .style("text-anchor", "middle")
+    .style("font-size", "9px")
+    .style("fill", "#f8f9fa")
+    .text(d => {
+      if (d.data.manager) {
+        const mgr = d.data.manager.name;
+        return `Manager: ${mgr.length > 12 ? mgr.substring(0, 12) + "..." : mgr}`;
+      }
+      return "";
+    });
+}
+
+function expandAllNodes() {
+  // Implementation for expanding all nodes
+  console.log("Expanding all nodes");
+}
+
+function collapseAllNodes() {
+  // Implementation for collapsing all nodes
+  console.log("Collapsing all nodes");
+}
+
+// Initialize chart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  createOrgChart();
+});
+</script>
+
+<style>
+.table th {
+  border-top: none;
+}
+
+.table td, .table th {
+  border-color: #495057;
+}
+
+#orgChartContainer {
+  background: #1a1a1a;
+  border-radius: 0.375rem;
+  border: 1px solid #495057;
+}
+
+.node circle {
+  cursor: pointer;
+}
+
+.node text {
+  pointer-events: none;
+}
+
+.link {
+  cursor: pointer;
+}
+</style>
+{% endblock %}

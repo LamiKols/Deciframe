@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Requirements - {{ case.code }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4" data-case-id="{{ case.id }}">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-light">Requirements Generator</h2>
+                    <p class="text-light mb-0">{{ case.code }}: {{ case.title }}</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('business.view_case', id=case.id) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Case
+                    </a>
+                </div>
+            </div>
+
+            {% if case.epics %}
+            <!-- Saved Requirements Display -->
+            <div class="card bg-dark border-secondary">
+                <div class="card-body">
+                    <h4 class="mb-3 text-light">Generated Requirements</h4>
+                    
+                    {% for epic in case.epics %}
+                    <div class="card mb-3 bg-dark border-success">
+                        <div class="card-header bg-success">
+                            <h5 class="mb-0 text-dark">Epic {{ loop.index }}: {{ epic.title }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-light">{{ epic.description }}</p>
+                            
+                            {% if epic.stories %}
+                            <h6 class="text-info mt-3">User Stories:</h6>
+                            <ul class="list-group list-group-flush">
+                                {% for story in epic.stories %}
+                                <li class="list-group-item bg-dark border-secondary text-light">
+                                    <strong>{{ story.title }}</strong><br>
+                                    <small class="text-muted">{{ story.description }}</small>
+                                    {% if story.acceptance_criteria %}
+                                    <br><small class="text-info">Criteria: {{ story.acceptance_criteria }}</small>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if current_user.role.value == 'BA' %}
+                    <div class="mt-4 text-center">
+                        <button id="regenerateBtn" class="btn btn-warning ms-2">
+                            <i class="fas fa-redo"></i> Regenerate Requirements
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- Requirements Generation Form -->
+            <div class="card bg-dark border-secondary">
+                <div class="card-body">
+                    <h4 class="mb-3 text-light">Requirements Generator</h4>
+                    <p class="text-light mb-4">Answer these questions to help generate comprehensive requirements:</p>
+                    
+                    {% if config.AI_AVAILABLE %}
+                    <button id="aiSuggestAnswersBtn" class="btn btn-info mb-3" data-case-id="{{ case.id }}">
+                        <i class="fas fa-magic"></i> AI Draft Requirements
+                    </button>
+                    <div class="text-muted small mb-3">
+                        <i class="fas fa-lightbulb"></i> Let AI help you get started with intelligent requirement suggestions
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning mb-3">
+                        <i class="fas fa-exclamation-triangle"></i> AI Requirements temporarily offline. Please fill manually or contact administrator.
+                    </div>
+                    {% endif %}
+                    
+                    <form id="requirementsForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">1. What are the major functional requirements?</label>
+                                    <textarea class="form-control" id="q1" name="question1" rows="3" placeholder="e.g., User management, data processing, reporting, workflow automation..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">2. What are the user roles & permissions?</label>
+                                    <textarea class="form-control" id="q2" name="question2" rows="3" placeholder="e.g., Admin roles, user access levels, permission matrices..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">3. What integration/data-flow needs exist?</label>
+                                    <textarea class="form-control" id="q3" name="question3" rows="3" placeholder="e.g., Existing systems, databases, APIs, third-party services..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">4. What are the performance/scalability requirements?</label>
+                                    <textarea class="form-control" id="q4" name="question4" rows="3" placeholder="e.g., Response times, concurrent users, data volume, availability..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">5. What reporting/audit needs are required?</label>
+                                    <textarea class="form-control" id="q5" name="question5" rows="3" placeholder="e.g., Dashboards, KPI tracking, audit trails, compliance reporting..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">6. What error-handling/validation rules are needed?</label>
+                                    <textarea class="form-control" id="q6" name="question6" rows="3" placeholder="e.g., Input validation, error messages, data integrity checks..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">7. What UI/UX/accessibility standards apply?</label>
+                                    <textarea class="form-control" id="q7" name="question7" rows="3" placeholder="e.g., Mobile responsiveness, WCAG compliance, user experience requirements..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-light">8. What security/compliance constraints exist?</label>
+                                    <textarea class="form-control" id="q8" name="question8" rows="3" placeholder="e.g., Data encryption, access controls, regulatory compliance, audit requirements..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <button type="button" id="generateEpicsBtn" class="btn btn-success">
+                                <i class="fas fa-cogs"></i> Generate Epics & User Stories
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Results Display -->
+                    <div id="generationResults" style="display: none;" class="mt-4">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Include AI Requirements JavaScript -->
+<script src="{{ url_for('static', filename='js/case_requirements_ai.js') }}"></script>
+
+<script>
+// Regenerate button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const regenerateBtn = document.getElementById('regenerateBtn');
+    if (regenerateBtn) {
+        regenerateBtn.addEventListener('click', function() {
+            if (confirm('This will delete all existing requirements and start over. Are you sure?')) {
+                // Clear existing epics and reload the page
+                fetch(`/api/ai/clear-epics/{{ case.id }}`, {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to clear requirements');
+                });
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

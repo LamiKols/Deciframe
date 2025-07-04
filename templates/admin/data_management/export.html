@@ -1,0 +1,235 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Data Export - DeciFrame{% endblock %}
+
+{% block admin_content %}
+<h2>Data Export</h2>
+<form method="get" action="{{ url_for('data_management.download_export_direct') }}" class="row g-2 mb-4">
+  <div class="col-auto">
+    <select name="type" class="form-select" required>
+      <option value="">Select Data Type</option>
+      <option value="problems">Problems</option>
+      <option value="cases">Business Cases</option>
+      <option value="projects">Projects</option>
+      <option value="audit">Audit Logs</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <input type="date" name="start" class="form-control" placeholder="Start Date">
+  </div>
+  <div class="col-auto">
+    <input type="date" name="end" class="form-control" placeholder="End Date">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">Download CSV</button>
+  </div>
+</form>
+        
+        <!-- Advanced Export -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Advanced Export Job</h5>
+                <small class="text-muted">Full-featured export with multiple formats and filtering</small>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('data_management.export_data') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="table_name" class="form-label">Data Table</label>
+                            <select class="form-select" name="table_name" id="table_name" required>
+                                <option value="">Select table to export...</option>
+                                <option value="problems">Problems</option>
+                                <option value="business_cases">Business Cases</option>
+                                <option value="projects">Projects</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="format" class="form-label">Export Format</label>
+                            <select class="form-select" name="format" id="format" required>
+                                <option value="csv">CSV (Comma Separated)</option>
+                                <option value="json">JSON (JavaScript Object)</option>
+                                <option value="excel">Excel Spreadsheet</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="status_filter" class="form-label">Status Filter (Optional)</label>
+                            <select class="form-select" name="status_filter" id="status_filter">
+                                <option value="">All Status</option>
+                                {% for status in status_options %}
+                                    <option value="{{ status.value }}">{{ status.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="priority_filter" class="form-label">Priority Filter (Optional)</label>
+                            <select class="form-select" name="priority_filter" id="priority_filter">
+                                <option value="">All Priorities</option>
+                                {% for priority in priority_options %}
+                                    <option value="{{ priority.value }}">{{ priority.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Export Information:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>CSV files are compatible with Excel and other spreadsheet applications</li>
+                                <li>JSON files are ideal for data integration and API consumption</li>
+                                <li>Excel files preserve formatting and are ready for business analysis</li>
+                                <li>Large exports may take several minutes to complete</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Start Export
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Export Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <h6>What gets exported?</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> All visible data fields</li>
+                    <li><i class="fas fa-check text-success"></i> Related entity names</li>
+                    <li><i class="fas fa-check text-success"></i> User email addresses</li>
+                    <li><i class="fas fa-check text-success"></i> Timestamps and dates</li>
+                </ul>
+                
+                <h6 class="mt-3">Data Privacy</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-shield-alt text-info"></i> No password data</li>
+                    <li><i class="fas fa-shield-alt text-info"></i> No internal system IDs</li>
+                    <li><i class="fas fa-shield-alt text-info"></i> Admin access required</li>
+                </ul>
+                
+                <h6 class="mt-3">File Management</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-clock text-warning"></i> Files auto-delete after 30 days</li>
+                    <li><i class="fas fa-download text-primary"></i> Download immediately after completion</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Exports -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Your Recent Exports</h5>
+                <a href="{{ url_for('data_management.export_jobs') }}" class="btn btn-sm btn-outline-primary">
+                    View All Exports
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_exports %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Table</th>
+                                    <th>Format</th>
+                                    <th>Records</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for export in recent_exports %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ export.table_name.replace('_', ' ').title() }}</strong>
+                                        {% if export.filters %}
+                                            <br><small class="text-muted">Filtered</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ export.format.upper() }}</span>
+                                    </td>
+                                    <td>
+                                        {% if export.row_count %}
+                                            <span class="badge bg-info">{{ export.row_count }} rows</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if export.status == 'Complete' %}
+                                            <span class="badge bg-success">{{ export.status }}</span>
+                                        {% elif export.status == 'Failed' %}
+                                            <span class="badge bg-danger">{{ export.status }}</span>
+                                        {% elif export.status == 'Processing' %}
+                                            <span class="badge bg-warning">{{ export.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ export.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ export.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if export.status == 'Complete' and export.file_path %}
+                                            <a href="{{ url_for('data_management.download_export', job_id=export.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        {% elif export.status == 'Failed' %}
+                                            <span class="text-danger" title="{{ export.error_message }}">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-download fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No exports yet</h5>
+                        <p class="text-muted">Create your first data export using the form above.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-refresh for pending exports
+document.addEventListener('DOMContentLoaded', function() {
+    const pendingExports = document.querySelectorAll('[data-status="Processing"], [data-status="Pending"]');
+    
+    if (pendingExports.length > 0) {
+        setTimeout(function() {
+            location.reload();
+        }, 5000); // Refresh every 5 seconds if there are pending exports
+    }
+});
+</script>
+{% endblock %}

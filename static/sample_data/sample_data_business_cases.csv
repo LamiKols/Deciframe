@@ -1,0 +1,6 @@
+title,summary,cost_estimate,benefit_estimate,case_type,status
+Customer Portal Upgrade,Modernize customer portal to improve user experience and reduce support calls,75000,150000,Proactive,Open
+Database Migration,Migrate legacy database to cloud infrastructure for better performance and scalability,50000,100000,Reactive,In Progress
+Mobile App Development,Develop native mobile application to increase customer engagement,120000,300000,Proactive,Open
+Security Enhancement,Implement advanced security measures to protect customer data,40000,80000,Reactive,Open
+Process Automation,Automate manual processes to reduce operational costs,60000,200000,Proactive,Open

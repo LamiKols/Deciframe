@@ -1,0 +1,683 @@
+/**
+ * DeciFrame Light Theme
+ */
+
+:root {
+  --bg-color: #fafafa;
+  --text-color: #212121;
+  --card-bg: #fefefe;
+  --border-color: #2d5aa0;
+  --border-width: 3px;
+  --input-bg: #fefefe;
+  --dropdown-bg: #fefefe;
+  --navbar-bg: #f8f9fa;
+  --header-bg: #f8f9fa;
+  --secondary-bg: #f5f5f5;
+  --muted-text: #6c757d;
+  --hover-bg: #f0f0f0;
+  --btn-hover: #e8e8e8;
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Enhanced Cards and Section Separation */
+.card, .form-control, .dropdown-menu {
+  background-color: var(--input-bg);
+  color: var(--text-color) !important;
+  border-color: var(--border-color);
+}
+
+/* Fix Sign In Button Text Visibility */
+.btn-primary {
+  color: white !important;
+}
+
+.btn-outline-primary {
+  color: #212121 !important;
+  border-color: #2d5aa0 !important;
+}
+
+.btn-outline-primary:hover {
+  color: white !important;
+  background-color: #2d5aa0 !important;
+}
+
+/* Comprehensive Dropdown Menu Text Visibility Fix */
+.dropdown-menu {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  color: #212121 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dropdown-menu .dropdown-item,
+.dropdown-menu a,
+.dropdown-menu button,
+.dropdown-menu form,
+.dropdown-menu * {
+  color: #212121 !important;
+  background-color: transparent !important;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus,
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+  color: #000000 !important;
+  background-color: var(--hover-bg) !important;
+}
+
+/* Bootstrap dropdown overrides for light theme */
+.dropdown-menu a,
+.dropdown-menu button,
+.dropdown-menu .dropdown-item a,
+.dropdown-menu .dropdown-item span {
+  color: var(--text-color) !important;
+}
+
+/* Admin Center Navigation Text Fix */
+.nav-link, .navbar-nav .nav-link {
+  color: var(--text-color) !important;
+}
+
+.nav-link:hover, .navbar-nav .nav-link:hover {
+  color: var(--text-color) !important;
+  background-color: var(--hover-bg) !important;
+}
+
+/* Navbar dropdown specific fixes for light theme */
+.navbar .dropdown-menu {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.navbar .dropdown-menu .dropdown-item,
+.navbar .dropdown-menu a,
+.navbar .dropdown-item {
+  color: var(--text-color) !important;
+  background-color: transparent !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover,
+.navbar .dropdown-menu a:hover,
+.navbar .dropdown-item:hover {
+  color: var(--text-color) !important;
+  background-color: var(--hover-bg) !important;
+}
+
+/* Force text visibility with maximum specificity */
+body .dropdown-menu,
+body .dropdown-menu .dropdown-item,
+body .dropdown-menu a,
+body .dropdown-menu span,
+body .dropdown-menu div {
+  color: #212121 !important;
+}
+
+/* Ultimate dropdown text fix for light theme */
+html body .dropdown-menu * {
+  color: #212121 !important;
+}
+
+/* Specific targeting for admin center navigation */
+.admin-nav .dropdown-menu,
+.admin-nav .dropdown-menu .dropdown-item,
+.admin-nav .dropdown-menu a {
+  color: #212121 !important;
+  background-color: #fefefe !important;
+}
+
+/* Bootstrap overrides with maximum priority */
+.dropdown-menu .dropdown-item,
+.dropdown-menu .dropdown-item:focus,
+.dropdown-menu .dropdown-item:hover {
+  color: #212121 !important;
+}
+
+/* Nuclear option - force all possible dropdown elements */
+.dropdown-menu,
+.dropdown-menu li,
+.dropdown-menu li a,
+.dropdown-menu .dropdown-item,
+.dropdown-item,
+.dropdown-divider,
+.dropdown-header {
+  color: #212121 !important;
+  background-color: #fefefe !important;
+}
+
+/* Force text visibility for all text elements */
+.dropdown-menu *,
+.dropdown-menu span,
+.dropdown-menu div,
+.dropdown-menu p,
+.dropdown-menu a,
+.dropdown-menu button {
+  color: #212121 !important;
+}
+
+/* Override any text-white or text-light classes in dropdowns */
+.dropdown-menu .text-white,
+.dropdown-menu .text-light {
+  color: #212121 !important;
+}
+
+/* Force proper text colors for all text elements */
+label, .form-label, p, span, div, h1, h2, h3, h4, h5, h6 {
+  color: var(--text-color) !important;
+}
+
+/* Input field text colors */
+.form-control, .form-select, textarea, input {
+  color: var(--text-color) !important;
+  background-color: var(--input-bg) !important;
+}
+
+/* Specific fixes for business case forms */
+.card-body, .card-header, .form-group {
+  color: var(--text-color) !important;
+}
+
+/* Button and link colors */
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #ffffff !important;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: #ffffff !important;
+}
+
+/* Override any white text on light backgrounds */
+.text-white {
+  color: var(--text-color) !important;
+}
+
+/* Fix placeholders */
+::placeholder {
+  color: #6c757d !important;
+  opacity: 1;
+}
+
+/* Additional comprehensive text color fixes */
+.form-control, .form-select, input[type="text"], input[type="email"], 
+input[type="password"], input[type="number"], textarea, select {
+  color: #212121 !important;
+  background-color: #fefefe !important;
+  border: 1px solid #2d5aa0 !important;
+}
+
+/* Radio button and checkbox labels */
+.form-check-label, .radio label, .checkbox label {
+  color: #212121 !important;
+}
+
+/* Bootstrap text utility overrides for light theme */
+.text-light, .text-white {
+  color: #212121 !important;
+}
+
+/* Card headers and bodies */
+.card-header, .card-body, .card-footer {
+  color: #212121 !important;
+  background-color: #fefefe !important;
+}
+
+/* Ensure all text elements use proper dark text */
+* {
+  color: inherit;
+}
+
+/* Ultimate text color override for light theme */
+[data-theme="light"] *,
+[data-theme="light"] label,
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] div,
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6,
+[data-theme="light"] .form-label,
+[data-theme="light"] .card-body,
+[data-theme="light"] .card-header {
+  color: #212121 !important;
+}
+
+/* Also target the root when no theme is set (defaults to light) */
+html:not([data-theme="dark"]) *,
+html:not([data-theme="dark"]) label,
+html:not([data-theme="dark"]) p,
+html:not([data-theme="dark"]) span,
+html:not([data-theme="dark"]) div,
+html:not([data-theme="dark"]) h1,
+html:not([data-theme="dark"]) h2,
+html:not([data-theme="dark"]) h3,
+html:not([data-theme="dark"]) h4,
+html:not([data-theme="dark"]) h5,
+html:not([data-theme="dark"]) h6,
+html:not([data-theme="dark"]) .form-label,
+html:not([data-theme="dark"]) .card-body,
+html:not([data-theme="dark"]) .card-header {
+  color: #212121 !important;
+}
+
+/* Dashboard and Table Container Standardization */
+.table-container, .dashboard-card, .metric-card, .stats-card, .chart-container {
+  background-color: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card, .section-box, .widget, .form-group, .filter-section, .list-group-item {
+  background-color: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover, .section-box:hover, .widget:hover, .form-group:hover, .filter-section:hover {
+  box-shadow: 0 4px 12px rgba(45, 90, 160, 0.3);
+  border-color: #1e3d6f;
+}
+
+/* Table Container Styling */
+.table-responsive, .table-container {
+  background-color: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Button Containers and Forms */
+.btn-group, .form-row, .input-group {
+  background-color: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+/* List and Navigation Styling */
+.list-group, .nav-tabs, .pagination {
+  background-color: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+/* Alert and Message Styling */
+.alert {
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+}
+
+.navbar {
+  background-color: var(--navbar-bg) !important;
+}
+
+.navbar-brand, .nav-link {
+  color: var(--text-color) !important;
+}
+
+.dropdown-content {
+  background-color: var(--dropdown-bg);
+  border-color: var(--border-color);
+}
+
+.dropdown-content a {
+  color: var(--text-color);
+}
+
+.dropdown-content a:hover {
+  background-color: var(--hover-bg);
+}
+
+.table {
+  color: var(--text-color);
+}
+
+.table th, .table td {
+  border-color: var(--border-color);
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.text-muted {
+  color: var(--muted-text) !important;
+}
+
+.bg-light {
+  background-color: var(--secondary-bg) !important;
+}
+
+.bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+.border {
+  border-color: var(--border-color) !important;
+}
+
+/* Form elements */
+.form-select {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: #0d6efd;
+}
+
+/* Input groups */
+.input-group-text {
+  background-color: var(--secondary-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Alerts */
+.alert {
+  border-color: var(--border-color);
+}
+
+/* List groups */
+.list-group-item {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Pagination */
+.page-link {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.page-link:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-color);
+}
+
+/* Footer */
+.bg-dark {
+  background-color: var(--secondary-bg) !important;
+}
+
+/* Enhanced Header, Footer, and Sidebar Styling */
+.navbar, .navbar-custom, .header, .navbar-dark {
+  background-color: #1a1a2e !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #2d5aa0;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.3);
+}
+
+.navbar-brand, .nav-link, .navbar-custom .navbar-brand, .navbar-custom .nav-link,
+.navbar-dark .navbar-brand, .navbar-dark .nav-link {
+  color: #ffffff !important;
+}
+
+.nav-link:hover, .navbar-custom .nav-link:hover, .navbar-dark .nav-link:hover {
+  color: #4CAF50 !important;
+  background-color: rgba(76, 175, 80, 0.1) !important;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.sidebar {
+  background-color: #1a1a2e !important;
+  color: #ffffff !important;
+  border-right: 2px solid #2d5aa0;
+  box-shadow: 2px 0 8px rgba(45, 90, 160, 0.3);
+}
+
+.sidebar .nav-link {
+  color: #ffffff !important;
+}
+
+.sidebar .nav-link:hover {
+  color: #4CAF50 !important;
+  background-color: rgba(76, 175, 80, 0.1) !important;
+}
+
+/* Footer Styling */
+.footer, footer {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem;
+  box-shadow: 0 -2px 4px var(--shadow-light);
+}
+
+.dropdown-content {
+  background-color: var(--dropdown-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+.dropdown-content a {
+  color: var(--text-color) !important;
+}
+
+.dropdown-content a:hover {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Theme form styling for light mode */
+.theme-form-container {
+  background: var(--card-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.theme-label {
+  color: var(--text-color) !important;
+}
+
+.theme-form select {
+  background: var(--input-bg) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.theme-form option {
+  background: var(--input-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Enhanced Button Styling */
+.btn {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  font-weight: 500;
+}
+
+.btn:hover {
+  background-color: var(--btn-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--shadow-light);
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-color);
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  color: #0d6efd;
+  border: 1px solid #0d6efd;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.875rem;
+}
+
+/* Role Tag Styling */
+.role-tag, .badge-role, .user-role {
+  background-color: #eef2f8;
+  color: #333;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-block;
+  margin: 2px;
+  border: 1px solid #d1e7dd;
+}
+
+.role-tag.admin, .badge-role.admin {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffeaa7;
+}
+
+.role-tag.manager, .badge-role.manager {
+  background-color: #e7f3ff;
+  color: #004085;
+  border-color: #b3d7ff;
+}
+
+.role-tag.staff, .badge-role.staff {
+  background-color: #f0f9ff;
+  color: #0c4a6e;
+  border-color: #bae6fd;
+}
+
+.role-tag.director, .badge-role.director {
+  background-color: #fdf2f8;
+  color: #831843;
+  border-color: #fbcfe8;
+}
+
+.role-tag.ceo, .badge-role.ceo {
+  background-color: #f3e8ff;
+  color: #581c87;
+  border-color: #ddd6fe;
+}
+
+.role-tag.ba, .badge-role.ba, .role-tag.business_analyst, .badge-role.business_analyst {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.role-tag.pm, .badge-role.pm, .role-tag.project_manager, .badge-role.project_manager {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+/* =================================
+   STANDARDIZED FORM OVERRIDES FOR LIGHT THEME
+   ================================= */
+
+/* Light theme form element overrides to ensure proper visibility */
+[data-bs-theme="light"] input[type="text"],
+[data-bs-theme="light"] input[type="email"],
+[data-bs-theme="light"] input[type="password"],
+[data-bs-theme="light"] input[type="number"],
+[data-bs-theme="light"] input[type="tel"],
+[data-bs-theme="light"] input[type="url"],
+[data-bs-theme="light"] input[type="search"],
+[data-bs-theme="light"] input[type="date"],
+[data-bs-theme="light"] input[type="datetime-local"],
+[data-bs-theme="light"] input[type="time"],
+[data-bs-theme="light"] select,
+[data-bs-theme="light"] textarea,
+[data-bs-theme="light"] .form-control,
+[data-bs-theme="light"] .form-select {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  border-color: #ced4da !important;
+}
+
+[data-bs-theme="light"] label,
+[data-bs-theme="light"] .form-label {
+  color: #212529 !important;
+}
+
+/* Light theme button overrides to maintain consistency */
+[data-bs-theme="light"] .btn-primary {
+  background-color: #0d6efd !important;
+  color: #ffffff !important;
+  border-color: #0d6efd !important;
+}
+
+[data-bs-theme="light"] .btn-secondary {
+  background-color: #6c757d !important;
+  color: #ffffff !important;
+  border-color: #6c757d !important;
+}
+
+[data-bs-theme="light"] .btn-success {
+  background-color: #198754 !important;
+  color: #ffffff !important;
+  border-color: #198754 !important;
+}
+
+[data-bs-theme="light"] .btn-danger {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  border-color: #dc3545 !important;
+}

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeciFrame - AI-Powered Business Case & Decision Intelligence Platform</title>
+    <meta name="description" content="Transform your organization's decision-making with DeciFrame's intelligent business case management, problem solving, and workflow automation platform.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="nav-brand">
+                <span class="brand-name">DeciFrame</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#solutions">Solutions</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Sign Up</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="color: white !important;">Sign In</a>
+            </div>
+            <div class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">
+                        Transform Decision-Making with 
+                        <span class="gradient-text">AI-Powered Intelligence</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        DeciFrame revolutionizes how organizations solve problems, build business cases, and make data-driven decisions. Streamline workflows, accelerate approvals, and maximize ROI with our comprehensive decision intelligence platform.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">
+                            <i class="fas fa-user-plus"></i>
+                            Get Started Free
+                        </a>
+                        <a href="{{ url_for('waitlist.index') }}" class="btn btn-secondary btn-large">
+                            <i class="fas fa-rocket"></i>
+                            Request Demo
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-number">95%</div>
+                            <div class="stat-label">Faster Approvals</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">{{ org_settings.get_currency_symbol() }}2.5M</div>
+                            <div class="stat-label">Average ROI Increase</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">10,000+</div>
+                            <div class="stat-label">Decisions Optimized</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="dashboard-preview">
+                        <div class="dashboard-header">
+                            <div class="dashboard-tabs">
+                                <span class="tab active">Problems</span>
+                                <span class="tab">Business Cases</span>
+                                <span class="tab">Projects</span>
+                            </div>
+                        </div>
+                        <div class="dashboard-content">
+                            <div class="metric-cards">
+                                <div class="metric-card">
+                                    <div class="metric-icon">📊</div>
+                                    <div class="metric-value">127</div>
+                                    <div class="metric-label">Active Cases</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-icon">💡</div>
+                                    <div class="metric-value">{{ org_settings.get_currency_symbol() }}4.2M</div>
+                                    <div class="metric-label">Projected ROI</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-icon">⚡</div>
+                                    <div class="metric-value">89%</div>
+                                    <div class="metric-label">Approval Rate</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Complete Decision Intelligence Platform</h2>
+                <p>Everything you need to transform problems into profitable solutions</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Problem Classification</h3>
+                    <p>Automatically categorize and prioritize problems with 95% accuracy using advanced machine learning algorithms.</p>
+                    <ul class="feature-list">
+                        <li>Intelligent issue type detection</li>
+                        <li>Automated priority scoring</li>
+                        <li>Smart workflow routing</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Intelligent Business Case Builder</h3>
+                    <p>Generate comprehensive business cases with AI-assisted analysis, ROI calculations, and stakeholder mapping.</p>
+                    <ul class="feature-list">
+                        <li>Automated ROI projections</li>
+                        <li>Risk assessment modeling</li>
+                        <li>Stakeholder impact analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3>Epic & Story Management</h3>
+                    <p>Break down complex initiatives into manageable epics and user stories with automatic project synchronization.</p>
+                    <ul class="feature-list">
+                        <li>AI story generation</li>
+                        <li>Epic workflow management</li>
+                        <li>Project auto-linking</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Executive Dashboards</h3>
+                    <p>Role-based dashboards providing real-time insights and decision support for every organizational level.</p>
+                    <ul class="feature-list">
+                        <li>Real-time analytics</li>
+                        <li>Custom role views</li>
+                        <li>Predictive insights</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Workflow Automation</h3>
+                    <p>Streamline approval processes with intelligent routing, notifications, and escalation management.</p>
+                    <ul class="feature-list">
+                        <li>Smart approval routing</li>
+                        <li>Automated notifications</li>
+                        <li>Escalation management</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Enterprise Security</h3>
+                    <p>Department-based access controls, audit trails, and compliance features for enterprise-grade security.</p>
+                    <ul class="feature-list">
+                        <li>Role-based permissions</li>
+                        <li>Complete audit trails</li>
+                        <li>SOC 2 compliance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solutions Section -->
+    <section id="solutions" class="solutions">
+        <div class="container">
+            <div class="section-header">
+                <h2>Solutions for Every Industry</h2>
+                <p>Trusted by organizations across sectors to drive better decisions</p>
+            </div>
+            <div class="solutions-grid">
+                <div class="solution-card">
+                    <div class="solution-icon">🏢</div>
+                    <h3>Enterprise</h3>
+                    <p>Large organizations managing complex decision hierarchies and cross-departmental initiatives.</p>
+                    <div class="solution-benefits">
+                        <span class="benefit">Scalable architecture</span>
+                        <span class="benefit">Advanced analytics</span>
+                        <span class="benefit">Custom integrations</span>
+                    </div>
+                </div>
+                
+                <div class="solution-card">
+                    <div class="solution-icon">🏭</div>
+                    <h3>Manufacturing</h3>
+                    <p>Optimize production processes, supply chain decisions, and operational efficiency initiatives.</p>
+                    <div class="solution-benefits">
+                        <span class="benefit">Process optimization</span>
+                        <span class="benefit">Supply chain insights</span>
+                        <span class="benefit">Quality management</span>
+                    </div>
+                </div>
+                
+                <div class="solution-card">
+                    <div class="solution-icon">🏥</div>
+                    <h3>Healthcare</h3>
+                    <p>Improve patient outcomes through data-driven clinical and operational decision making.</p>
+                    <div class="solution-benefits">
+                        <span class="benefit">Clinical workflows</span>
+                        <span class="benefit">Resource allocation</span>
+                        <span class="benefit">Compliance tracking</span>
+                    </div>
+                </div>
+                
+                <div class="solution-card">
+                    <div class="solution-icon">🏦</div>
+                    <h3>Financial Services</h3>
+                    <p>Accelerate investment decisions, risk assessments, and regulatory compliance initiatives.</p>
+                    <div class="solution-benefits">
+                        <span class="benefit">Risk modeling</span>
+                        <span class="benefit">Investment analysis</span>
+                        <span class="benefit">Regulatory support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Decision-Making?</h2>
+                <p>Join thousands of organizations already using DeciFrame to drive better outcomes</p>
+                <div class="cta-buttons">
+                    <a href="{{ url_for('waitlist.index') }}" class="btn btn-primary btn-large">
+                        <i class="fas fa-rocket"></i>
+                        Request Demo
+                    </a>
+                    <a href="{{ url_for('waitlist.index') }}" class="btn btn-large" style="background: #ffffff !important; color: #2563eb !important; border: 2px solid #ffffff !important; font-weight: 600 !important;">
+                        <i class="fas fa-phone" style="color: #2563eb !important;"></i>
+                        Talk to Sales
+                    </a>
+                </div>
+                <div class="cta-note">
+                    <p>Free 30-day trial • No credit card required • Setup in under 10 minutes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='landing.js') }}"></script>
+</body>
+</html>

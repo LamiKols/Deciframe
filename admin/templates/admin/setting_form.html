@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Setting - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ action }} System Setting</h5>
+                    <a href="{{ url_for('admin.system_settings') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> Back to Settings
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.key.label(class="form-label") }}
+                            {{ form.key(class="form-control" + (" is-invalid" if form.key.errors else "")) }}
+                            {% if form.key.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.key.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Use a unique key identifier (e.g., "MAX_FILE_SIZE", "FEATURE_ENABLED")
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.value.label(class="form-label") }}
+                            {{ form.value(class="form-control" + (" is-invalid" if form.value.errors else ""), rows="4") }}
+                            {% if form.value.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.value.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                The setting value (can be JSON for complex configurations)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="3") }}
+                            <div class="form-text">
+                                Optional description explaining the purpose of this setting
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.is_active(class="form-check-input") }}
+                                {{ form.is_active.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-text">
+                                Inactive settings are ignored by the system
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.system_settings') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {{ action }} Setting
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if action == 'Edit' and setting %}
+            <!-- Setting Information Card -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Setting Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Setting ID:</dt>
+                                <dd class="col-sm-8">{{ setting.id }}</dd>
+                                
+                                <dt class="col-sm-4">Created:</dt>
+                                <dd class="col-sm-8">{{ setting.created_at.strftime('%Y-%m-%d %H:%M') if setting.created_at else 'N/A' }}</dd>
+                                
+                                <dt class="col-sm-4">Last Updated:</dt>
+                                <dd class="col-sm-8">{{ setting.updated_at.strftime('%Y-%m-%d %H:%M') if setting.updated_at else 'N/A' }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Status:</dt>
+                                <dd class="col-sm-8">
+                                    {% if setting.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Inactive</span>
+                                    {% endif %}
+                                </dd>
+                                
+                                <dt class="col-sm-4">Key:</dt>
+                                <dd class="col-sm-8"><code>{{ setting.key }}</code></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: var(--bs-dark);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: var(--bs-secondary);
+}
+
+.invalid-feedback {
+    display: block;
+}
+
+code {
+    font-size: 0.875em;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+}
+</style>
+{% endblock %}

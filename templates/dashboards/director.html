@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Director Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-chart-line me-2"></i>Director Dashboard</h2>
+            <p class="text-muted">Executive oversight and strategic decision making for {{ user.first_name }}</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    {% include 'includes/quick_actions.html' %}
+
+    <!-- KPI Cards -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ kpi.problems_open }}</h3>
+                            <p class="mb-0">Problems Open</p>
+                        </div>
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    </div>
+                    <div class="mt-2">
+                        <small>+{{ kpi.problems_new_this_week }} this week</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ kpi.cases_pending }}</h3>
+                            <p class="mb-0">Cases Pending</p>
+                        </div>
+                        <i class="fas fa-briefcase fa-3x"></i>
+                    </div>
+                    <div class="mt-2">
+                        <small>{{ kpi.cases_awaiting_approval }} awaiting approval</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ kpi.projects_active }}</h3>
+                            <p class="mb-0">Projects Active</p>
+                        </div>
+                        <i class="fas fa-project-diagram fa-3x"></i>
+                    </div>
+                    <div class="mt-2">
+                        <small>{{ kpi.projects_on_track }}% on track</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Awaiting Approvals Panel -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-clipboard-check me-2"></i>Awaiting Approvals</h5>
+                    <a href="{{ url_for('business.list_cases') }}?filter=awaiting_approval" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if awaiting_approvals %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Department</th>
+                                        <th>Type</th>
+                                        <th>Est. Cost</th>
+                                        <th>ROI</th>
+                                        <th>Submitted</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for case in awaiting_approvals %}
+                                    <tr>
+                                        <td><a href="{{ url_for('business.case_detail', id=case.id) }}">{{ case.code }}</a></td>
+                                        <td>{{ case.title[:30] }}{% if case.title|length > 30 %}...{% endif %}</td>
+                                        <td>{{ case.department.name if case.department else 'N/A' }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if case.case_type.value == 'Reactive' %}warning{% else %}info{% endif %}">
+                                                {{ case.case_type.value }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if case.estimated_cost %}
+                                                {{ org_settings.get_currency_symbol() }}{{ "{:,.0f}".format(case.estimated_cost) }}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if case.estimated_roi %}
+                                                <span class="text-success">{{ "%.0f"|format(case.estimated_roi) }}%</span>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ case.created_at.strftime('%m/%d/%Y') }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('business.case_detail', id=case.id) }}" class="btn btn-xs btn-info">Review</a>
+                                                <form method="POST" action="{{ url_for('business.approve_case', id=case.id) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-xs btn-success" onclick="return confirm('Approve this business case?')">Approve</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <p class="text-muted">No business cases awaiting approval.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strategic Overview -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie me-2"></i>Portfolio Health</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <h4 class="text-success">{{ portfolio.total_value }}</h4>
+                            <small class="text-muted">Total Portfolio Value</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <h4 class="text-info">{{ portfolio.avg_roi }}%</h4>
+                            <small class="text-muted">Average ROI</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <h5 class="text-warning">{{ portfolio.at_risk }}</h5>
+                            <small class="text-muted">Projects at Risk</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <h5 class="text-primary">{{ portfolio.on_time }}</h5>
+                            <small class="text-muted">On-Time Delivery</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-trending-up me-2"></i>Recent Trends</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Problem Resolution Rate</span>
+                            <span class="text-success">{{ trends.problem_resolution }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: {{ trends.problem_resolution }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Case Approval Rate</span>
+                            <span class="text-info">{{ trends.case_approval }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" style="width: {{ trends.case_approval }}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between">
+                            <span>Project Success Rate</span>
+                            <span class="text-primary">{{ trends.project_success }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" style="width: {{ trends.project_success }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-chart-line me-2"></i>Executive Dashboard
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('business.list_cases') }}?filter=awaiting_approval" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-clipboard-check me-2"></i>Review Approvals
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('reports.list_templates') }}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-file-alt me-2"></i>Executive Report
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-cogs me-2"></i>Admin Panel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
