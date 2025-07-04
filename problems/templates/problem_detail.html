@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Problem {{ problem.code }} - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Problem {{ problem.code }}
+                </h2>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('problems.edit', id=problem.id, auth_token=request.args.get('auth_token')) }}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{{ url_for('problems.index', auth_token=request.args.get('auth_token')) }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Problem Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">{{ problem.title }}</h4>
+                            <p class="card-text">{{ problem.description }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Problem Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Code:</strong>
+                                <span class="text-primary">{{ problem.code }}</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Priority:</strong>
+                                <span class="badge {% if problem.priority.value == 'High' %}bg-danger{% elif problem.priority.value == 'Medium' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ problem.priority.value }}
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Status:</strong>
+                                <span class="badge {% if problem.status.value == 'Open' %}bg-primary{% elif problem.status.value == 'In Progress' %}bg-info{% elif problem.status.value == 'Resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ problem.status.value }}
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Department:</strong>
+                                <div class="text-muted">{{ problem.department.name if problem.department else 'N/A' }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Created By:</strong>
+                                <div class="text-muted">{{ problem.creator.name if problem.creator else 'N/A' }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Created At:</strong>
+                                <div class="text-muted">{{ problem.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('problems.edit', id=problem.id) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Edit Problem
+                                </a>
+                                
+                                <a href="{{ url_for('business.new_case') }}?problem_id={{ problem.id }}" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Create Business Case
+                                </a>
+                                
+                                {% if user.role.value in ['Manager', 'Director', 'CEO', 'Admin'] %}
+                                <button type="button" id="aiSuggestBtn" class="btn btn-warning">
+                                    <i class="fas fa-lightbulb me-1"></i>AI Suggest Solutions
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Business Cases Section -->
+        {% if related_cases %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-briefcase text-success me-2"></i>Related Business Cases
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for case in related_cases %}
+                        <div class="card mb-3 border-success">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-briefcase me-2"></i>{{ case.code }} - {{ case.title }}
+                                </h6>
+                                <span class="badge bg-light text-dark">{{ case.status.value }}</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ case.description }}</p>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <small class="text-muted">Cost Estimate:</small>
+                                        <div class="fw-bold text-danger">{{ currency_symbol }}{{ "{:,.2f}".format(case.cost_estimate) if case.cost_estimate else "0.00" }}</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <small class="text-muted">Benefit Estimate:</small>
+                                        <div class="fw-bold text-success">{{ currency_symbol }}{{ "{:,.2f}".format(case.benefit_estimate) if case.benefit_estimate else "0.00" }}</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <small class="text-muted">ROI:</small>
+                                        <div class="fw-bold {% if case.roi and case.roi > 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {{ "{:.1f}%".format(case.roi) if case.roi else "N/A" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <small class="text-muted">
+                                        Created on {{ case.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        {% if case.assigned_ba %}by {{ case.assigned_ba.name }}{% endif %}
+                                    </small>
+                                    <span class="badge {% if case.case_depth.value == 'Full' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                        {{ case.case_depth.value }} Case
+                                    </span>
+                                </div>
+                                <!-- Business Case Actions -->
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('business.view_case', id=case.id, auth_token=request.args.get('auth_token')) }}" 
+                                       class="btn btn-success btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Business Case
+                                    </a>
+                                    <a href="{{ url_for('business.edit_case', id=case.id, auth_token=request.args.get('auth_token')) }}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit me-1"></i>Edit Case
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Solutions Section -->
+        {% if problem.solutions %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Solutions</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for solution in problem.solutions %}
+                        <div class="card mb-3 border-success">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-lightbulb me-2"></i>{{ solution.title or solution.name }}
+                                </h6>
+                                <span class="badge bg-light text-dark">{{ solution.status.value }}</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ solution.description }}</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <small class="text-muted">
+                                        Created by {{ solution.creator.name }} on {{ solution.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                    {% if solution.priority %}
+                                    <span class="badge {% if solution.priority.value == 'High' %}bg-danger{% elif solution.priority.value == 'Medium' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                        {{ solution.priority.value }} Priority
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <!-- Solution to Business Case Actions -->
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('business.new_case') }}?problem_id={{ problem.id }}&solution_id={{ solution.id }}" 
+                                       class="btn btn-success btn-sm">
+                                        <i class="fas fa-briefcase me-1"></i>Create Business Case
+                                    </a>
+                                    <a href="{{ url_for('solutions.view_solution', solution_id=solution.id) }}" 
+                                       class="btn btn-outline-light btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- AI Solution Suggestion Modal -->
+<div class="modal fade" id="aiSuggestModal" tabindex="-1" aria-labelledby="aiSuggestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="aiSuggestModalLabel">
+                    <i class="fas fa-lightbulb me-2 text-warning"></i>
+                    AI Solution Recommendations
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="aiSolutions">
+                <!-- Solutions will be populated here -->
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data for JavaScript -->
+<div data-problem-id="{{ problem.id }}" style="display: none;"></div>
+
+<script src="{{ url_for('static', filename='js/problem_solutions_ai.js') }}"></script>
+{% endblock %}

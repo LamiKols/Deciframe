@@ -1,0 +1,243 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Review Business Case: {{ case.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">{{ case.title }}</h3>
+                        <small class="text-muted">{{ case.code or 'No code' }} | Submitted {{ case.submitted_at | format_org_datetime if case.submitted_at else 'Unknown' }}</small>
+                    </div>
+                    <span class="badge bg-warning">Submitted</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Description</h5>
+                            <p>{{ case.description }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Financial Summary</h5>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Cost Estimate:</strong><br>
+                                    {{ case.cost_estimate | format_currency }}
+                                </div>
+                                <div class="col-6">
+                                    <strong>Benefit Estimate:</strong><br>
+                                    {{ case.benefit_estimate | format_currency }}
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <strong>ROI:</strong> {{ case.roi | round(2) if case.roi else 0 }}%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Case Details</h5>
+                            <p><strong>Type:</strong> 
+                                <span class="badge bg-secondary">{{ case.case_type.value }}</span>
+                                <span class="badge bg-info">{{ case.case_depth.value }}</span>
+                            </p>
+                            <p><strong>Department:</strong> {{ case.department.name if case.department else 'Unknown' }}</p>
+                            <p><strong>Created by:</strong> {{ case.creator.first_name }} {{ case.creator.last_name }}</p>
+                            {% if case.business_analyst %}
+                            <p><strong>Assigned BA:</strong> {{ case.business_analyst.first_name }} {{ case.business_analyst.last_name }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if case.case_depth.value == 'Full' %}
+                            <h5>Additional Details</h5>
+                            {% if case.strategic_alignment %}
+                            <p><strong>Strategic Alignment:</strong> {{ case.strategic_alignment }}</p>
+                            {% endif %}
+                            {% if case.risk_mitigation %}
+                            <p><strong>Risk Mitigation:</strong> {{ case.risk_mitigation }}</p>
+                            {% endif %}
+                            {% if case.stakeholder_analysis %}
+                            <p><strong>Stakeholder Analysis:</strong> {{ case.stakeholder_analysis }}</p>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if case.summary %}
+                    <div class="mb-4">
+                        <h5>Executive Summary</h5>
+                        <div class="alert alert-info">
+                            {{ case.summary }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- AI Reviewer Insights -->
+            {% if ai_insights and ai_insights.success %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-robot"></i> AI Reviewer Insights</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-3">
+                        <h6><i class="fas fa-eye"></i> Executive Summary</h6>
+                        <p class="mb-0">{{ ai_insights.summary }}</p>
+                    </div>
+                    
+                    {% if ai_insights.considerations %}
+                    <div class="mb-3">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Critical Review Factors</h6>
+                        <ul class="list-unstyled">
+                            {% for consideration in ai_insights.considerations %}
+                            <li class="mb-2">
+                                <span class="badge bg-warning me-2">{{ loop.index }}</span>
+                                {{ consideration }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        AI insights are generated to assist in review decisions and should be considered alongside your professional judgment.
+                    </small>
+                </div>
+            </div>
+            {% elif ai_insights and not ai_insights.success %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-robot"></i> AI Reviewer Insights</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        {{ ai_insights.summary or "AI insights are temporarily unavailable." }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Enhanced AI Review Insights -->
+            {% if enhanced_ai_insights and enhanced_ai_insights.confidence_score %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-brain"></i> Enhanced AI Review Analysis
+                        <span class="badge {{ get_confidence_badge_class(enhanced_ai_insights.confidence_score) }} ms-2">
+                            {{ get_confidence_label(enhanced_ai_insights.confidence_score) }}
+                        </span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-gauge-high"></i> Approval Confidence</h6>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="progress flex-grow-1 me-3" style="height: 20px;">
+                                    <div class="progress-bar {{ get_confidence_badge_class(enhanced_ai_insights.confidence_score) }}" 
+                                         role="progressbar" 
+                                         style="width: {{ enhanced_ai_insights.confidence_score }}%">
+                                        {{ enhanced_ai_insights.confidence_score }}%
+                                    </div>
+                                </div>
+                                <span class="fw-bold">{{ enhanced_ai_insights.confidence_score }}%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb"></i> AI Recommendation</h6>
+                            <p class="mb-3">{{ enhanced_ai_insights.recommendation or 'Review content for optimal decision making.' }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if enhanced_ai_insights.risks %}
+                    <div class="mb-3">
+                        <h6><i class="fas fa-shield-alt"></i> Key Risk Assessment</h6>
+                        <div class="list-group list-group-flush">
+                            {% for risk in enhanced_ai_insights.risks %}
+                            <div class="list-group-item d-flex align-items-start p-3">
+                                <i class="fas fa-exclamation-triangle text-warning me-3 mt-1"></i>
+                                <span>{{ risk }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        Enhanced AI analysis provides confidence scoring and risk assessment to support informed decision making.
+                    </small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Review Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Review Actions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('review.handle_business_case_action', case_id=case.id) }}">
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Review Comment</label>
+                            <textarea name="comment" id="comment" class="form-control" rows="4" placeholder="Add your review comments..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="approve" class="btn btn-success">
+                                ✓ Approve Business Case
+                            </button>
+                            <button type="submit" name="action" value="send_back" class="btn btn-warning">
+                                ← Send Back for Revisions
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Comments History -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Discussion</h5>
+                </div>
+                <div class="card-body">
+                    {% if comments %}
+                        {% for comment in comments %}
+                        <div class="mb-3 pb-2 border-bottom">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ comment.author.first_name }} {{ comment.author.last_name }}</strong>
+                                <small class="text-muted">{{ comment.created_at | format_org_datetime }}</small>
+                            </div>
+                            <p class="mb-0 mt-1">{{ comment.content }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No comments yet.</p>
+                    {% endif %}
+                    
+                    <!-- Add Comment Form -->
+                    <form method="POST" action="{{ url_for('review.add_business_case_comment', case_id=case.id) }}" class="mt-3">
+                        <div class="mb-3">
+                            <textarea name="comment" class="form-control" rows="3" placeholder="Add a comment..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Add Comment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('review.review_business_cases') }}" class="btn btn-secondary">← Back to Business Cases</a>
+    </div>
+</div>
+{% endblock %}

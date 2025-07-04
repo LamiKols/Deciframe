@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Business Case Review{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Business Case Review</h1>
+    
+    {% if cases %}
+        <div class="row">
+            {% for case in cases %}
+            <div class="col-lg-6 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">{{ case.title }}</h5>
+                            <small class="text-muted">{{ case.code or 'No code' }} | Submitted {{ case.submitted_at | format_org_datetime if case.submitted_at else 'Unknown' }}</small>
+                        </div>
+                        <span class="badge bg-warning">Submitted</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ case.description[:150] }}{% if case.description|length > 150 %}...{% endif %}</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Cost:</strong><br>
+                                {{ case.cost_estimate | format_currency }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Benefit:</strong><br>
+                                {{ case.benefit_estimate | format_currency }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>ROI:</strong> {{ case.roi | round(2) if case.roi else 0 }}%
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Type:</strong> 
+                            <span class="badge bg-secondary">{{ case.case_type.value }}</span>
+                            <span class="badge bg-info">{{ case.case_depth.value }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                Created by: {{ case.creator.first_name }} {{ case.creator.last_name }}<br>
+                                Department: {{ case.department.name if case.department else 'Unknown' }}
+                            </small>
+                        </div>
+                        
+                        <a href="{{ url_for('review.business_case_detail', case_id=case.id) }}" class="btn btn-primary">
+                            Review Case
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center">
+                <h5>No Business Cases Pending Review</h5>
+                <p class="text-muted">All business cases have been reviewed or no cases have been submitted for review yet.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

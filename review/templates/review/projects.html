@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Project Review{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>📋 Project Review</h2>
+    <p class="text-muted">Review submitted projects requiring approval</p>
+    
+    <!-- Projects Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Projects Pending Review</h5>
+        </div>
+        <div class="card-body">
+            {% if projects %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Project Code</th>
+                                <th>Project Name</th>
+                                <th>Project Manager</th>
+                                <th>Submitted By</th>
+                                <th>Submitted At</th>
+                                <th>Budget</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            <tr>
+                                <td><strong>{{ project.code or 'N/A' }}</strong></td>
+                                <td>
+                                    <a href="{{ url_for('review.project_detail', project_id=project.id) }}" class="text-decoration-none">
+                                        {{ project.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if project.project_manager %}
+                                        {{ project.project_manager.name }}
+                                    {% else %}
+                                        <span class="text-muted">Not assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if project.submitted_by %}
+                                        {{ project.submitter.name }}
+                                    {% else %}
+                                        <span class="text-muted">Unknown</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if project.submitted_at %}
+                                        {{ project.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if project.budget %}
+                                        {{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(project.budget) }}
+                                    {% else %}
+                                        <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if project.priority %}
+                                        <span class="badge bg-{% if project.priority.value == 'High' %}danger{% elif project.priority.value == 'Medium' %}warning{% else %}secondary{% endif %}">
+                                            {{ project.priority.value }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Not set</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('review.project_detail', project_id=project.id) }}" class="btn btn-sm btn-primary">
+                                        Review
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-clipboard-check fa-3x mb-3"></i>
+                        <h5>No Projects Pending Review</h5>
+                        <p>All projects have been reviewed or there are no submitted projects yet.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Navigation Links -->
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+        <a href="{{ url_for('review.review_business_cases') }}" class="btn btn-outline-primary">
+            Business Case Review
+        </a>
+        <a href="{{ url_for('review.review_epics') }}" class="btn btn-outline-primary">
+            Epic Review
+        </a>
+    </div>
+</div>
+{% endblock %}
