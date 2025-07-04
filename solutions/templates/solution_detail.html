@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Solution Details - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>{{ solution.title or solution.name }}
+                    </h4>
+                    <span class="badge {% if solution.status.value == 'Open' %}bg-success{% elif solution.status.value == 'In Progress' %}bg-warning{% else %}bg-secondary{% endif %}">
+                        {{ solution.status.value }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Description</h6>
+                        <p class="text-muted">{{ solution.description }}</p>
+                    </div>
+                    
+                    {% if solution.priority %}
+                    <div class="mb-3">
+                        <h6>Priority</h6>
+                        <span class="badge {% if solution.priority.value == 'High' %}bg-danger{% elif solution.priority.value == 'Medium' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ solution.priority.value }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <h6>Created</h6>
+                        <small class="text-muted">
+                            By {{ solution.creator.name }} on {{ solution.created_at.strftime('%Y-%m-%d %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('business.new_case') }}?problem_id={{ solution.problem_id }}&solution_id={{ solution.id }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-briefcase me-1"></i>Create Business Case
+                        </a>
+                        
+                        <a href="{{ url_for('problems.view', id=solution.problem_id) }}" 
+                           class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Problem
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

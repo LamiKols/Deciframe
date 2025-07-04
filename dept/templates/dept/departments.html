@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Departments - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Department Hierarchy</h2>
+                <a href="{{ url_for('dept.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    {% if departments %}
+                    
+                    {# Recursive macro to render department hierarchy #}
+                    {% macro render_department(dept, level=0) %}
+                        <li class="list-unstyled mb-2" style="margin-left: {{ level * 30 }}px;">
+                            <div class="d-flex justify-content-between align-items-center p-2 border rounded bg-light">
+                                <div class="d-flex align-items-center">
+                                    {% if level > 0 %}
+                                        <i class="fas fa-arrow-right text-muted me-2"></i>
+                                    {% endif %}
+                                    <strong>{{ dept.name }}</strong>
+                                    <span class="badge bg-secondary ms-2">Level {{ dept.level }}</span>
+                                </div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('dept.edit', id=dept.id) }}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form method="POST" action="{{ url_for('dept.delete', id=dept.id) }}" 
+                                          style="display: inline;"
+                                          onsubmit="return confirm('Are you sure you want to delete {{ dept.name }}?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            {# Render children departments #}
+                            {% for child in departments %}
+                                {% if child.parent and child.parent.id == dept.id %}
+                                    {{ render_department(child, level + 1) }}
+                                {% endif %}
+                            {% endfor %}
+                        </li>
+                    {% endmacro %}
+
+                    {# Main department hierarchy rendering #}
+                    <ul class="list-unstyled">
+                        {% for dept in departments %}
+                            {% if not dept.parent %}
+                                {{ render_department(dept) }}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No departments found</h5>
+                        <p class="text-muted">Get started by creating your first department.</p>
+                        <a href="{{ url_for('dept.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> New
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
