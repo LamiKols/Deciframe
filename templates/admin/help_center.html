@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Help Center Management - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-question-circle me-2"></i>Help Center Management
+                    <span class="contextual-help-icon" 
+                          data-help-slug="managing-user-accounts" 
+                          style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                          title="Help with managing the help center">
+                        <i class="fas fa-info-circle"></i>
+                    </span>
+                </h2>
+                <div>
+                    <a href="{{ url_for('admin_create_help_category') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-plus me-1"></i>New Category
+                    </a>
+                    <a href="{{ url_for('admin_create_help_article') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i>New Article
+                    </a>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Categories Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-folder me-2"></i>Categories ({{ categories|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if categories %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Articles</th>
+                                        <th>Sort Order</th>
+                                        <th>Created</th>
+                                        <th width="150">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for category in categories %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ category.name }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ category.article_count or 0 }}</span>
+                                        </td>
+                                        <td>{{ category.sort_order }}</td>
+                                        <td>{{ category.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('admin_edit_help_category', id=category.id) }}" 
+                                               class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% if category.article_count == 0 %}
+                                            <form method="POST" action="{{ url_for('admin_delete_help_category', id=category.id) }}" 
+                                                  class="d-inline" onsubmit="return confirm('Delete this category?')">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <button class="btn btn-sm btn-outline-secondary" disabled title="Cannot delete - contains articles">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No categories found. Create your first category to get started.</p>
+                            <a href="{{ url_for('admin_create_help_category') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Create Category
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Articles Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Articles ({{ articles|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if articles %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Slug</th>
+                                        <th>Sort Order</th>
+                                        <th>Author</th>
+                                        <th>Updated</th>
+                                        <th width="150">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for article in articles %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ article.title }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ article.category.name }}</span>
+                                        </td>
+                                        <td>
+                                            <code>{{ article.slug }}</code>
+                                        </td>
+                                        <td>{{ article.sort_order }}</td>
+                                        <td>{{ article.author.name if article.author else 'Unknown' }}</td>
+                                        <td>{{ article.updated_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('admin_edit_help_article', id=article.id) }}" 
+                                               class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" action="{{ url_for('admin_delete_help_article', id=article.id) }}" 
+                                                  class="d-inline" onsubmit="return confirm('Delete this article?')">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No articles found. Create your first article to get started.</p>
+                            {% if categories %}
+                            <a href="{{ url_for('admin_create_help_article') }}" class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i>Create Article
+                            </a>
+                            {% else %}
+                            <p class="text-muted">Create categories first before adding articles.</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

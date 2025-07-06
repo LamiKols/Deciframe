@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if logged_in %}
+    <div class="row">
+        <div class="col-12">
+            <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+                <h1 class="display-4">Welcome back, {{ user.name }}!</h1>
+                <p class="lead">Manage your organization's departments and team structure with DeciFrame.</p>
+                <hr class="my-4">
+                <p>Role: <strong>{{ user.role.value }}</strong> | Department: <strong>{{ user.department.name if user.department else 'Not assigned' }}</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-building fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">
+                        Department Management
+                        <span class="contextual-help-icon" 
+                              data-help-slug="system-navigation" 
+                              style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                              title="Help with department management">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                    </h5>
+                    <p class="card-text">Create, edit, and organize departments with up to 5 hierarchical levels.</p>
+                    <a href="{{ url_for('dept.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                        <i class="fas fa-cog"></i> Manage Departments
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">
+                        Problem Management
+                        <span class="contextual-help-icon" 
+                              data-help-slug="reporting-problems" 
+                              style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                              title="Help with problem management"><i class="fas fa-info-circle"></i></span>
+                    </h5>
+                    <p class="card-text">Track, manage, and resolve organizational problems with priority-based workflows.</p>
+                    <a href="{{ url_for('problems.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-warning">
+                        <i class="fas fa-tasks"></i> Manage Problems
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-briefcase fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">
+                        Business Cases
+                        <span class="contextual-help-icon" 
+                              data-help-slug="creating-business-cases" 
+                              style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                              title="Help with business cases"><i class="fas fa-info-circle"></i></span>
+                    </h5>
+                    <p class="card-text">Create and analyze business cases with ROI calculations and financial projections.</p>
+                    <a href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token')) }}" class="btn btn-success">
+                        <i class="fas fa-chart-line"></i> Manage Business Cases
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-project-diagram fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">
+                        Project Management
+                        <span class="contextual-help-icon" 
+                              data-help-slug="project-management" 
+                              style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                              title="Help with project management"><i class="fas fa-info-circle"></i></span>
+                    </h5>
+                    <p class="card-text">Track project execution, milestones, and progress from business case to completion.</p>
+                    <a href="{{ url_for('projects.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                        <i class="fas fa-tasks"></i> Manage Projects
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-cog fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Profile Settings</h5>
+                    <p class="card-text">Update your personal information, role, and department assignments.</p>
+                    <a href="{{ url_for('auth.profile', auth_token=request.args.get('auth_token')) }}" class="btn btn-info">
+                        <i class="fas fa-user-edit"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Executive Dashboard</h5>
+                    <p class="card-text">Live KPI metrics, trend analysis, and strategic insights for organizational performance.</p>
+                    {% if user and user.role and user.role.value in ['Director', 'CEO', 'Admin'] %}
+                    <a href="{{ url_for('dashboards.admin_dashboard') }}" class="btn btn-info">
+                        <i class="fas fa-chart-line"></i> View Executive Dashboard
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('dashboards.dashboard_home') }}" class="btn btn-info">
+                        <i class="fas fa-chart-line"></i> View Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="jumbotron text-center bg-dark text-white p-5 rounded border">
+                <h1 class="display-4 text-white">Welcome to DeciFrame</h1>
+                <p class="lead text-light">A comprehensive organizational management system for departments and team hierarchies.</p>
+                <hr class="my-4 border-light">
+                <p class="text-light">Get started by creating your account or logging into an existing one.</p>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus"></i> Get Started
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg" style="color: #000 !important;">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-sitemap fa-3x text-primary mb-3"></i>
+            <h5>Hierarchical Structure</h5>
+            <p class="text-muted">Organize departments with up to 5 levels of hierarchy for complex organizational structures.</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-users-cog fa-3x text-success mb-3"></i>
+            <h5>Role Management</h5>
+            <p class="text-muted">Assign roles from Staff to CEO with department-specific permissions and reporting relationships.</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+            <h5>Secure Access</h5>
+            <p class="text-muted">Email-based authentication with secure password management and profile controls.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% from 'macros/forms.html' import wtf_dropdown, priority_dropdown %}
+
+{% block title %}
+    {% if action == 'Edit' %}Edit Problem{% else %}New Problem{% endif %} - DeciFrame
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        {% if action == 'Edit' %}
+                            Edit Problem
+                            {% if problem %}
+                                <span class="text-muted">- {{ problem.code }}</span>
+                            {% endif %}
+                        {% else %}
+                            New Problem
+                        {% endif %}
+                        <span class="contextual-help-icon" 
+                              data-help-slug="reporting-problems" 
+                              style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                              title="Get help with problem reporting"><i class="fas fa-info-circle"></i></span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">
+                                {{ form.title.label.text }}
+                                <span class="contextual-help-icon" 
+                                      data-help-slug="reporting-problems" 
+                                      style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                                      title="Help with creating effective problem titles"><i class="fas fa-info-circle"></i></span>
+                            </label>
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            <div class="d-flex align-items-center mb-2">
+                                <small class="text-muted me-auto">Describe the problem in detail</small>
+                                <button type="button" id="aiRefineBtn" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-magic me-1"></i>AI Refine
+                                </button>
+                            </div>
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="4", id="description") }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- AI Problem Classification Section -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Issue Type
+                                <span class="contextual-help-icon" 
+                                      data-help-slug="reporting-problems" 
+                                      style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                                      title="AI automatically suggests the issue type based on your description"><i class="fas fa-info-circle"></i></span>
+                            </label>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="custom-dropdown flex-grow-1">
+                                    <select name="issue_type" id="issueType" class="form-select">
+                                        <option value="PROCESS">Process Issue - Workflow or procedural problem</option>
+                                        <option value="SYSTEM">System Issue - Technical or infrastructure problem</option>
+                                        <option value="OTHER">Other - General or miscellaneous issue</option>
+                                    </select>
+                                </div>
+                                <button type="button" id="aiClassifyBtn" class="btn btn-outline-primary" disabled>
+                                    <i class="fas fa-robot me-1"></i>AI Classify
+                                </button>
+                            </div>
+                            <div id="aiClassificationResult" class="alert alert-info d-none" style="color: #000; background-color: #d1ecf1; border-color: #bee5eb;">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-lightbulb me-2 text-primary"></i>
+                                    <div>
+                                        <strong style="color: #000;">AI Suggestion:</strong> <span id="aiSuggestion" style="color: #000; font-weight: 500;"></span>
+                                        <br><small id="aiExplanation" style="color: #495057;"></small>
+                                        <br><small id="aiConfidence" style="color: #495057; font-weight: 500;"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    {{ form.priority.label.text }}
+                                    <span class="contextual-help-icon" 
+                                          data-help-slug="reporting-problems" 
+                                          style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                                          title="Help with setting problem priority"><i class="fas fa-info-circle"></i></span>
+                                </label>
+                                {{ wtf_dropdown(form.priority, class="form-select" + (" is-invalid" if form.priority.errors else "")) }}
+                                {% if form.priority.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.priority.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.status.label(class="form-label") }}
+                                {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else "")) }}
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.status.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.department_id.label(class="form-label") }}
+                                {% if user.role == 'Admin' %}
+                                    {{ form.department_id(class="form-select" + (" is-invalid" if form.department_id.errors else "")) }}
+                                {% else %}
+                                    {{ form.department_id(class="form-select", readonly=true, style="background-color: #e9ecef;") }}
+                                    <small class="form-text text-muted">Problems are automatically assigned to your department</small>
+                                {% endif %}
+                                {% if form.department_id.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.department_id.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.org_unit_id.label(class="form-label") }}
+                                {{ form.org_unit_id(class="form-select" + (" is-invalid" if form.org_unit_id.errors else "")) }}
+                                {% if form.org_unit_id.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.org_unit_id.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('problems.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
+                                Back to Problems
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Refinement Modal -->
+<div class="modal fade" id="aiRefineModal" tabindex="-1" aria-labelledby="aiRefineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="aiRefineModalLabel">
+                    <i class="fas fa-magic me-2 text-primary"></i>
+                    AI Problem Refinement Assistant
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="aiVariants">
+                    <!-- Variants will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/problem_ai.js') }}"></script>
+{% endblock %}

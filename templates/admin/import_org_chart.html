@@ -1,0 +1,29 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<h2>Import Org Chart</h2>
+<form method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label for="file" class="form-label">Upload CSV</label>
+    <input type="file" name="file" id="file" class="form-control" accept=".csv" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+<div class="mt-4">
+  <h5>CSV Format Requirements:</h5>
+  <p>Your CSV file should contain these columns:</p>
+  <ul>
+    <li><strong>name</strong> (required): Unit name</li>
+    <li><strong>parent_name</strong> (optional): Parent unit name</li>
+    <li><strong>manager_email</strong> (optional): Manager's email address</li>
+  </ul>
+  
+  <h6>Example CSV:</h6>
+  <pre>name,parent_name,manager_email
+Company Root,,ceo@company.com
+IT Department,Company Root,it-manager@company.com
+Development Team,IT Department,dev-lead@company.com</pre>
+  
+  <p><a href="/sample_org_chart.csv" download class="btn btn-outline-info btn-sm">Download Sample CSV</a></p>
+</div>
+{% endblock %}

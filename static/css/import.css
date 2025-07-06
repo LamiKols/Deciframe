@@ -1,0 +1,183 @@
+/* Bulk Data Import Wizard Styles */
+
+.import-step {
+    min-height: 300px;
+}
+
+.mapping-select.is-invalid {
+    border-color: #dc3545;
+}
+
+.progress {
+    background-color: var(--bs-gray-700);
+}
+
+.progress-bar {
+    background-color: var(--bs-primary);
+    color: white;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-upload-area {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.file-upload-area:hover {
+    border-color: var(--bs-primary);
+}
+
+.file-upload-area.dragover {
+    border-color: var(--bs-success);
+    background-color: var(--bs-success-bg-subtle);
+}
+
+.mapping-section {
+    background-color: var(--bs-gray-100);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.mapping-field {
+    background-color: white;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--bs-primary);
+}
+
+.mapping-field.required {
+    border-left-color: var(--bs-danger);
+}
+
+.preview-table {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.import-status {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.import-status.success {
+    background-color: var(--bs-success-bg-subtle);
+    border: 1px solid var(--bs-success-border-subtle);
+    color: var(--bs-success-text-emphasis);
+}
+
+.import-status.error {
+    background-color: var(--bs-danger-bg-subtle);
+    border: 1px solid var(--bs-danger-border-subtle);
+    color: var(--bs-danger-text-emphasis);
+}
+
+.import-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem;
+    background-color: var(--bs-light);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.import-stat {
+    text-align: center;
+}
+
+.import-stat .number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--bs-primary);
+}
+
+.import-stat .label {
+    font-size: 0.9rem;
+    color: var(--bs-secondary);
+    text-transform: uppercase;
+}
+
+.error-list {
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--bs-light);
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+.error-item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: white;
+    border-radius: 4px;
+    border-left: 3px solid var(--bs-danger);
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.step-item {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    position: relative;
+}
+
+.step-item.active {
+    color: var(--bs-primary);
+    font-weight: bold;
+}
+
+.step-item.completed {
+    color: var(--bs-success);
+}
+
+.step-item::after {
+    content: '';
+    position: absolute;
+    right: -50%;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: var(--bs-border-color);
+}
+
+.step-item:last-child::after {
+    display: none;
+}
+
+.step-item.completed::after {
+    background-color: var(--bs-success);
+}
+
+/* Dark theme adjustments */
+[data-bs-theme="dark"] .mapping-section {
+    background-color: var(--bs-gray-800);
+}
+
+[data-bs-theme="dark"] .mapping-field {
+    background-color: var(--bs-gray-700);
+}
+
+[data-bs-theme="dark"] .error-list {
+    background-color: var(--bs-gray-800);
+}
+
+[data-bs-theme="dark"] .error-item {
+    background-color: var(--bs-gray-700);
+}
+
+[data-bs-theme="dark"] .import-stats {
+    background-color: var(--bs-gray-800);
+}

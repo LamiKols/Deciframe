@@ -1,0 +1,94 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if template %}Edit{% else %}Create{% endif %} Report Template{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{% if template %}Edit{% else %}Create{% endif %} Report Template</h2>
+        <a href="{{ url_for('reports.list_templates') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Templates
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Template Name</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ template.name if template else '' }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="template_type" class="form-label">Report Type</label>
+                            <select class="form-select" id="template_type" name="template_type" required>
+                                <option value="">Select Type</option>
+                                <option value="DashboardSummary" {% if template and template.template_type.value == 'DashboardSummary' %}selected{% endif %}>Dashboard Summary</option>
+                                <option value="TrendReport" {% if template and template.template_type.value == 'TrendReport' %}selected{% endif %}>Trend Report</option>
+                                <option value="RiskReport" {% if template and template.template_type.value == 'RiskReport' %}selected{% endif %}>Risk Report</option>
+                                <option value="Custom" {% if template and template.template_type.value == 'Custom' %}selected{% endif %}>Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="frequency" class="form-label">Frequency</label>
+                            <select class="form-select" id="frequency" name="frequency" required>
+                                <option value="">Select Frequency</option>
+                                <option value="Daily" {% if template and template.frequency.value == 'Daily' %}selected{% endif %}>Daily</option>
+                                <option value="Weekly" {% if template and template.frequency.value == 'Weekly' %}selected{% endif %}>Weekly</option>
+                                <option value="Monthly" {% if template and template.frequency.value == 'Monthly' %}selected{% endif %}>Monthly</option>
+                                <option value="Quarterly" {% if template and template.frequency.value == 'Quarterly' %}selected{% endif %}>Quarterly</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="active" name="active" 
+                                       {% if not template or template.active %}checked{% endif %}>
+                                <label class="form-check-label" for="active">
+                                    Active Template
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3">{{ template.description if template else '' }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mailing_list" class="form-label">Mailing List (Email addresses, one per line)</label>
+                    <textarea class="form-control" id="mailing_list" name="mailing_list" rows="4" 
+                              placeholder="example@company.com">{% if template %}{{ template.mailing_list }}{% endif %}</textarea>
+                    <div class="form-text">Enter email addresses for automatic report distribution</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="filters" class="form-label">Report Filters (JSON format)</label>
+                    <textarea class="form-control" id="filters" name="filters" rows="3" 
+                              placeholder='{"department": "Engineering", "status": "Active"}'>{% if template %}{{ template.filters }}{% endif %}</textarea>
+                    <div class="form-text">Optional JSON filters to customize report data</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('reports.list_templates') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if template %}Update{% else %}Create{% endif %} Template
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

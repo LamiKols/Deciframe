@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% set active_page = "monitoring" %}
+
+{% block title %}System Monitoring Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-chart-line me-2"></i>System Monitoring Dashboard</h1>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                    <button class="btn btn-outline-info" onclick="toggleAutoRefresh()">
+                        <i class="fas fa-clock me-1"></i>Auto Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Panel -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div id="alerts-panel" class="alert alert-info d-none">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>System Alerts</h5>
+                <div id="alerts-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5><i class="fas fa-microchip me-2"></i>CPU Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 id="cpu-usage">{{ system_stats.cpu.usage_percent|default(0) }}%</h3>
+                            <small class="text-muted">{{ system_stats.cpu.count|default(1) }} cores</small>
+                        </div>
+                        <div class="progress vertical-progress" style="width: 20px; height: 80px;">
+                            <div class="progress-bar bg-primary" 
+                                 style="height: {{ system_stats.cpu.usage_percent|default(0) }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5><i class="fas fa-memory me-2"></i>Memory Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 id="memory-usage">{{ system_stats.memory.usage_percent|default(0) }}%</h3>
+                            <small class="text-muted">{{ system_stats.memory.used_gb|default(0) }}GB / {{ system_stats.memory.total_gb|default(0) }}GB</small>
+                        </div>
+                        <div class="progress vertical-progress" style="width: 20px; height: 80px;">
+                            <div class="progress-bar bg-warning" 
+                                 style="height: {{ system_stats.memory.usage_percent|default(0) }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5><i class="fas fa-hdd me-2"></i>Disk Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 id="disk-usage">{{ system_stats.disk.usage_percent|default(0) }}%</h3>
+                            <small class="text-muted">{{ system_stats.disk.used_gb|default(0) }}GB / {{ system_stats.disk.total_gb|default(0) }}GB</small>
+                        </div>
+                        <div class="progress vertical-progress" style="width: 20px; height: 80px;">
+                            <div class="progress-bar bg-danger" 
+                                 style="height: {{ system_stats.disk.usage_percent|default(0) }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database and Application Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5><i class="fas fa-database me-2"></i>Database Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="badge bg-{{ 'success' if database_stats.status == 'connected' else 'danger' }} fs-6">
+                                {{ database_stats.status|title }}
+                            </span>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted">{{ database_stats.recent_activity.audit_logs_24h|default(0) }} activities (24h)</small>
+                        </div>
+                    </div>
+                    
+                    {% if database_stats.tables %}
+                    <div class="mt-3">
+                        <h6>Table Statistics</h6>
+                        {% for table in database_stats.tables %}
+                        <div class="d-flex justify-content-between">
+                            <span>{{ table.table|title }}</span>
+                            <span class="badge bg-secondary">{{ table.count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5><i class="fas fa-cogs me-2"></i>Application Metrics</h5>
+                </div>
+                <div class="card-body">
+                    {% if application_stats.users %}
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <h6>Users</h6>
+                            <div>Total: <span class="badge bg-primary">{{ application_stats.users.total }}</span></div>
+                            <div>Active Today: <span class="badge bg-success">{{ application_stats.users.active_today }}</span></div>
+                        </div>
+                        <div class="col-6">
+                            <h6>Content</h6>
+                            <div>Open Problems: <span class="badge bg-warning">{{ application_stats.content.open_problems }}</span></div>
+                            <div>Pending Cases: <span class="badge bg-info">{{ application_stats.content.pending_cases }}</span></div>
+                            <div>Active Projects: <span class="badge bg-success">{{ application_stats.content.active_projects }}</span></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monitoring Configuration -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5><i class="fas fa-sliders-h me-2"></i>Monitoring Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Sentry Error Tracking</h6>
+                            <span class="badge bg-{{ 'success' if monitoring_config.sentry.enabled else 'secondary' }}">
+                                {{ 'Enabled' if monitoring_config.sentry.enabled else 'Disabled' }}
+                            </span>
+                            {% if monitoring_config.sentry.enabled %}
+                            <div class="mt-2">
+                                <small>Environment: {{ monitoring_config.sentry.environment }}</small><br>
+                                <small>Sample Rate: {{ monitoring_config.sentry.traces_sample_rate * 100 }}%</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h6>Prometheus Metrics</h6>
+                            <span class="badge bg-{{ 'success' if monitoring_config.prometheus.enabled else 'secondary' }}">
+                                {{ 'Enabled' if monitoring_config.prometheus.enabled else 'Disabled' }}
+                            </span>
+                            {% if monitoring_config.prometheus.enabled %}
+                            <div class="mt-2">
+                                <small>Path: {{ monitoring_config.prometheus.metrics_path }}</small><br>
+                                <a href="{{ monitoring_config.prometheus.metrics_path }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                    View Metrics
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h6>Health Checks</h6>
+                            <span class="badge bg-{{ 'success' if monitoring_config.health_checks.enabled else 'secondary' }}">
+                                {{ 'Enabled' if monitoring_config.health_checks.enabled else 'Disabled' }}
+                            </span>
+                            <div class="mt-2">
+                                <small>Database Check: {{ 'Yes' if monitoring_config.health_checks.database_check else 'No' }}</small><br>
+                                <a href="/health" target="_blank" class="btn btn-sm btn-outline-success">
+                                    Check Health
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let autoRefreshInterval = null;
+
+function refreshDashboard() {
+    location.reload();
+}
+
+function toggleAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        document.querySelector('[onclick="toggleAutoRefresh()"]').innerHTML = 
+            '<i class="fas fa-clock me-1"></i>Auto Refresh';
+    } else {
+        autoRefreshInterval = setInterval(refreshDashboard, 30000); // 30 seconds
+        document.querySelector('[onclick="toggleAutoRefresh()"]').innerHTML = 
+            '<i class="fas fa-pause me-1"></i>Stop Auto Refresh';
+    }
+}
+
+function checkAlerts() {
+    fetch('/monitoring/api/alerts')
+        .then(response => response.json())
+        .then(data => {
+            const alertsPanel = document.getElementById('alerts-panel');
+            const alertsContent = document.getElementById('alerts-content');
+            
+            if (data.count > 0) {
+                alertsContent.innerHTML = data.alerts.map(alert => 
+                    `<div class="alert alert-${alert.level === 'critical' ? 'danger' : 'warning'} mb-2">
+                        <strong>${alert.type.toUpperCase()}:</strong> ${alert.message}
+                        <small class="d-block">${new Date(alert.timestamp).toLocaleString()}</small>
+                    </div>`
+                ).join('');
+                alertsPanel.classList.remove('d-none');
+                alertsPanel.className = alertsPanel.className.replace('alert-info', 
+                    data.alerts.some(a => a.level === 'critical') ? 'alert-danger' : 'alert-warning');
+            } else {
+                alertsPanel.classList.add('d-none');
+            }
+        })
+        .catch(error => console.error('Error checking alerts:', error));
+}
+
+// Check alerts on page load and every 60 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    checkAlerts();
+    setInterval(checkAlerts, 60000);
+});
+</script>
+
+<style>
+.vertical-progress {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.badge {
+    font-size: 0.8em;
+}
+</style>
+{% endblock %}

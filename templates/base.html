@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ effective_theme }}">
+<head>
+  <!-- Meta, title, Bootstrap CSS -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+  <title>{% block title %}DeciFrame{% endblock %}</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Dynamic Bootstrap Theme System -->
+  {% if org_prefs.theme == 'dark' %}
+      <!-- Bootstrap Dark Theme -->
+      <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-dark.css') }}">
+  {% else %}
+      <!-- Bootstrap Light Theme -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-light.css') }}">
+  {% endif %}
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+  <!-- Custom styles -->
+  <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/responsive.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/inter-font.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/admin-button-fixes.css') }}" rel="stylesheet">
+
+  {% block extra_head %}{% endblock %}
+
+  <!-- Global Variables for JavaScript -->
+  <script>
+    window.ORG_PREFS = {
+      currency: '{{ org_prefs.currency if org_prefs else "USD" }}',
+      date_format: '{{ org_prefs.date_format if org_prefs else "%Y-%m-%d" }}',
+      timezone: '{{ org_prefs.timezone if org_prefs else "UTC" }}',
+      theme: '{{ org_prefs.theme if org_prefs else "light" }}'
+    };
+    window.CURRENCY_SYMBOLS = {
+      'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
+      'CAD': 'C$', 'AUD': 'A$', 'CHF': 'CHF', 'CNY': '¥'
+    };
+    window.CURRENCY_SYMBOL = window.CURRENCY_SYMBOLS['{{ org_prefs.currency if org_prefs else "USD" }}'] || '$';
+  </script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  
+  <!-- Toast Container for Notifications -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast align-items-center text-bg-{{ 'danger' if category == 'error' else category }}" role="alert" aria-live="assertive" aria-describedby="toast-body" data-bs-autohide="true" data-bs-delay="4000">
+            <div class="d-flex">
+              <div class="toast-body">
+                <i class="bi bi-{{ 'exclamation-triangle' if category == 'error' else ('check-circle' if category == 'success' else ('exclamation-circle' if category == 'warning' else 'info-circle')) }}"></i>
+                {{ message }}
+              </div>
+              <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Navbar -->
+  {% set logged_in = user and user.is_authenticated %}
+  {% include 'partials/navbar.html' %}
+
+  <!-- Onboarding Modal -->
+  {% if user and user.is_authenticated and not user.onboarded %}
+  <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="welcomeModalLabel">Welcome to DeciFrame!</h5>
+        </div>
+        <div class="modal-body">
+          <p>Welcome to your enterprise decision management platform. Here's what you can explore:</p>
+          <ul>
+            <li><strong>Dashboard:</strong> View your personalized metrics and pending tasks</li>
+            <li><strong>Problems:</strong> Report and track organizational challenges</li>
+            <li><strong>Business Cases:</strong> Build comprehensive business justifications</li>
+            <li><strong>Projects:</strong> Manage your project portfolio and milestones</li>
+            <li><strong>Help Center:</strong> Access guides and support resources</li>
+          </ul>
+          <p>Ready to get started with your decision intelligence journey?</p>
+        </div>
+        <div class="modal-footer">
+          <form method="post" action="{{ url_for('auth.mark_onboarded') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}"/>
+            <button type="submit" class="btn btn-primary">Get Started</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Page content -->
+  <main class="flex-fill">
+    <div class="container-fluid px-3 px-md-4 py-4">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-light text-center text-muted py-3 border-top mt-auto">
+    <div class="container">
+      <small>
+        © 2025 DeciFrame. Organizational Management System.
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="{{ url_for('public.terms') }}" class="text-muted">Terms of Use</a> |
+        <a href="{{ url_for('public.privacy') }}" class="text-muted">Privacy Policy</a>
+      </small>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Toast Notification Initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize all toast notifications
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+      var toastList = toastElList.map(function(toastEl) {
+        return new bootstrap.Toast(toastEl);
+      });
+      // Show all toasts
+      toastList.forEach(toast => toast.show());
+    });
+  </script>
+
+  <!-- Theme Toggle Initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Theme toggle initialized');
+    });
+  </script>
+
+  <!-- Show Onboarding Modal -->
+  {% if user and user.is_authenticated and not user.onboarded %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+      welcomeModal.show();
+    });
+  </script>
+  {% endif %}
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

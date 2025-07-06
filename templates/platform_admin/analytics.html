@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - DeciFrame Platform Admin{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+    <style>
+        .platform-navbar {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 2px solid #e74c3c;
+            padding: 1rem 0;
+        }
+        .platform-badge {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .analytics-card {
+            background: rgba(46, 46, 72, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .metric-card {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        .metric-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        .metric-label {
+            color: #bbb;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .trend-up {
+            color: #2ecc71;
+        }
+        .trend-down {
+            color: #e74c3c;
+        }
+        .company-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(26, 26, 46, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid;
+        }
+        .company-enterprise {
+            border-left-color: #2ecc71;
+        }
+        .company-growth {
+            border-left-color: #f39c12;
+        }
+        .company-smb {
+            border-left-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <!-- Platform Admin Navbar -->
+    <nav class="platform-navbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="text-white mb-0 d-inline-block me-3">DeciFrame Platform Admin</h4>
+                    <span class="platform-badge">Staff Only</span>
+                </div>
+                <div>
+                    <a href="{{ url_for('platform_admin.dashboard') }}" class="btn btn-outline-light me-2">Dashboard</a>
+                    <a href="{{ url_for('platform_admin.waitlist_management') }}" class="btn btn-outline-light me-2">Manage Waitlist</a>
+                    <a href="{{ url_for('platform_admin.logout') }}" class="btn btn-outline-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="text-white mb-3">Advanced Analytics</h2>
+                <p class="text-muted">Deep insights into waitlist performance and user behavior</p>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-number">{{ total_entries }}</div>
+                    <div class="metric-label">Total Signups</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-number">{{ "%.1f"|format(contacted_rate) }}%</div>
+                    <div class="metric-label">Contact Rate</div>
+                    <div class="text-success small mt-1">
+                        <i class="bi bi-trending-up"></i> Industry Leading
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-number">{{ company_analysis|length }}</div>
+                    <div class="metric-label">Unique Companies</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-number">
+                        {% set avg_daily = (daily_signups|length > 0) and (daily_signups|map(attribute='count')|sum / daily_signups|length) or 0 %}
+                        {{ "%.1f"|format(avg_daily) }}
+                    </div>
+                    <div class="metric-label">Avg Daily Signups</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Trend Chart -->
+        <div class="analytics-card">
+            <h5 class="text-white mb-3">📈 Signup Trends (Last 30 Days)</h5>
+            <canvas id="signupTrendChart" width="400" height="150"></canvas>
+        </div>
+
+        <!-- Company Analysis -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="analytics-card">
+                    <h5 class="text-white mb-3">🏢 Company Performance Analysis</h5>
+                    {% if company_analysis %}
+                        {% for item in company_analysis[:10] %}
+                            <div class="company-row {{ 'company-enterprise' if item.signups >= 5 else ('company-growth' if item.signups >= 3 else 'company-smb') }}">
+                                <div>
+                                    <strong class="text-white">{{ item.company }}</strong>
+                                    <div class="small text-muted">
+                                        {{ item.signups }} signup{{ 's' if item.signups != 1 else '' }} • 
+                                        {{ item.contacted }} contacted ({{ "%.0f"|format(item.contacted/item.signups*100 if item.signups > 0 else 0) }}%)
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    {% if item.signups >= 5 %}
+                                        <span class="badge bg-success">Enterprise</span>
+                                    {% elif item.signups >= 3 %}
+                                        <span class="badge bg-warning">Growth</span>
+                                    {% else %}
+                                        <span class="badge bg-info">SMB</span>
+                                    {% endif %}
+                                    <div class="small text-muted mt-1">
+                                        Conversion Rate: {{ "%.0f"|format(item.contacted/item.signups*100 if item.signups > 0 else 0) }}%
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No company data available yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="analytics-card">
+                    <h5 class="text-white mb-3">📊 Conversion Insights</h5>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-light">Contact Performance</h6>
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ contacted_rate }}%" aria-valuenow="{{ contacted_rate }}" 
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-muted">{{ "%.1f"|format(contacted_rate) }}% contact rate</small>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-light">Market Segments</h6>
+                        {% set enterprise_count = company_analysis | selectattr('signups', 'ge', 5) | list | length %}
+                        {% set growth_count = company_analysis | selectattr('signups', 'ge', 3) | selectattr('signups', 'lt', 5) | list | length %}
+                        {% set smb_count = company_analysis | selectattr('signups', 'lt', 3) | list | length %}
+                        
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Enterprise</small>
+                            <small>{{ enterprise_count }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Growth</small>
+                            <small>{{ growth_count }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small>SMB</small>
+                            <small>{{ smb_count }}</small>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h6 class="text-light">Recommendations</h6>
+                        <ul class="small text-muted ps-3">
+                            {% if contacted_rate < 50 %}
+                                <li>Improve contact follow-up rate</li>
+                            {% endif %}
+                            {% if enterprise_count > 3 %}
+                                <li>Focus on enterprise segment</li>
+                            {% endif %}
+                            <li>Monitor daily signup trends</li>
+                            <li>Track conversion by company size</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Actions -->
+        <div class="analytics-card">
+            <h5 class="text-white mb-3">📋 Export & Actions</h5>
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-light" onclick="exportCSV()">
+                    📊 Export Full Dataset
+                </button>
+                <button class="btn btn-outline-info" onclick="exportAnalyticsReport()">
+                    📈 Analytics Report
+                </button>
+                <a href="{{ url_for('platform_admin.waitlist_management') }}" class="btn btn-outline-warning">
+                    ✉️ Contact Uncontacted
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Signup Trend Chart
+        const trendCtx = document.getElementById('signupTrendChart').getContext('2d');
+        const dailyData = {{ daily_signups | tojson }};
+        
+        // Prepare data for chart
+        const labels = dailyData.map(item => {
+            const date = new Date(item.date);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        
+        const signupCounts = dailyData.map(item => item.count);
+        
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Daily Signups',
+                    data: signupCounts,
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#f8f9fa'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#f8f9fa',
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#f8f9fa'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Export functions
+        async function exportCSV() {
+            try {
+                const response = await fetch('{{ url_for("platform_admin.export_csv") }}');
+                const data = await response.json();
+                
+                const blob = new Blob([data.csv_content], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = data.filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                alert('Export completed successfully!');
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Export failed. Please try again.');
+            }
+        }
+
+        function exportAnalyticsReport() {
+            // Create analytics summary report
+            const report = `DeciFrame Platform Analytics Report
+Generated: ${new Date().toLocaleString()}
+
+=== KEY METRICS ===
+Total Signups: {{ total_entries }}
+Contact Rate: {{ "%.1f"|format(contacted_rate) }}%
+Unique Companies: {{ company_analysis|length }}
+Average Daily Signups: {{ "%.1f"|format((daily_signups|length > 0) and (daily_signups|map(attribute='count')|sum / daily_signups|length) or 0) }}
+
+=== TOP COMPANIES ===
+{% for item in company_analysis[:5] %}{{ item.company }}: {{ item.signups }} signups ({{ "%.0f"|format(item.contacted/item.signups*100 if item.signups > 0 else 0) }}% contacted)
+{% endfor %}
+
+=== RECOMMENDATIONS ===
+{% if contacted_rate < 50 %}- Improve contact follow-up processes
+{% endif %}{% if company_analysis|selectattr('signups', 'ge', 5)|list|length > 3 %}- Focus on enterprise segment opportunities
+{% endif %}- Monitor signup trends for optimal outreach timing
+- Implement automated follow-up sequences
+
+Generated by DeciFrame Platform Admin`;
+
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `deciframe_analytics_report_${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+{% endblock %}

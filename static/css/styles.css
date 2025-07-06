@@ -1,0 +1,48 @@
+body {
+  background-color: #f9f9f9;
+}
+
+footer {
+  font-size: 0.9rem;
+}
+
+/* Fix dropdown text visibility */
+.dropdown-menu {
+  background-color: #fff !important;
+  border: 1px solid #dee2e6 !important;
+}
+
+.dropdown-item {
+  color: #212529 !important;
+  background-color: transparent !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: #1e2125 !important;
+  background-color: #e9ecef !important;
+}
+
+.dropdown-divider {
+  border-top: 1px solid #dee2e6 !important;
+}
+
+/* Dark theme dropdown overrides */
+[data-bs-theme="dark"] .dropdown-menu {
+  background-color: #212529 !important;
+  border: 1px solid #495057 !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+  color: #fff !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover,
+[data-bs-theme="dark"] .dropdown-item:focus {
+  color: #fff !important;
+  background-color: #495057 !important;
+}
+
+[data-bs-theme="dark"] .dropdown-divider {
+  border-top: 1px solid #495057 !important;
+}

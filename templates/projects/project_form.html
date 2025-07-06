@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - DeciFrame{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-project-diagram"></i> {{ title }}
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" id="projectForm">
+                            {{ form.hidden_tag() }}
+                            <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        {{ form.name.label(class="form-label") }}
+                                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                                        {% if form.name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.name.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        {{ form.description.label(class="form-label") }}
+                                        {{ form.description(class="form-control", rows="4") }}
+                                        {% if form.description.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.description.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.start_date.label(class="form-label") }}
+                                        {{ form.start_date(class="form-control") }}
+                                        {% if form.start_date.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.start_date.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.end_date.label(class="form-label") }}
+                                        {{ form.end_date(class="form-control") }}
+                                        {% if form.end_date.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.end_date.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.budget.label(class="form-label") }}
+                                        <div class="input-group">
+                                            <span class="input-group-text">{{ org_settings.get_currency_symbol() }}</span>
+                                            {{ form.budget(class="form-control", placeholder="0.00") }}
+                                        </div>
+                                        {% if form.budget.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.budget.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.business_case_id.label(class="form-label") }}
+                                        {{ form.business_case_id(class="form-select") }}
+                                        {% if form.business_case_id.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.business_case_id.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <small class="text-muted">Link this project to an approved business case</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.status.label(class="form-label") }}
+                                        {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else "")) }}
+                                        {% if form.status.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.status.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.priority.label(class="form-label") }}
+                                        {{ form.priority(class="form-select" + (" is-invalid" if form.priority.errors else "")) }}
+                                        {% if form.priority.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.priority.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.project_manager_id.label(class="form-label") }}
+                                        {{ form.project_manager_id(class="form-select" + (" is-invalid" if form.project_manager_id.errors else "")) }}
+                                        {% if form.project_manager_id.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.project_manager_id.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.department_id.label(class="form-label") }}
+                                        {% if current_user.role.value == 'Admin' %}
+                                            {{ form.department_id(class="form-select" + (" is-invalid" if form.department_id.errors else "")) }}
+                                        {% else %}
+                                            {{ form.department_id(class="form-select", readonly=true, style="background-color: #e9ecef;") }}
+                                            <small class="form-text text-muted">Projects are automatically assigned to your department</small>
+                                        {% endif %}
+                                        {% if form.department_id.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.department_id.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        {{ form.org_unit_id.label(class="form-label") }}
+                                        {{ form.org_unit_id(class="form-select") }}
+                                        {% if form.org_unit_id.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.org_unit_id.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <small class="text-muted">Optional: Assign to a specific organizational unit</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{{ url_for('projects.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back to Projects
+                                </a>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

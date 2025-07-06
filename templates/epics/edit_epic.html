@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Epic - {{ epic.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-edit"></i> Edit Epic</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Epic Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ epic.title }}" required maxlength="200">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Epic Description *</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="4" required>{{ epic.description }}</textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('epics.view_epics', case_id=epic.case_id) }}" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

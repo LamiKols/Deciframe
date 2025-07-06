@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Help Center - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar with Categories -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Help Topics
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if categories %}
+                        <div class="list-group list-group-flush">
+                            {% for category in categories %}
+                            <div class="list-group-item">
+                                <h6 class="mb-2">
+                                    <i class="fas fa-folder me-2"></i>{{ category.name }}
+                                    <span class="badge bg-secondary ms-2">{{ category.article_count }}</span>
+                                </h6>
+                                {% if category.articles %}
+                                    <ul class="list-unstyled ms-3 mb-0">
+                                        {% for article in category.articles|sort(attribute='sort_order') %}
+                                        <li class="mb-1">
+                                            <a href="{{ url_for('help.article', slug=article.slug) }}" 
+                                               class="text-decoration-none">
+                                                <i class="fas fa-file-alt me-1"></i>{{ article.title }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No help content available yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-compass fa-4x text-primary mb-4"></i>
+                    <h2 class="mb-3">Welcome to the Help Center</h2>
+                    <p class="lead text-muted mb-4">
+                        Find answers to your questions and learn how to use DeciFrame effectively.
+                    </p>
+                    <p class="text-muted">
+                        Select a topic from the left sidebar to get started, or use the search function 
+                        in the navigation bar to find specific information.
+                    </p>
+                    
+                    {% if categories %}
+                    <div class="row mt-5">
+                        <div class="col-md-6 offset-md-3">
+                            <h5 class="mb-3">Popular Topics</h5>
+                            <div class="list-group">
+                                {% for category in categories[:3] %}
+                                <a href="{{ url_for('help.category', category_id=category.id) }}" 
+                                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-folder me-2"></i>{{ category.name }}
+                                        <small class="d-block text-muted">
+                                            {% if category.articles %}
+                                                {{ category.articles[0].title if category.articles else 'Learn the basics' }}
+                                            {% else %}
+                                                Getting started guide
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-primary">{{ category.article_count }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

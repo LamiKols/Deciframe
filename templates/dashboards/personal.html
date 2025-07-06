@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Personal Dashboard - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0">
+                    <i class="fas fa-tachometer-alt text-primary"></i> 
+                    Personal Dashboard
+                </h1>
+                <small class="text-muted">Welcome back, {{ user.name }}!</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                My Problems
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ my_problems }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-success">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                My Business Cases
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ my_cases }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-info">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                My Projects
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ my_projects }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-project-diagram fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if pending_approvals > 0 %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Approvals
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_approvals }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-exclamation-circle"></i> My Recent Problems
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_problems %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for problem in recent_problems %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('problems.view', id=problem.id) }}" class="text-decoration-none">
+                                                {{ problem.code }}
+                                            </a>
+                                        </td>
+                                        <td>{{ problem.title[:50] }}{% if problem.title|length > 50 %}...{% endif %}</td>
+                                        <td>
+                                            <span class="badge badge-{{ 'success' if problem.status.value == 'Resolved' else 'warning' if problem.status.value == 'Open' else 'info' }}">
+                                                {{ problem.status.value }}
+                                            </span>
+                                        </td>
+                                        <td>{{ problem.created_at.strftime('%m/%d') if problem.created_at else 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No problems reported yet.</p>
+                            <a href="{{ url_for('problems.create') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Report a Problem
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        <i class="fas fa-briefcase"></i> My Recent Business Cases
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_cases %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for case in recent_cases %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('business.view_case', id=case.id) }}" class="text-decoration-none">
+                                                {{ case.code }}
+                                            </a>
+                                        </td>
+                                        <td>{{ case.title[:50] }}{% if case.title|length > 50 %}...{% endif %}</td>
+                                        <td>
+                                            <span class="badge badge-{{ 'success' if case.status.value == 'Approved' else 'warning' if case.status.value == 'Open' else 'info' }}">
+                                                {{ case.status.value }}
+                                            </span>
+                                        </td>
+                                        <td>{{ case.created_at.strftime('%m/%d') if case.created_at else 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No business cases created yet.</p>
+                            <a href="{{ url_for('business.new_case') }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus"></i> Create Business Case
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('problems.create') }}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-exclamation-triangle"></i><br>
+                                Report Problem
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('business.new_case') }}" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-briefcase"></i><br>
+                                Create Business Case
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('projects.new_project') }}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-project-diagram"></i><br>
+                                Start Project
+                            </a>
+                        </div>
+                        {% if user.role.value in ['Director', 'CEO', 'Admin'] %}
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('dashboards.admin_dashboard') }}" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-tasks"></i><br>
+                                Admin Center
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

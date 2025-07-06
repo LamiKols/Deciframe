@@ -1,0 +1,9 @@
+deciframe_clean.zip
+deciframe-clean-export.tar.gz
+attached_assets/
+*.cookies.txt
+__pycache__/
+*.tar.gz
+*.zip
+test_*.py
+debug_*.py

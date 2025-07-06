@@ -1,0 +1,13 @@
+services:
+- type: web
+  name: deciframe-app
+  env: python
+  repo: https://github.com/LamiKols/deciframe-export
+  branch: main
+  buildCommand: "pip install -r requirements.txt"
+  startCommand: "gunicorn app:app"
+  autoDeploy: true
+  envVars:
+    - key: FLASK_ENV
+      value: production
+buildCommand: "pip install -r path/to/requirements.txt"

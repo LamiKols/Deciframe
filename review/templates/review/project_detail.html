@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Review Project: {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>📋 Project Review</h2>
+            <h4>{{ project.name }}</h4>
+            <p class="text-muted">{{ project.code or 'No Code' }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-warning fs-6">{{ project.status.value }}</span>
+        </div>
+    </div>
+
+    <!-- Project Details -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Project Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Description</h6>
+                    <p>{{ project.description or 'No description provided' }}</p>
+                    
+                    <h6>Project Manager</h6>
+                    <p>
+                        {% if project.project_manager %}
+                            {{ project.project_manager.name }} ({{ project.project_manager.email }})
+                        {% else %}
+                            <span class="text-muted">Not assigned</span>
+                        {% endif %}
+                    </p>
+                    
+                    <h6>Department</h6>
+                    <p>
+                        {% if project.department %}
+                            {{ project.department.name }}
+                        {% else %}
+                            <span class="text-muted">Not specified</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Budget</h6>
+                    <p>
+                        {% if project.budget %}
+                            {{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(project.budget) }}
+                        {% else %}
+                            <span class="text-muted">Not specified</span>
+                        {% endif %}
+                    </p>
+                    
+                    <h6>Timeline</h6>
+                    <p>
+                        <strong>Start:</strong> 
+                        {% if project.start_date %}
+                            {{ project.start_date.strftime('%B %d, %Y') }}
+                        {% else %}
+                            <span class="text-muted">Not set</span>
+                        {% endif %}
+                        <br>
+                        <strong>End:</strong> 
+                        {% if project.end_date %}
+                            {{ project.end_date.strftime('%B %d, %Y') }}
+                        {% else %}
+                            <span class="text-muted">Not set</span>
+                        {% endif %}
+                    </p>
+                    
+                    <h6>Priority</h6>
+                    <p>
+                        {% if project.priority %}
+                            <span class="badge bg-{% if project.priority.value == 'High' %}danger{% elif project.priority.value == 'Medium' %}warning{% else %}secondary{% endif %}">
+                                {{ project.priority.value }}
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">Not set</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission Information -->
+    {% if project.submitted_by or project.submitted_at %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Submission Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Submitted By</h6>
+                    <p>
+                        {% if project.submitted_by %}
+                            {{ project.submitter.name }} ({{ project.submitter.email }})
+                        {% else %}
+                            <span class="text-muted">Unknown</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Submitted At</h6>
+                    <p>
+                        {% if project.submitted_at %}
+                            {{ project.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        {% else %}
+                            <span class="text-muted">Not recorded</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Related Business Case -->
+    {% if project.business_case %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Related Business Case</h5>
+        </div>
+        <div class="card-body">
+            <h6>{{ project.business_case.title }}</h6>
+            <p>{{ project.business_case.summary or 'No summary available' }}</p>
+            <a href="{{ url_for('business.view_case', case_id=project.business_case.id) }}" class="btn btn-sm btn-outline-primary">
+                View Business Case
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- AI Reviewer Insights -->
+    {% if ai_insights and ai_insights.success %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-robot"></i> AI Reviewer Insights</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info mb-3">
+                <h6><i class="fas fa-eye"></i> Executive Summary</h6>
+                <p class="mb-0">{{ ai_insights.summary }}</p>
+            </div>
+            
+            {% if ai_insights.considerations %}
+            <div class="mb-3">
+                <h6><i class="fas fa-exclamation-triangle"></i> Critical Review Factors</h6>
+                <ul class="list-unstyled">
+                    {% for consideration in ai_insights.considerations %}
+                    <li class="mb-2">
+                        <span class="badge bg-warning me-2">{{ loop.index }}</span>
+                        {{ consideration }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <small class="text-muted">
+                <i class="fas fa-info-circle"></i> 
+                AI insights are generated to assist in review decisions and should be considered alongside your professional judgment.
+            </small>
+        </div>
+    </div>
+    {% elif ai_insights and not ai_insights.success %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-robot"></i> AI Reviewer Insights</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> 
+                {{ ai_insights.summary or "AI insights are temporarily unavailable." }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Enhanced AI Review Insights -->
+    {% if enhanced_ai_insights and enhanced_ai_insights.confidence_score %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-brain"></i> Enhanced AI Review Analysis
+                <span class="badge {{ get_confidence_badge_class(enhanced_ai_insights.confidence_score) }} ms-2">
+                    {{ get_confidence_label(enhanced_ai_insights.confidence_score) }}
+                </span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-gauge-high"></i> Approval Confidence</h6>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="progress flex-grow-1 me-3" style="height: 20px;">
+                            <div class="progress-bar {{ get_confidence_badge_class(enhanced_ai_insights.confidence_score) }}" 
+                                 role="progressbar" 
+                                 style="width: {{ enhanced_ai_insights.confidence_score }}%">
+                                {{ enhanced_ai_insights.confidence_score }}%
+                            </div>
+                        </div>
+                        <span class="fw-bold">{{ enhanced_ai_insights.confidence_score }}%</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-lightbulb"></i> AI Recommendation</h6>
+                    <p class="mb-3">{{ enhanced_ai_insights.recommendation or 'Review content for optimal decision making.' }}</p>
+                </div>
+            </div>
+            
+            {% if enhanced_ai_insights.risks %}
+            <div class="mb-3">
+                <h6><i class="fas fa-shield-alt"></i> Key Risk Assessment</h6>
+                <div class="list-group list-group-flush">
+                    {% for risk in enhanced_ai_insights.risks %}
+                    <div class="list-group-item d-flex align-items-start p-3">
+                        <i class="fas fa-exclamation-triangle text-warning me-3 mt-1"></i>
+                        <span>{{ risk }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <small class="text-muted">
+                <i class="fas fa-info-circle"></i> 
+                Enhanced AI analysis provides confidence scoring and risk assessment to support informed decision making.
+            </small>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Review Comments -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Review Comments</h5>
+        </div>
+        <div class="card-body">
+            {% if comments %}
+                {% for comment in comments %}
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ comment.author.name }}</strong>
+                            <small class="text-muted">{{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                        </div>
+                    </div>
+                    <p class="mt-2 mb-0">{{ comment.content }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No comments yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Review Actions -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Review Actions</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('review.handle_project_action', project_id=project.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                
+                <!-- Comment Section -->
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Add Comment (Optional)</label>
+                    <textarea class="form-control" id="comment" name="comment" rows="3" 
+                              placeholder="Enter your review comments here..."></textarea>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2">
+                    <button type="submit" name="action" value="approve" class="btn btn-success">
+                        ✅ Approve Project
+                    </button>
+                    <button type="submit" name="action" value="send_back" class="btn btn-warning">
+                        🔄 Send Back for Revisions
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="mt-4">
+        <a href="{{ url_for('review.review_projects') }}" class="btn btn-secondary">
+            ← Back to Project Review
+        </a>
+        <a href="{{ url_for('projects.view_project', project_id=project.id) }}" class="btn btn-outline-primary">
+            View Full Project Details
+        </a>
+    </div>
+</div>
+{% endblock %}

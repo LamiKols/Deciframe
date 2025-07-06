@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Role Permissions - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-shield me-2"></i>Role Permission Matrix</h2>
+                <button class="btn btn-success" onclick="saveAllPermissions()">
+                    <i class="fas fa-save me-2"></i>Save All Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Permission Matrix -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Module Permissions by Role</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Role / Module</th>
+                                    {% for module in modules %}
+                                    <th class="text-center">{{ module }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for role in roles %}
+                                <tr>
+                                    <td><strong>{{ role.value }}</strong></td>
+                                    {% for module in modules %}
+                                    <td class="text-center">
+                                        {% set permission = permissions.get(role.value, {}).get(module, {}) %}
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <input type="checkbox" class="btn-check" 
+                                                   id="create_{{ role.value }}_{{ module }}" 
+                                                   {% if permission.get('create', False) %}checked{% endif %}>
+                                            <label class="btn btn-outline-success" for="create_{{ role.value }}_{{ module }}" title="Create">C</label>
+                                            
+                                            <input type="checkbox" class="btn-check" 
+                                                   id="read_{{ role.value }}_{{ module }}" 
+                                                   {% if permission.get('read', False) %}checked{% endif %}>
+                                            <label class="btn btn-outline-primary" for="read_{{ role.value }}_{{ module }}" title="Read">R</label>
+                                            
+                                            <input type="checkbox" class="btn-check" 
+                                                   id="update_{{ role.value }}_{{ module }}" 
+                                                   {% if permission.get('update', False) %}checked{% endif %}>
+                                            <label class="btn btn-outline-warning" for="update_{{ role.value }}_{{ module }}" title="Update">U</label>
+                                            
+                                            <input type="checkbox" class="btn-check" 
+                                                   id="delete_{{ role.value }}_{{ module }}" 
+                                                   {% if permission.get('delete', False) %}checked{% endif %}>
+                                            <label class="btn btn-outline-danger" for="delete_{{ role.value }}_{{ module }}" title="Delete">D</label>
+                                        </div>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <strong>Legend:</strong> C = Create, R = Read, U = Update, D = Delete
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveAllPermissions() {
+    const permissions = {};
+    
+    {% for role in roles %}
+    permissions['{{ role.value }}'] = {};
+    {% for module in modules %}
+    permissions['{{ role.value }}']['{{ module }}'] = {
+        create: document.getElementById('create_{{ role.value }}_{{ module }}').checked,
+        read: document.getElementById('read_{{ role.value }}_{{ module }}').checked,
+        update: document.getElementById('update_{{ role.value }}_{{ module }}').checked,
+        delete: document.getElementById('delete_{{ role.value }}_{{ module }}').checked
+    };
+    {% endfor %}
+    {% endfor %}
+    
+    fetch('/admin/roles', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({permissions: permissions})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Permissions updated successfully!');
+        } else {
+            alert('Error updating permissions: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+</script>
+{% endblock %}

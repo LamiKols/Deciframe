@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}System Health - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">System Health</h2>
+                    <p class="text-muted">Monitor system performance and health metrics</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                    <button type="button" class="btn btn-primary" onclick="refreshHealth()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Health -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-database me-2"></i>Database Health</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-3">
+                                <h3 class="text-primary mb-1">{{ db_stats.total_tables }}</h3>
+                                <h6 class="text-muted mb-0">Tables</h6>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-3">
+                                <h3 class="text-success mb-1">{{ db_stats.total_records }}</h3>
+                                <h6 class="text-muted mb-0">Total Records</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <span class="badge bg-success">Database Connected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Metrics -->
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Performance Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>Response Time:</span>
+                                <span class="text-success">{{ performance_metrics.avg_response_time }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>Uptime:</span>
+                                <span class="text-success">{{ performance_metrics.uptime }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>CPU Usage:</span>
+                                <span class="text-info">{{ performance_metrics.cpu_usage }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>Memory:</span>
+                                <span class="text-warning">{{ performance_metrics.memory_usage }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <span class="badge bg-success">System Healthy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Error Logs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Recent Error Logs</h5>
+                    <a href="{{ url_for('admin_audit_trail') }}?action=error" class="btn btn-sm btn-outline-danger">
+                        View All Errors
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if error_logs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in error_logs %}
+                                    <tr>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') if log.timestamp else '-' }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            {% if log.user_id %}
+                                                <span class="text-primary">User #{{ log.user_id }}</span>
+                                            {% else %}
+                                                <span class="text-muted">System</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ log.action }}</span>
+                                        </td>
+                                        <td>
+                                            <small>
+                                                {% if log.details %}
+                                                    {{ log.details[:150] }}{% if log.details|length > 150 %}...{% endif %}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-check-circle fa-3x mb-3 text-success opacity-25"></i>
+                            <h5>No Recent Errors</h5>
+                            <p>System is running smoothly with no error logs in the recent period.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshHealth() {
+    window.location.reload();
+}
+</script>
+
+{% endblock %}

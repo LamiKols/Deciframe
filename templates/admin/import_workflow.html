@@ -1,0 +1,75 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Import Workflow from Library</h2>
+    <a href="{{ url_for('admin_workflows') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Back to Workflows
+    </a>
+</div>
+
+{% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+{% endif %}
+
+<form method="post">
+    <div class="mb-3">
+        <label for="librarySelect" class="form-label">Choose a template</label>
+        <select id="librarySelect" name="library_id" class="form-select" required>
+            <option value="">Select a workflow template...</option>
+            {% for lib in libraries %}
+                <option value="{{ lib.id }}">
+                    [{{ lib.category }}] {{ lib.name }} – {{ lib.description }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="custom_name" class="form-label">Custom Name (optional)</label>
+        <input type="text" class="form-control" id="custom_name" name="custom_name" 
+               placeholder="Leave blank to use 'My - [Template Name]'">
+        <div class="form-text">Customize the name for your imported workflow</div>
+    </div>
+    
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-download me-1"></i>Import
+        </button>
+        <a href="{{ url_for('admin_workflows') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+<div class="mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h6 class="mb-0">Available Templates</h6>
+        </div>
+        <div class="card-body">
+            {% if libraries %}
+                {% set categories = libraries | groupby('category') %}
+                {% for category, templates in categories %}
+                    <div class="mb-3">
+                        <h6 class="text-primary border-bottom pb-1">{{ category or 'General' }}</h6>
+                        {% for template in templates %}
+                            <div class="ms-3 mb-2">
+                                <strong>{{ template.name }}</strong>
+                                <p class="text-muted small mb-1">{{ template.description }}</p>
+                                <small class="text-info">
+                                    Triggers: {{ template.definition.get('triggers', []) | join(', ') or 'None' }} | 
+                                    Steps: {{ template.definition.get('steps', []) | length }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No library templates available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

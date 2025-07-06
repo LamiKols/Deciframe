@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}Story Refinement - {{ business_case.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-light">Story Refinement</h2>
+                    <p class="text-light mb-0">{{ business_case.code }}: {{ business_case.title }}</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('business.view_case', id=business_case.id) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Case
+                    </a>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading epics and stories...</span>
+                </div>
+                <p class="text-light mt-2">Loading epics and stories...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="alert alert-danger d-none">
+                <h5><i class="fas fa-exclamation-triangle"></i> Failed to Load Stories and Epics</h5>
+                <p>Unable to load the epics and stories for this business case. This might be because:</p>
+                <ul>
+                    <li>No requirements have been generated yet</li>
+                    <li>There's a connection issue</li>
+                    <li>The data is being processed</li>
+                </ul>
+                <button id="retryBtn" class="btn btn-warning">
+                    <i class="fas fa-redo"></i> Retry Loading
+                </button>
+                <a href="{{ url_for('business.requirements', id=business_case.id) }}" class="btn btn-primary ms-2">
+                    <i class="fas fa-cogs"></i> Go to Requirements Generator
+                </a>
+            </div>
+
+            <!-- Epics and Stories Container -->
+            <div id="epicsContainer" class="d-none">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-header">
+                        <h4 class="mb-0 text-light">
+                            <i class="fas fa-tasks me-2"></i>Epics and User Stories
+                            <small class="text-muted ms-2">Drag and drop to reorder, click to edit</small>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="epicsContent">
+                            <!-- Epics will be loaded here -->
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <button id="saveChangesBtn" class="btn btn-success">
+                                <i class="fas fa-save"></i> Save All Changes
+                            </button>
+                            <button id="addEpicBtn" class="btn btn-primary ms-2">
+                                <i class="fas fa-plus"></i> Add New Epic
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class StoryRefinement {
+    constructor() {
+        this.caseId = {{ business_case.id }};
+        this.epics = [];
+        this.init();
+    }
+    
+    init() {
+        this.loadEpicsAndStories();
+        this.setupEventListeners();
+    }
+    
+    async loadEpicsAndStories() {
+        console.log('Loading epics for case ID:', this.caseId);
+        try {
+            // Show loading state
+            document.getElementById('loadingState').classList.remove('d-none');
+            document.getElementById('errorState').classList.add('d-none');
+            document.getElementById('epicsContainer').classList.add('d-none');
+            
+            // Load epics and stories directly from API endpoint
+            console.log('Making fetch request to:', `/api/business-cases/${this.caseId}/epics`);
+            const epicsResponse = await fetch(`/api/business-cases/${this.caseId}/epics`, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!epicsResponse.ok) {
+                console.error('API Response Status:', epicsResponse.status, epicsResponse.statusText);
+                const errorText = await epicsResponse.text();
+                console.error('API Error Response:', errorText);
+                throw new Error(`Failed to load epics data: ${epicsResponse.status} ${epicsResponse.statusText}`);
+            }
+            
+            const data = await epicsResponse.json();
+            console.log('API Response:', data);
+            this.epics = data.epics || [];
+            console.log('Loaded epics:', this.epics.length);
+            
+            if (this.epics.length === 0) {
+                console.log('No epics found, showing no data state');
+                this.showNoDataState();
+            } else {
+                console.log('Rendering epics container');
+                this.renderEpics();
+                this.showEpicsContainer();
+            }
+            
+        } catch (error) {
+            console.error('Error loading epics and stories:', error);
+            this.showErrorState();
+        }
+    }
+    
+    showNoDataState() {
+        document.getElementById('loadingState').classList.add('d-none');
+        document.getElementById('errorState').classList.remove('d-none');
+        document.getElementById('epicsContainer').classList.add('d-none');
+        
+        // Update error message for no data
+        const errorState = document.getElementById('errorState');
+        errorState.innerHTML = `
+            <h5><i class="fas fa-info-circle"></i> No Requirements Found</h5>
+            <p>This business case doesn't have any generated requirements yet.</p>
+            <a href="/cases/${this.caseId}/requirements" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Generate Requirements First
+            </a>
+        `;
+    }
+    
+    showErrorState() {
+        document.getElementById('loadingState').classList.add('d-none');
+        document.getElementById('errorState').classList.remove('d-none');
+        document.getElementById('epicsContainer').classList.add('d-none');
+    }
+    
+    showEpicsContainer() {
+        document.getElementById('loadingState').classList.add('d-none');
+        document.getElementById('errorState').classList.add('d-none');
+        document.getElementById('epicsContainer').classList.remove('d-none');
+    }
+    
+    renderEpics() {
+        const container = document.getElementById('epicsContent');
+        container.innerHTML = '';
+        
+        this.epics.forEach((epic, epicIndex) => {
+            const epicHtml = this.createEpicHtml(epic, epicIndex);
+            container.insertAdjacentHTML('beforeend', epicHtml);
+        });
+    }
+    
+    createEpicHtml(epic, epicIndex) {
+        const storiesHtml = epic.stories.map((story, storyIndex) => 
+            this.createStoryHtml(story, epicIndex, storyIndex)
+        ).join('');
+        
+        return `
+            <div class="epic-container card mb-3 bg-secondary border-light" data-epic-index="${epicIndex}">
+                <div class="card-header bg-primary">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-layer-group me-2"></i>
+                        <span class="epic-title" contenteditable="true">${epic.title}</span>
+                        <button class="btn btn-sm btn-outline-light float-end" onclick="refinement.deleteEpic(${epicIndex})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="epic-description text-light" contenteditable="true">${epic.description}</p>
+                    
+                    <h6 class="text-info mt-3">User Stories:</h6>
+                    <div class="stories-container">
+                        ${storiesHtml}
+                    </div>
+                    
+                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="refinement.addStory(${epicIndex})">
+                        <i class="fas fa-plus"></i> Add Story
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    createStoryHtml(story, epicIndex, storyIndex) {
+        const criteria = Array.isArray(story.acceptance_criteria) 
+            ? story.acceptance_criteria 
+            : (story.acceptance_criteria ? JSON.parse(story.acceptance_criteria) : []);
+            
+        const criteriaHtml = criteria.map(criterion => `<li>${criterion}</li>`).join('');
+        
+        return `
+            <div class="story-item card mb-2 bg-dark border-secondary" data-story-index="${storyIndex}">
+                <div class="card-body">
+                    <h6 class="story-title text-warning" contenteditable="true">${story.title}</h6>
+                    <p class="story-description text-light" contenteditable="true">${story.description}</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong class="text-info">Acceptance Criteria:</strong>
+                            <ul class="acceptance-criteria text-light" contenteditable="true">
+                                ${criteriaHtml}
+                            </ul>
+                        </div>
+                        <div class="col-md-3">
+                            <strong class="text-info">Priority:</strong>
+                            <select class="form-select form-select-sm story-priority">
+                                <option value="High" ${story.priority === 'High' ? 'selected' : ''}>High</option>
+                                <option value="Medium" ${story.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+                                <option value="Low" ${story.priority === 'Low' ? 'selected' : ''}>Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <strong class="text-info">Effort:</strong>
+                            <input type="text" class="form-control form-control-sm story-effort" value="${story.effort_estimate || '5 story points'}">
+                            <button class="btn btn-sm btn-outline-danger mt-1" onclick="refinement.deleteStory(${epicIndex}, ${storyIndex})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    setupEventListeners() {
+        document.getElementById('retryBtn')?.addEventListener('click', () => {
+            this.loadEpicsAndStories();
+        });
+        
+        document.getElementById('saveChangesBtn')?.addEventListener('click', () => {
+            this.saveChanges();
+        });
+        
+        document.getElementById('addEpicBtn')?.addEventListener('click', () => {
+            this.addEpic();
+        });
+    }
+    
+    async saveChanges() {
+        // Collect all current data from the DOM
+        const updatedEpics = this.collectEpicsData();
+        
+        try {
+            const response = await fetch('/api/requirements/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    epics: updatedEpics
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                this.showToast('Changes saved successfully!', 'success');
+            } else {
+                this.showToast('Failed to save changes: ' + result.error, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Error saving changes:', error);
+            this.showToast('Error saving changes', 'error');
+        }
+    }
+    
+    collectEpicsData() {
+        const epics = [];
+        const epicElements = document.querySelectorAll('.epic-container');
+        
+        epicElements.forEach(epicElement => {
+            const epic = {
+                id: this.epics[epicElement.dataset.epicIndex]?.id,
+                title: epicElement.querySelector('.epic-title').textContent,
+                description: epicElement.querySelector('.epic-description').textContent,
+                stories: []
+            };
+            
+            const storyElements = epicElement.querySelectorAll('.story-item');
+            storyElements.forEach(storyElement => {
+                const story = {
+                    id: this.epics[epicElement.dataset.epicIndex]?.stories[storyElement.dataset.storyIndex]?.id,
+                    title: storyElement.querySelector('.story-title').textContent,
+                    description: storyElement.querySelector('.story-description').textContent,
+                    criteria: storyElement.querySelector('.acceptance-criteria').textContent,
+                    priority: storyElement.querySelector('.story-priority').value,
+                    effort_estimate: storyElement.querySelector('.story-effort').value
+                };
+                epic.stories.push(story);
+            });
+            
+            epics.push(epic);
+        });
+        
+        return epics;
+    }
+    
+    showToast(message, type) {
+        // Simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+    
+    addEpic() {
+        const newEpic = {
+            title: 'New Epic',
+            description: 'Epic description',
+            stories: []
+        };
+        
+        this.epics.push(newEpic);
+        this.renderEpics();
+    }
+    
+    deleteEpic(epicIndex) {
+        if (confirm('Are you sure you want to delete this epic and all its stories?')) {
+            this.epics.splice(epicIndex, 1);
+            this.renderEpics();
+        }
+    }
+    
+    addStory(epicIndex) {
+        const newStory = {
+            title: 'New User Story',
+            description: 'As a user, I want...',
+            acceptance_criteria: ['Acceptance criterion 1'],
+            priority: 'Medium',
+            effort_estimate: '5 story points'
+        };
+        
+        this.epics[epicIndex].stories.push(newStory);
+        this.renderEpics();
+    }
+    
+    deleteStory(epicIndex, storyIndex) {
+        if (confirm('Are you sure you want to delete this story?')) {
+            this.epics[epicIndex].stories.splice(storyIndex, 1);
+            this.renderEpics();
+        }
+    }
+}
+
+// Initialize when page loads
+let refinement;
+document.addEventListener('DOMContentLoaded', function() {
+    refinement = new StoryRefinement();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+name,parent_name,manager_email
+CEO Office,,admin@deciframe.com
+Technology Division,CEO Office,lami.kolade@gmail.com
+Human Resources,CEO Office,ruth.kolade@gmail.com
+Finance Division,CEO Office,manager@test.com
+Operations,CEO Office,director@test.com
+Software Development,Technology Division,testuser@example.com
+Infrastructure,Technology Division,staff@test.com
+Quality Assurance,Technology Division,manager@test.com
+Frontend Team,Software Development,staff@test.com
+Backend Team,Software Development,testuser@example.com
+Mobile Team,Software Development,manager@test.com
+DevOps Team,Infrastructure,manager@test.com
+Security Team,Infrastructure,director@test.com
+Manual Testing,Quality Assurance,staff@test.com
+Automation Testing,Quality Assurance,testuser@example.com
+Recruitment,Human Resources,ruth.kolade@gmail.com
+Employee Relations,Human Resources,manager@test.com
+Accounting,Finance Division,manager@test.com
+Budgeting,Finance Division,director@test.com
+Customer Support,Operations,staff@test.com
+Logistics,Operations,manager@test.com
+Sales Team,Operations,director@test.com
+Marketing,Operations,lami.kolade@gmail.com
+Data Analytics,Technology Division,testuser@example.com
+Business Intelligence,Data Analytics,manager@test.com

@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}AI Threshold Settings - DeciFrame Admin{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb" class="mt-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
+                        <li class="breadcrumb-item active">AI Threshold Settings</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-robot me-2"></i>AI Workflow Automation Settings</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/admin/ai-settings/update">
+                            {% for setting in settings %}
+                            <div class="mb-4">
+                                <label for="{{ setting.setting_name }}" class="form-label">
+                                    <strong>{{ setting.setting_name.replace('_', ' ').title() }}</strong>
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="{{ setting.setting_name }}" 
+                                       name="{{ setting.setting_name }}" 
+                                       value="{{ setting.setting_value }}" 
+                                       step="0.01" 
+                                       {% if setting.setting_name == 'SUCCESS_ALERT_THRESHOLD' %}
+                                       min="0" max="1"
+                                       {% elif setting.setting_name == 'CYCLE_TIME_ALERT_FACTOR' %}
+                                       min="1" max="5"
+                                       {% endif %}
+                                       required>
+                                {% if setting.description %}
+                                <div class="form-text">{{ setting.description }}</div>
+                                {% endif %}
+                                {% if setting.updated_at %}
+                                <small class="text-muted">
+                                    Last updated: {{ setting.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                                    {% if setting.updater %}by {{ setting.updater.name }}{% endif %}
+                                </small>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Update Settings
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="checkStatus()">
+                                    <i class="fas fa-sync me-1"></i>Check Status
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>AI System Status</h5>
+                    </div>
+                    <div class="card-body" id="ai-status">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Checking AI system status...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>
+                            <i class="fas fa-vial me-2"></i>Test AI Workflows
+                            <span class="contextual-help-icon" 
+                                  data-help-slug="system-navigation" 
+                                  style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                                  title="Help with AI workflow testing"><i class="fas fa-info-circle"></i></span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="test-project-id" class="form-label">Project ID</label>
+                            <input type="number" class="form-control" id="test-project-id" placeholder="Enter project ID">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="testWorkflow('risk_escalation')">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Test Risk Escalation
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="testWorkflow('milestone_reschedule')">
+                                <i class="fas fa-calendar-alt me-1"></i>Test Milestone Reschedule
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="testWorkflow('anomaly_investigation')">
+                                <i class="fas fa-search me-1"></i>Test Anomaly Investigation
+                            </button>
+                        </div>
+                        
+                        <div id="test-results" class="mt-3" style="display: none;">
+                            <div class="alert alert-info">
+                                <strong>Test Results:</strong>
+                                <div id="test-output"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-book me-2"></i>Threshold Guidelines</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Success Alert Threshold</h6>
+                        <ul class="small">
+                            <li><strong>0.3-0.4:</strong> Aggressive intervention</li>
+                            <li><strong>0.5:</strong> Balanced approach (recommended)</li>
+                            <li><strong>0.6-0.7:</strong> Conservative alerts</li>
+                        </ul>
+                        
+                        <h6>Cycle Time Alert Factor</h6>
+                        <ul class="small">
+                            <li><strong>1.2:</strong> Early milestone adjustment</li>
+                            <li><strong>1.25:</strong> Standard buffer (recommended)</li>
+                            <li><strong>1.5+:</strong> Extended tolerance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function checkStatus() {
+            fetch('/admin/ai-settings/status')
+                .then(response => response.json())
+                .then(data => {
+                    const statusDiv = document.getElementById('ai-status');
+                    
+                    if (data.error) {
+                        statusDiv.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Error: ${data.error}
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let modelsHtml = '';
+                    data.models.forEach(model => {
+                        const status = model.exists ? 
+                            `<span class="badge bg-success">Available</span>` : 
+                            `<span class="badge bg-danger">Missing</span>`;
+                        const cached = model.cached ? 
+                            `<span class="badge bg-info ms-1">Cached</span>` : '';
+                        modelsHtml += `
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>${model.type}</span>
+                                <div>${status}${cached}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    const schedulerStatus = data.scheduler.running ? 
+                        '<span class="badge bg-success">Running</span>' : 
+                        '<span class="badge bg-warning">Stopped</span>';
+                    
+                    statusDiv.innerHTML = `
+                        <h6>ML Scheduler</h6>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Status</span>
+                            ${schedulerStatus}
+                        </div>
+                        
+                        <h6>ML Models</h6>
+                        ${modelsHtml}
+                        
+                        <h6 class="mt-3">Current Thresholds</h6>
+                        <div class="small">
+                            <div class="d-flex justify-content-between">
+                                <span>Success Alert:</span>
+                                <span>${data.thresholds.SUCCESS_ALERT_THRESHOLD || 'Not set'}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Cycle Time Factor:</span>
+                                <span>${data.thresholds.CYCLE_TIME_ALERT_FACTOR || 'Not set'}</span>
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('ai-status').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Failed to load status: ${error.message}
+                        </div>
+                    `;
+                });
+        }
+        
+        function testWorkflow(testType) {
+            const projectId = document.getElementById('test-project-id').value;
+            if (!projectId) {
+                alert('Please enter a project ID to test');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('project_id', projectId);
+            formData.append('test_type', testType);
+            
+            fetch('/admin/ai-settings/test', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('test-results');
+                const outputDiv = document.getElementById('test-output');
+                
+                if (data.error) {
+                    outputDiv.innerHTML = `<div class="text-danger">Error: ${data.error}</div>`;
+                } else {
+                    outputDiv.innerHTML = `
+                        <div class="text-success">${data.message}</div>
+                        <pre class="mt-2">${JSON.stringify(data.results, null, 2)}</pre>
+                    `;
+                }
+                
+                resultsDiv.style.display = 'block';
+            })
+            .catch(error => {
+                document.getElementById('test-output').innerHTML = `
+                    <div class="text-danger">Test failed: ${error.message}</div>
+                `;
+                document.getElementById('test-results').style.display = 'block';
+            });
+        }
+        
+        // Load status on page load
+        document.addEventListener('DOMContentLoaded', checkStatus);
+    </script>
+{% endblock %}

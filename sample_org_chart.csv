@@ -1,0 +1,27 @@
+name,manager_email,parent_name
+DeciFrame Corporation,,
+Executive Office,admin@deciframe.com,DeciFrame Corporation
+Information Technology,lami.kolade@gmail.com,DeciFrame Corporation
+Human Resources,ruth.kolade@gmail.com,DeciFrame Corporation
+Finance,manager@test.com,DeciFrame Corporation
+Operations,director@test.com,DeciFrame Corporation
+Development Team,testuser@example.com,Information Technology
+Infrastructure Team,staff@test.com,Information Technology
+Security Team,manager@test.com,Information Technology
+Frontend Development,staff@test.com,Development Team
+Backend Development,testuser@example.com,Development Team
+QA Testing,manager@test.com,Development Team
+DevOps,manager@test.com,Infrastructure Team
+Network Administration,staff@test.com,Infrastructure Team
+Database Administration,testuser@example.com,Infrastructure Team
+Information Security,director@test.com,Security Team
+Compliance,admin@deciframe.com,Security Team
+Recruitment,ruth.kolade@gmail.com,Human Resources
+Benefits Administration,manager@test.com,Human Resources
+Training & Development,staff@test.com,Human Resources
+Accounting,manager@test.com,Finance
+Financial Planning,director@test.com,Finance
+Procurement,testuser@example.com,Finance
+Customer Support,staff@test.com,Operations
+Business Analysis,lami.kolade@gmail.com,Operations
+Project Management,director@test.com,Operations

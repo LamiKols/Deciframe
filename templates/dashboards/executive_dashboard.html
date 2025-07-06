@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📊 Executive Dashboard</h2>
+    <form method="post" action="{{ url_for('dashboards.export_exec_dashboard') }}" target="_blank">
+      <button type="submit" class="btn btn-outline-secondary">
+        <i class="fas fa-file-pdf"></i> Export to PDF
+      </button>
+    </form>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5>Total Business Cases</h5>
+        <h2>{{ case_count }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5>Approved Projects</h5>
+        <h2>{{ project_count }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5>Open Problems</h5>
+        <h2>{{ problem_count }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5>Total Budget Approved</h5>
+        <h2>{{ currency_symbol }}{{ total_budget|int }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <h4>📁 Business Cases by Department</h4>
+  <table class="table table-bordered table-striped mt-3">
+    <thead>
+      <tr>
+        <th>Department</th>
+        <th>Total Cases</th>
+        <th>Approved</th>
+        <th>Rejected</th>
+        <th>Pending</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for dept in case_stats %}
+      <tr>
+        <td>{{ dept.name }}</td>
+        <td>{{ dept.total }}</td>
+        <td>{{ dept.approved }}</td>
+        <td>{{ dept.rejected }}</td>
+        <td>{{ dept.pending }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No data available</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h4 class="mt-5">📈 Active Project Portfolio</h4>
+  <table class="table table-sm table-hover mt-2">
+    <thead>
+      <tr>
+        <th>Project</th>
+        <th>Owner</th>
+        <th>Status</th>
+        <th>Budget</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for proj in projects %}
+      <tr>
+        <td><a href="{{ url_for('projects.view_project', id=proj.id) }}">{{ proj.title }}</a></td>
+        <td>{{ proj.owner.name if proj.owner else 'Unassigned' }}</td>
+        <td>{{ proj.status }}</td>
+        <td>{{ currency_symbol }}{{ proj.budget|int if proj.budget else 0 }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">No active projects</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Quick Actions</h5>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{{ url_for('review.review_summary') }}" class="btn btn-primary btn-sm">Review Dashboard</a>
+          <a href="{{ url_for('business.list_cases') }}" class="btn btn-secondary btn-sm">Business Cases</a>
+          <a href="{{ url_for('projects.index') }}" class="btn btn-secondary btn-sm">Projects</a>
+          <a href="{{ url_for('problems.index') }}" class="btn btn-secondary btn-sm">Problems</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Executive Reports</h5>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{{ url_for('reports.list_templates') }}" class="btn btn-outline-primary btn-sm">All Reports</a>
+          <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">Admin Center</a>
+          <a href="{{ url_for('dashboards.dashboard_home') }}" class="btn btn-outline-secondary btn-sm">User Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

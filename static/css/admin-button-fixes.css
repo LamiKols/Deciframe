@@ -1,0 +1,221 @@
+/*
+ * Admin Button Visibility Fixes for Light & Dark Themes
+ * Ensures all interactive elements are clearly visible
+ */
+
+:root {
+  --btn-border-color: #6c757d;
+  --btn-text-color: #212529;
+  --btn-hover-bg: #f8f9fa;
+  --btn-hover-text: #000;
+}
+
+[data-bs-theme="dark"] {
+  --btn-border-color: #adb5bd;
+  --btn-text-color: #f8f9fa;
+  --btn-hover-bg: #495057;
+  --btn-hover-text: #fff;
+}
+
+/* Fallback button styling for elements missing proper Bootstrap classes */
+.button-visible {
+  border: 1px solid var(--btn-border-color) !important;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--btn-text-color) !important;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s ease-in-out;
+}
+
+.button-visible:hover {
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+  border-color: var(--btn-border-color);
+  text-decoration: none;
+}
+
+/* Ensure pagination links are visible */
+.page-link {
+  color: var(--btn-text-color) !important;
+  border-color: var(--btn-border-color) !important;
+}
+
+.page-link:hover {
+  background-color: var(--btn-hover-bg) !important;
+  border-color: var(--btn-border-color) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+/* Fix for nav-link buttons that might have poor visibility */
+.nav-link {
+  color: var(--btn-text-color) !important;
+  border: 1px solid var(--btn-border-color) !important;
+  background-color: transparent !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+  color: var(--btn-hover-text) !important;
+  background-color: var(--btn-hover-bg) !important;
+  border-color: var(--btn-border-color) !important;
+}
+
+.nav-link.active {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: #fff !important;
+}
+
+/* Tab navigation specific fixes for admin workflows */
+.nav-tabs .nav-link {
+  margin-bottom: -1px;
+  background: none;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: var(--btn-border-color) var(--btn-border-color) var(--bs-border-color);
+  isolation: isolate;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-border-color) var(--bs-border-color) var(--bs-body-bg);
+}
+
+/* Ensure all buttons in admin area have minimum visibility */
+.admin-area .btn:not(.btn-outline):not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning):not(.btn-info):not(.btn-secondary) {
+  border: 1px solid var(--btn-border-color) !important;
+  color: var(--btn-text-color) !important;
+}
+
+.admin-area .btn:not(.btn-outline):not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning):not(.btn-info):not(.btn-secondary):hover {
+  background-color: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+/* Special handling for modal close buttons */
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-bs-theme="light"] .btn-close {
+  filter: none;
+}
+
+/* Improved button visibility on admin screens */
+.table .btn {
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 1rem;
+  padding: 0.375rem 0.75rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* Fix dropdown buttons in admin */
+.dropdown-toggle {
+  border: 1px solid var(--btn-border-color) !important;
+  color: var(--btn-text-color) !important;
+}
+
+.dropdown-toggle:hover {
+  background-color: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+/* Ensure form submit buttons are visible */
+input[type="submit"]:not(.btn) {
+  border: 1px solid var(--btn-border-color) !important;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--btn-text-color) !important;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="submit"]:not(.btn):hover {
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+/* Fix for buttons inside cards that might blend in */
+.card .btn:not(.btn-outline):not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning):not(.btn-info):not(.btn-secondary) {
+  border: 1px solid var(--btn-border-color) !important;
+  background: transparent !important;
+  color: var(--btn-text-color) !important;
+}
+
+.card .btn:not(.btn-outline):not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning):not(.btn-info):not(.btn-secondary):hover {
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+/* Enhanced visibility for admin center containers */
+.admin-container {
+  min-height: 100vh;
+  background-color: var(--bs-body-bg);
+}
+
+/* Ensure all admin buttons are clearly visible */
+.admin-dashboard .btn,
+.admin-interface .btn,
+[class*="admin"] .btn {
+  min-width: 44px; /* Accessibility minimum touch target */
+  min-height: 44px;
+  position: relative;
+}
+
+/* Fix for any bare buttons without classes */
+button:not([class*="btn"]) {
+  border: 1px solid var(--btn-border-color) !important;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--btn-text-color) !important;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:not([class*="btn"]):hover {
+  background: var(--btn-hover-bg) !important;
+  color: var(--btn-hover-text) !important;
+}
+
+/* Ensure admin action buttons stand out */
+.admin-actions .btn,
+.card-header .btn,
+.d-flex .btn {
+  border: 1px solid currentColor;
+  font-weight: 500;
+}
+
+/* Fix for potentially invisible text elements in buttons */
+.btn * {
+  color: inherit !important;
+}
+
+
+/* Dark mode specific enhancements */
+[data-bs-theme="dark"] .btn-outline-secondary {
+  --bs-btn-color: #adb5bd;
+  --bs-btn-border-color: #6c757d;
+  --bs-btn-hover-color: #000;
+  --bs-btn-hover-bg: #adb5bd;
+  --bs-btn-hover-border-color: #adb5bd;
+}
+
+/* Light mode specific enhancements */
+[data-bs-theme="light"] .btn-outline-secondary {
+  --bs-btn-color: #6c757d;
+  --bs-btn-border-color: #6c757d;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #6c757d;
+  --bs-btn-hover-border-color: #6c757d;
+}

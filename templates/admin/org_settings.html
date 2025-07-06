@@ -1,0 +1,69 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<h2>Organization Settings</h2>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<form method="POST">
+    <label>Organization Name</label>
+    <input type="text" name="name" value="{{ org.name if org.name else '' }}" class="form-control mb-2" required>
+
+    <label>Currency</label>
+    <select name="currency" class="form-select mb-2" required>
+        <option value="USD" {% if org.currency == 'USD' %}selected{% endif %}>USD ($)</option>
+        <option value="EUR" {% if org.currency == 'EUR' %}selected{% endif %}>EUR (€)</option>
+        <option value="GBP" {% if org.currency == 'GBP' %}selected{% endif %}>GBP (£)</option>
+        <option value="CAD" {% if org.currency == 'CAD' %}selected{% endif %}>CAD (C$)</option>
+        <option value="AUD" {% if org.currency == 'AUD' %}selected{% endif %}>AUD (A$)</option>
+        <option value="JPY" {% if org.currency == 'JPY' %}selected{% endif %}>JPY (¥)</option>
+        <option value="CNY" {% if org.currency == 'CNY' %}selected{% endif %}>CNY (¥)</option>
+        <option value="INR" {% if org.currency == 'INR' %}selected{% endif %}>INR (₹)</option>
+    </select>
+
+    <label>Date Format</label>
+    <select name="date_format" class="form-select mb-2" required>
+        <option value="ISO" {% if org.date_format == 'ISO' %}selected{% endif %}>2024-12-31 (ISO)</option>
+        <option value="%Y-%m-%d" {% if org.date_format == '%Y-%m-%d' %}selected{% endif %}>2024-12-31 (YYYY-MM-DD)</option>
+        <option value="%m/%d/%Y" {% if org.date_format == '%m/%d/%Y' %}selected{% endif %}>12/31/2024 (US)</option>
+        <option value="%d/%m/%Y" {% if org.date_format == '%d/%m/%Y' %}selected{% endif %}>31/12/2024 (EU)</option>
+        <option value="%d-%m-%Y" {% if org.date_format == '%d-%m-%Y' %}selected{% endif %}>31-12-2024 (EU dashes)</option>
+        <option value="%B %d, %Y" {% if org.date_format == '%B %d, %Y' %}selected{% endif %}>December 31, 2024 (Full)</option>
+    </select>
+
+    <label>Timezone</label>
+    <select name="timezone" class="form-select mb-2" required>
+        <option value="UTC" {% if org.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+        <option value="US/Eastern" {% if org.timezone == 'US/Eastern' %}selected{% endif %}>US Eastern</option>
+        <option value="US/Central" {% if org.timezone == 'US/Central' %}selected{% endif %}>US Central</option>
+        <option value="US/Mountain" {% if org.timezone == 'US/Mountain' %}selected{% endif %}>US Mountain</option>
+        <option value="US/Pacific" {% if org.timezone == 'US/Pacific' %}selected{% endif %}>US Pacific</option>
+        <option value="Europe/London" {% if org.timezone == 'Europe/London' %}selected{% endif %}>London</option>
+        <option value="Europe/Paris" {% if org.timezone == 'Europe/Paris' %}selected{% endif %}>Paris</option>
+        <option value="Europe/Berlin" {% if org.timezone == 'Europe/Berlin' %}selected{% endif %}>Berlin</option>
+        <option value="Asia/Tokyo" {% if org.timezone == 'Asia/Tokyo' %}selected{% endif %}>Tokyo</option>
+        <option value="Asia/Shanghai" {% if org.timezone == 'Asia/Shanghai' %}selected{% endif %}>Shanghai</option>
+        <option value="Asia/Kolkata" {% if org.timezone == 'Asia/Kolkata' %}selected{% endif %}>India</option>
+        <option value="Australia/Sydney" {% if org.timezone == 'Australia/Sydney' %}selected{% endif %}>Sydney</option>
+    </select>
+
+    <label>Default Theme</label>
+    <select name="theme" class="form-select mb-3" required>
+        <option value="light" {% if org.theme == 'light' %}selected{% endif %}>Light</option>
+        <option value="dark" {% if org.theme == 'dark' %}selected{% endif %}>Dark</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Save Settings</button>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary ms-2">Back to Admin</a>
+</form>
+{% endblock %}

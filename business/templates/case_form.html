@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}{% if business_case %}Edit{% else %}Create{% endif %} Business Case - DeciFrame{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>
+                            {% if business_case %}Edit Business Case {{ business_case.code }}{% else %}Create New Business Case{% endif %}
+                            <span class="contextual-help-icon" 
+                                  data-help-slug="creating-business-cases" 
+                                  style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                                  title="Get help with creating business cases"><i class="fas fa-info-circle"></i></span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Flash Messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                          {% if messages %}
+                            <div class="mb-3">
+                              {% for category, msg in messages %}
+                                <div class="alert alert-{{ 'danger' if category=='danger' else category }} alert-dismissible fade show">
+                                  {{ msg }}
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        {% endwith %}
+                        
+                        <form method="POST" id="businessCaseForm">
+                            {{ form.hidden_tag() }}
+                            {{ form.solution_id() }}
+                            
+                            <!-- Solution Context (if creating from solution) -->
+                            {% if form.solution_description.data %}
+                            <div class="alert alert-info mb-3">
+                                <h6><i class="fas fa-lightbulb me-2"></i>Creating Business Case from AI Solution</h6>
+                                <div class="mb-2">
+                                    {{ form.solution_description.label(class="form-label fw-bold") }}
+                                    {{ form.solution_description(class="form-control", rows="3", readonly="readonly", style="background-color: var(--bs-secondary-bg); color: var(--bs-body-color);") }}
+                                </div>
+                                <small class="text-info">This business case will be linked to the selected solution for full traceability.</small>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Case Type Selection -->
+                            <div class="mb-3">
+                                {{ form.case_type.label(class="form-label") }}
+                                <div class="mt-2">
+                                    {% for subfield in form.case_type %}
+                                        <div class="form-check form-check-inline">
+                                            {{ subfield(class="form-check-input", onclick="toggleFields()") }}
+                                            {{ subfield.label(class="form-check-label") }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.case_type.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.case_type.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Case Depth Selection -->
+                            <div class="mb-3">
+                                {{ form.case_depth.label(class="form-label") }}
+                                <div class="mt-2">
+                                    {% for subfield in form.case_depth %}
+                                        <div class="form-check form-check-inline">
+                                            {{ subfield(class="form-check-input", onclick="toggleDepthFields()") }}
+                                            {{ subfield.label(class="form-check-label") }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.case_depth.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.case_depth.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="text-light">Light cases are for quick approvals under {{ org_settings.get_currency_symbol() }}25,000. Full cases require detailed analysis for higher-value initiatives.</small>
+                            </div>
+
+                            <!-- Problem Selection (for Reactive cases) -->
+                            <div class="mb-3" id="problemField">
+                                {{ form.problem.label(class="form-label") }}
+                                {% if form.solution_id.data %}
+                                {{ form.problem(class="form-select", readonly=True) }}
+                                <small class="text-light">Problem pre-selected from solution context</small>
+                                {% else %}
+                                {{ form.problem(class="form-select" + (" is-invalid" if form.problem.errors else "")) }}
+                                <small class="text-light">Select the problem this business case addresses</small>
+                                {% endif %}
+                                {% if form.problem.errors %}
+                                    <div class="text-danger">{{ form.problem.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Initiative Name (for Proactive cases) -->
+                            <div class="mb-3" id="initiativeField" style="display: none;">
+                                {{ form.initiative_name.label(class="form-label") }}
+                                {{ form.initiative_name(class="form-control" + (" is-invalid" if form.initiative_name.errors else "")) }}
+                                {% if form.initiative_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.initiative_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.title.label(class="form-label") }}
+                                {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger">{{ form.title.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.summary.label(class="form-label") }}
+                                <div class="input-group">
+                                    {{ form.summary(class="form-control" + (" is-invalid" if form.summary.errors else ""), rows="2", id="bcSummary") }}
+                                    <button type="button" class="btn btn-outline-info" id="aiWriteSummaryBtn">
+                                        <i class="fas fa-magic"></i> AI Write Summary
+                                    </button>
+                                </div>
+                                {% if form.summary.errors %}
+                                    <div class="text-danger">{{ form.summary.errors[0] }}</div>
+                                {% endif %}
+                                <small class="text-light">Brief overview of the business case (recommended for Light cases)</small>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.description.label(class="form-label") }}
+                                {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="4") }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.description.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.cost_estimate.label(class="form-label") }}
+                                        <div class="input-group">
+                                            <span class="input-group-text">{{ org_settings.get_currency_symbol() }}</span>
+                                            {{ form.cost_estimate(class="form-control" + (" is-invalid" if form.cost_estimate.errors else ""), step="0.01") }}
+                                        </div>
+                                        {% if form.cost_estimate.errors %}
+                                            <div class="text-danger">{{ form.cost_estimate.errors[0] }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.benefit_estimate.label(class="form-label") }}
+                                        <div class="input-group">
+                                            <span class="input-group-text">{{ org_settings.get_currency_symbol() }}</span>
+                                            {{ form.benefit_estimate(class="form-control" + (" is-invalid" if form.benefit_estimate.errors else ""), step="0.01") }}
+                                        </div>
+                                        {% if form.benefit_estimate.errors %}
+                                            <div class="text-danger">{{ form.benefit_estimate.errors[0] }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Full Case Elaboration Fields -->
+                            <div id="fullCaseFields" style="display: none;">
+                                <div class="card mt-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Full Case Elaboration</h5>
+                                        <small class="text-light">Required for cases over {{ org_settings.get_currency_symbol() }}25,000 or when detailed analysis is needed</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    {{ form.strategic_alignment.label(class="form-label") }}
+                                                    {{ form.strategic_alignment(class="form-control", rows="3") }}
+                                                    <small class="text-light">How this initiative aligns with organizational strategy</small>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    {{ form.benefit_breakdown.label(class="form-label") }}
+                                                    {{ form.benefit_breakdown(class="form-control", rows="3") }}
+                                                    <small class="text-light">Detailed breakdown of expected benefits and value</small>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    {{ form.risk_mitigation.label(class="form-label") }}
+                                                    {{ form.risk_mitigation(class="form-control", rows="3") }}
+                                                    <small class="text-light">Key risks identified and mitigation strategies</small>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    {{ form.sensitivity_analysis.label(class="form-label") }}
+                                                    {{ form.sensitivity_analysis(class="form-control", rows="3") }}
+                                                    <small class="text-light">Analysis of how changes in assumptions affect outcomes</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    {{ form.stakeholder_analysis.label(class="form-label") }}
+                                                    {{ form.stakeholder_analysis(class="form-control", rows="3") }}
+                                                    <small class="text-light">Key stakeholders and their interests/concerns</small>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    {{ form.dependencies.label(class="form-label") }}
+                                                    {{ form.dependencies(class="form-control", rows="3") }}
+                                                    <small class="text-light">Critical dependencies and prerequisites</small>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    {{ form.roadmap.label(class="form-label") }}
+                                                    {{ form.roadmap(class="form-control", rows="3") }}
+                                                    <small class="text-light">High-level implementation timeline and milestones</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{{ url_for('business.list_cases') }}" class="btn btn-secondary">
+                                    Back to Business Cases
+                                </a>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleFields() {
+            const caseType = document.querySelector('input[name="case_type"]:checked').value;
+            const problemField = document.getElementById('problemField');
+            const initiativeField = document.getElementById('initiativeField');
+            
+            if (caseType === 'Reactive') {
+                problemField.style.display = 'block';
+                initiativeField.style.display = 'none';
+            } else {
+                problemField.style.display = 'none';
+                initiativeField.style.display = 'block';
+            }
+        }
+        
+        function toggleDepthFields() {
+            const caseDepth = document.querySelector('input[name="case_depth"]:checked').value;
+            const fullCaseFields = document.getElementById('fullCaseFields');
+            
+            if (caseDepth === 'Full') {
+                fullCaseFields.style.display = 'block';
+            } else {
+                fullCaseFields.style.display = 'none';
+            }
+        }
+        
+        function validateCostThreshold() {
+            const costEstimate = parseFloat(document.querySelector('input[name="cost_estimate"]').value) || 0;
+            const caseDepth = document.querySelector('input[name="case_depth"]:checked').value;
+            const threshold = 25000; // Should match Config.FULL_CASE_THRESHOLD
+            
+            if (costEstimate > threshold && caseDepth === 'Light') {
+                alert(`Cost estimate ($${costEstimate.toLocaleString()}) exceeds threshold ($${threshold.toLocaleString()}). Full case elaboration is required.`);
+                document.querySelector('input[name="case_depth"][value="Full"]').checked = true;
+                toggleDepthFields();
+                return false;
+            }
+            return true;
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleFields();
+            toggleDepthFields();
+            
+            // Add cost validation on cost field change
+            const costField = document.querySelector('input[name="cost_estimate"]');
+            if (costField) {
+                costField.addEventListener('blur', validateCostThreshold);
+            }
+            
+            // Validate on form submission
+            document.getElementById('businessCaseForm').addEventListener('submit', function(e) {
+                console.log('Form submission attempted');
+                if (!validateCostThreshold()) {
+                    console.log('Cost threshold validation failed');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Check for required fields
+                const requiredFields = ['title', 'description', 'cost_estimate', 'benefit_estimate'];
+                let hasErrors = false;
+                
+                requiredFields.forEach(fieldName => {
+                    const field = document.querySelector(`[name="${fieldName}"]`);
+                    if (field && !field.value.trim()) {
+                        console.log(`Required field missing: ${fieldName}`);
+                        hasErrors = true;
+                    }
+                });
+                
+                if (hasErrors) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+                
+                console.log('Form validation passed, submitting...');
+                return true;
+            });
+        });
+        
+        // Inject case ID for AI summary generation
+        window.caseId = {{ business_case.id if business_case else 'null' }};
+    </script>
+    <script src="{{ url_for('static', filename='js/case_summary_ai.js') }}"></script>
+{% endblock %}

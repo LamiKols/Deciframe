@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Projects - DeciFrame{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1><i class="fas fa-project-diagram"></i> Project Management</h1>
+                    <div>
+                        <a href="{{ url_for('projects.dashboard', auth_token=request.args.get('auth_token')) }}" class="btn btn-info me-2">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                        <a href="{{ url_for('projects.new_project', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> New Project
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>{{ project_stats.total }}</h4>
+                                        <p class="mb-0">Total Projects</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-project-diagram fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>{{ project_stats.open }}</h4>
+                                        <p class="mb-0">Open</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-folder-open fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>{{ project_stats.in_progress }}</h4>
+                                        <p class="mb-0">In Progress</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-spinner fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>{{ project_stats.resolved }}</h4>
+                                        <p class="mb-0">Completed</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-check-circle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Department Filter Dropdown -->
+                <form method="get" class="mb-3">
+                    <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                    <input type="hidden" name="status" value="{{ request.args.status or '' }}">
+                    <input type="hidden" name="priority" value="{{ request.args.priority or '' }}">
+                    <input type="hidden" name="project_manager_id" value="{{ request.args.project_manager_id or '' }}">
+                    <input type="hidden" name="org_unit_id" value="{{ request.args.org_unit_id or '' }}">
+                    <div class="custom-dropdown d-inline-block">
+                        <select name="dept" onchange="this.form.submit()" class="form-select w-auto d-inline">
+                            <option value="">All My Departments</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if dept.id == (request.args.get('dept')|int if request.args.get('dept') else None) %}selected{% endif %}>
+                                    {{ dept.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <noscript><button type="submit" class="btn btn-secondary">Filter</button></noscript>
+                </form>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-filter"></i> Filter Projects</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                            <input type="hidden" name="dept" value="{{ request.args.get('dept') or '' }}">
+                            <div class="col-md-3">
+                                {{ filter_form.status.label(class="form-label") }}
+                                <div class="custom-dropdown">
+                                    {{ filter_form.status(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                {{ filter_form.priority.label(class="form-label") }}
+                                <div class="custom-dropdown">
+                                    {{ filter_form.priority(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                {{ filter_form.project_manager_id.label(class="form-label") }}
+                                <div class="custom-dropdown">
+                                    {{ filter_form.project_manager_id(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                {{ filter_form.project_manager_id.label(class="form-label") }}
+                                <div class="custom-dropdown">
+                                    {{ filter_form.project_manager_id(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                {{ filter_form.department_id.label(class="form-label") }}
+                                <div class="custom-dropdown">
+                                    {{ filter_form.department_id(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Apply Filters
+                                </button>
+                                <a href="{{ url_for('projects.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Clear Filters
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Projects List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Projects ({{ projects|length }})
+                            <span class="contextual-help-icon" 
+                                  data-help-slug="project-management" 
+                                  style="cursor: pointer; color: var(--bs-info); margin-left: 0.5rem;"
+                                  title="Help with project management"><i class="fas fa-info-circle"></i></span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if projects %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Project Name</th>
+                                            <th>Status</th>
+                                            <th>Priority</th>
+                                            <th>Project Manager</th>
+                                            <th>Department</th>
+                                            <th>Organizational Unit</th>
+                                            <th>Budget</th>
+                                            <th>Start Date</th>
+                                            <th>Progress</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for project in projects %}
+                                            <tr>
+                                                <td>
+                                                    <div>
+                                                        <strong>{{ project.code or project.name }}</strong>
+                                                        <br><span class="text-muted">{{ project.name }}</span>
+                                                        {% if project.business_case %}
+                                                            <br><small class="text-muted">
+                                                                <i class="fas fa-link"></i> {{ project.business_case.code }}
+                                                            </small>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-{{ 'primary' if project.status.value == 'Open' else 'info' if project.status.value == 'In Progress' else 'success' if project.status.value == 'Resolved' else 'secondary' }}">
+                                                        {{ project.status.value }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-{{ 'danger' if project.priority.value == 'High' else 'warning' if project.priority.value == 'Medium' else 'secondary' }}">
+                                                        {{ project.priority.value }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ project.project_manager.name }}</td>
+                                                <td>{{ project.department.name }}</td>
+                                                <td>
+                                                    {% if project.org_unit %}
+                                                        {{ project.org_unit.name }}
+                                                    {% else %}
+                                                        <span class="text-muted">Not assigned</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if project.budget %}
+                                                        {{ currency_symbol }}{{ "{:,.2f}".format(project.budget) }}
+                                                    {% else %}
+                                                        <span class="text-muted">Not set</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if project.start_date %}
+                                                        {{ project.start_date.strftime('%m/%d/%Y') }}
+                                                    {% else %}
+                                                        <span class="text-muted">Not set</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% set milestone_count = project.milestones|length %}
+                                                    {% set completed_count = project.milestones|selectattr('completed')|list|length %}
+                                                    {% if milestone_count > 0 %}
+                                                        {% set progress = (completed_count / milestone_count * 100)|round(1) %}
+                                                        <div class="progress" style="height: 20px;">
+                                                            <div class="progress-bar" role="progressbar" style="width: {{ progress }}%;">
+                                                                {{ progress }}%
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted">{{ completed_count }}/{{ milestone_count }} milestones</small>
+                                                    {% else %}
+                                                        <span class="text-muted">No milestones</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a href="{{ url_for('projects.view_project', id=project.id, auth_token=request.args.get('auth_token')) }}" 
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{{ url_for('projects.edit_project', id=project.id, auth_token=request.args.get('auth_token')) }}" 
+                                                           class="btn btn-sm btn-outline-secondary">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No projects found</h5>
+                                <p class="text-muted">Start by creating your first project or adjust your filters.</p>
+                                <a href="{{ url_for('projects.new_project', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create First Project
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-4">
+                    <a href="{{ url_for('index', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

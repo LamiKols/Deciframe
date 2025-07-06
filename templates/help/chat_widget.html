@@ -1,0 +1,423 @@
+<!-- Help Assistant Chat Widget -->
+<div id="helpAssistantWidget" class="help-assistant-widget">
+    <!-- Chat Toggle Button -->
+    <button id="helpAssistantToggle" class="help-assistant-toggle" title="Ask DeciFrame">
+        <i class="fas fa-question-circle"></i>
+        <span class="toggle-text">Ask DeciFrame</span>
+    </button>
+    
+    <!-- Chat Window -->
+    <div id="helpAssistantWindow" class="help-assistant-window" style="display: none;">
+        <div class="help-assistant-header">
+            <div class="header-content">
+                <i class="fas fa-robot me-2"></i>
+                <span class="header-title">DeciFrame Assistant</span>
+            </div>
+            <button id="helpAssistantClose" class="help-assistant-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="help-assistant-body">
+            <div id="helpAssistantMessages" class="help-assistant-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <i class="fas fa-robot me-2"></i>
+                        <span>Hi! I'm your DeciFrame assistant. Ask me anything about using the system, like "How do I assign a BA?" or "How do I create a business case?"</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="help-assistant-input">
+                <div class="input-group">
+                    <input type="text" id="helpAssistantInput" 
+                           class="form-control" 
+                           placeholder="Ask me anything about DeciFrame..."
+                           maxlength="200">
+                    <button id="helpAssistantSend" class="btn btn-primary" type="button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div id="helpAssistantLoading" class="loading-indicator" style="display: none;">
+                    <i class="fas fa-spinner fa-spin me-2"></i>Thinking...
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-assistant-footer">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Powered by AI • Based on help documentation
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+.help-assistant-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.help-assistant-toggle {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.help-assistant-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+    background: linear-gradient(135deg, #0056b3, #004085);
+}
+
+.help-assistant-window {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: var(--bs-body-bg, #212529);
+    border: 1px solid var(--bs-border-color, #495057);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.help-assistant-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.help-assistant-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.help-assistant-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.help-assistant-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.help-assistant-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    max-height: 350px;
+}
+
+.message {
+    margin-bottom: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+.message-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.bot-message .message-content {
+    background: var(--bs-secondary-bg, #343a40);
+    padding: 12px;
+    border-radius: 12px;
+    color: var(--bs-body-color, #ffffff);
+}
+
+.user-message {
+    text-align: right;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    display: inline-block;
+    max-width: 80%;
+    margin-left: auto;
+}
+
+.help-assistant-input {
+    padding: 15px;
+    border-top: 1px solid var(--bs-border-color, #495057);
+}
+
+.help-assistant-input .input-group {
+    margin-bottom: 10px;
+}
+
+.help-assistant-input .form-control {
+    background: var(--bs-body-bg, #212529);
+    border: 1px solid var(--bs-border-color, #495057);
+    color: var(--bs-body-color, #ffffff);
+}
+
+.help-assistant-input .form-control:focus {
+    background: var(--bs-body-bg, #212529);
+    border-color: #007bff;
+    color: var(--bs-body-color, #ffffff);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.loading-indicator {
+    text-align: center;
+    color: var(--bs-muted, #6c757d);
+    font-size: 14px;
+}
+
+.help-assistant-footer {
+    padding: 10px 15px;
+    border-top: 1px solid var(--bs-border-color, #495057);
+    text-align: center;
+}
+
+.relevant-articles {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--bs-border-color, #495057);
+}
+
+.relevant-articles h6 {
+    color: var(--bs-body-color, #ffffff);
+    margin-bottom: 8px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.article-link {
+    display: block;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 12px;
+    margin-bottom: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.article-link:hover {
+    background: rgba(0, 123, 255, 0.1);
+    color: #0056b3;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .help-assistant-widget {
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .help-assistant-window {
+        width: 300px;
+        height: 400px;
+    }
+    
+    .help-assistant-toggle .toggle-text {
+        display: none;
+    }
+}
+</style>
+
+<script>
+class HelpAssistant {
+    constructor() {
+        this.isOpen = false;
+        this.isLoading = false;
+        this.initializeEventListeners();
+    }
+    
+    initializeEventListeners() {
+        // Toggle button
+        document.getElementById('helpAssistantToggle').addEventListener('click', () => {
+            this.toggleWidget();
+        });
+        
+        // Close button
+        document.getElementById('helpAssistantClose').addEventListener('click', () => {
+            this.closeWidget();
+        });
+        
+        // Send button
+        document.getElementById('helpAssistantSend').addEventListener('click', () => {
+            this.sendMessage();
+        });
+        
+        // Enter key in input
+        document.getElementById('helpAssistantInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !this.isLoading) {
+                this.sendMessage();
+            }
+        });
+        
+        // Click outside to close
+        document.addEventListener('click', (e) => {
+            const widget = document.getElementById('helpAssistantWidget');
+            if (this.isOpen && !widget.contains(e.target)) {
+                this.closeWidget();
+            }
+        });
+    }
+    
+    toggleWidget() {
+        if (this.isOpen) {
+            this.closeWidget();
+        } else {
+            this.openWidget();
+        }
+    }
+    
+    openWidget() {
+        document.getElementById('helpAssistantWindow').style.display = 'flex';
+        document.getElementById('helpAssistantInput').focus();
+        this.isOpen = true;
+    }
+    
+    closeWidget() {
+        document.getElementById('helpAssistantWindow').style.display = 'none';
+        this.isOpen = false;
+    }
+    
+    async sendMessage() {
+        const input = document.getElementById('helpAssistantInput');
+        const query = input.value.trim();
+        
+        if (!query || this.isLoading) return;
+        
+        // Add user message to chat
+        this.addMessage(query, 'user');
+        
+        // Clear input and show loading
+        input.value = '';
+        this.showLoading(true);
+        
+        try {
+            const response = await fetch('/help/chat/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ query: query })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                this.addMessage(data.response, 'bot', data.relevant_articles);
+            } else {
+                this.addMessage(data.error || 'Sorry, I encountered an error. Please try again.', 'bot');
+            }
+            
+        } catch (error) {
+            console.error('Help Assistant error:', error);
+            this.addMessage('Sorry, I\'m having trouble connecting. Please try again or browse the help articles directly.', 'bot');
+        }
+        
+        this.showLoading(false);
+    }
+    
+    addMessage(content, type, relevantArticles = []) {
+        const messagesContainer = document.getElementById('helpAssistantMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}-message`;
+        
+        let articleLinksHtml = '';
+        if (relevantArticles && relevantArticles.length > 0) {
+            articleLinksHtml = `
+                <div class="relevant-articles">
+                    <h6><i class="fas fa-book me-1"></i>For More Details:</h6>
+                    ${relevantArticles.map(article => 
+                        `<a href="/help/${article.slug}" class="article-link" target="_blank">
+                            <i class="fas fa-external-link-alt me-1"></i>${article.title}
+                        </a>`
+                    ).join('')}
+                </div>
+            `;
+        }
+        
+        if (type === 'user') {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <span>${this.escapeHtml(content)}</span>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <i class="fas fa-robot me-2"></i>
+                    <span>${this.escapeHtml(content)}</span>
+                    ${articleLinksHtml}
+                </div>
+            `;
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    showLoading(show) {
+        const loadingDiv = document.getElementById('helpAssistantLoading');
+        const sendButton = document.getElementById('helpAssistantSend');
+        const input = document.getElementById('helpAssistantInput');
+        
+        this.isLoading = show;
+        loadingDiv.style.display = show ? 'block' : 'none';
+        sendButton.disabled = show;
+        input.disabled = show;
+    }
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Initialize the Help Assistant when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    new HelpAssistant();
+});
+</script>

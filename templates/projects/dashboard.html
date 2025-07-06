@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Project Dashboard - DeciFrame{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center">
+                        <a href="{{ url_for('index', auth_token=request.args.get('auth_token')) }}" class="btn btn-outline-secondary btn-sm me-3">
+                            <i class="fas fa-home"></i>
+                        </a>
+                        <h1><i class="fas fa-chart-line"></i> Project Management Dashboard</h1>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('projects.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary me-2">
+                            <i class="fas fa-list"></i> View Projects
+                        </a>
+                        <a href="{{ url_for('projects.new_project', auth_token=request.args.get('auth_token')) }}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> New Project
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Overview Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3>{{ dashboard_data.total_projects }}</h3>
+                                        <p class="mb-0">Total Projects</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-project-diagram fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3>{{ dashboard_data.active_projects }}</h3>
+                                        <p class="mb-0">Active Projects</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-play fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3>{{ dashboard_data.completed_projects }}</h3>
+                                        <p class="mb-0">Completed</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-check-circle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3>{{ dashboard_data.overdue_milestones|length }}</h3>
+                                        <p class="mb-0">Overdue Milestones</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Distribution -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-pie"></i> Projects by Status</h5>
+                            </div>
+                            <div class="card-body">
+                                {% for status, count in dashboard_data.status_stats.items() %}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-{{ 'primary' if status == 'Open' else 'info' if status == 'In Progress' else 'success' if status == 'Resolved' else 'secondary' }}">
+                                            {{ status }}
+                                        </span>
+                                        <span class="fw-bold">{{ count }}</span>
+                                    </div>
+                                    {% if dashboard_data.total_projects > 0 %}
+                                        {% set percentage = (count / dashboard_data.total_projects * 100) %}
+                                        <div class="progress mb-3" style="height: 8px;">
+                                            <div class="progress-bar bg-{{ 'primary' if status == 'Open' else 'info' if status == 'In Progress' else 'success' if status == 'Resolved' else 'secondary' }}" 
+                                                 style="width: {{ percentage }}%;"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-building"></i> Projects by Department</h5>
+                            </div>
+                            <div class="card-body">
+                                {% for dept_name, project_count in dashboard_data.dept_stats %}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{{ dept_name }}</span>
+                                        <span class="badge bg-primary">{{ project_count }}</span>
+                                    </div>
+                                {% endfor %}
+                                {% if not dashboard_data.dept_stats %}
+                                    <p class="text-muted text-center">No projects found</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Projects -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-clock"></i> Recent Projects</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if dashboard_data.recent_projects %}
+                                    {% for project in dashboard_data.recent_projects %}
+                                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                            <div>
+                                                <h6 class="mb-0">
+                                                    <a href="{{ url_for('projects.view_project', id=project.id, auth_token=request.args.get('auth_token')) }}" 
+                                                       class="text-decoration-none">
+                                                        {{ project.name }}
+                                                    </a>
+                                                </h6>
+                                                <small class="text-muted">
+                                                    {{ project.department.name }} • {{ project.project_manager.name }}
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-{{ 'primary' if project.status.value == 'Open' else 'info' if project.status.value == 'In Progress' else 'success' if project.status.value == 'Resolved' else 'secondary' }}">
+                                                    {{ project.status.value }}
+                                                </span>
+                                                <br>
+                                                <small class="text-muted">{{ project.created_at.strftime('%m/%d/%Y') if project.created_at else 'Date unknown' }}</small>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted text-center">No recent projects</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overdue Milestones -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-exclamation-triangle text-warning"></i> Overdue Milestones</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if dashboard_data.overdue_milestones %}
+                                    {% for milestone in dashboard_data.overdue_milestones %}
+                                        <div class="alert alert-warning mb-2 py-2" style="color: #856404;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong style="color: #856404;">{{ milestone.name }}</strong>
+                                                    <br>
+                                                    <small>
+                                                        <a href="{{ url_for('projects.view_project', id=milestone.project.id, auth_token=request.args.get('auth_token')) }}" 
+                                                           class="text-decoration-none" style="color: #0066cc;">
+                                                            Project: {{ milestone.project.name }}
+                                                        </a>
+                                                    </small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <small style="color: #dc3545; font-weight: bold;">
+                                                        Due: {{ milestone.due_date.strftime('%m/%d/%Y') }}
+                                                    </small>
+                                                    <br>
+                                                    <small style="color: #856404;">{{ milestone.owner.name }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center py-3">
+                                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                        <p class="text-muted mb-0">No overdue milestones</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Milestones -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-calendar-check"></i> Upcoming Milestones (Next 14 Days)</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if dashboard_data.upcoming_milestones %}
+                                    <div class="row">
+                                        {% for milestone in dashboard_data.upcoming_milestones %}
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card border-info">
+                                                    <div class="card-body py-2">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <h6 class="mb-0">{{ milestone.name }}</h6>
+                                                                <small class="text-muted">
+                                                                    <a href="{{ url_for('projects.view_project', id=milestone.project.id, auth_token=request.args.get('auth_token')) }}" 
+                                                                       class="text-decoration-none">
+                                                                        {{ milestone.project.name }}
+                                                                    </a>
+                                                                </small>
+                                                            </div>
+                                                            <div class="text-end">
+                                                                <span class="badge bg-info">{{ milestone.due_date.strftime('%m/%d') }}</span>
+                                                                <br>
+                                                                <small class="text-muted">{{ milestone.owner.name }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-3">
+                                        <i class="fas fa-calendar-day fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">No upcoming milestones in the next 14 days</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-grid">
+                                            <a href="{{ url_for('projects.new_project', auth_token=request.args.get('auth_token')) }}" 
+                                               class="btn btn-primary">
+                                                <i class="fas fa-plus"></i> Create Project
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-grid">
+                                            <a href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token')) }}" 
+                                               class="btn btn-success">
+                                                <i class="fas fa-briefcase"></i> View Business Cases
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-grid">
+                                            <a href="{{ url_for('problems.index', auth_token=request.args.get('auth_token')) }}" 
+                                               class="btn btn-warning">
+                                                <i class="fas fa-exclamation-triangle"></i> View Problems
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="d-grid">
+                                            <a href="{{ url_for('index', auth_token=request.args.get('auth_token')) }}" 
+                                               class="btn btn-secondary">
+                                                <i class="fas fa-home"></i> Main Dashboard
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

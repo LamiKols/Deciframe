@@ -1,0 +1,150 @@
+/* Theme-aware department styling with proper text visibility */
+
+.department-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 1rem;
+  background-color: var(--bs-body-bg);
+  border: 3px solid var(--bs-border-color, #2d5aa0);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  color: var(--bs-body-color);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bs-body-bg);
+  border: 3px solid var(--bs-border-color, #2d5aa0);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  color: var(--bs-body-color);
+}
+
+.header h2 {
+  color: var(--bs-body-color) !important;
+  margin: 0;
+}
+
+.new-btn {
+  background: #4CAF50;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.dept-tree {
+  list-style: none;
+  padding: 1rem;
+  margin-top: 0;
+  background-color: var(--bs-body-bg);
+  border: 3px solid var(--bs-border-color, #2d5aa0);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  color: var(--bs-body-color);
+}
+
+.dept-node {
+  margin: 6px 0;
+}
+
+.dept-label {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color) !important;
+  border: 3px solid var(--bs-border-color, #2d5aa0);
+  border-radius: 4px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+}
+
+.dept-label:hover {
+  background-color: var(--bs-secondary-bg, #f8f9fa);
+  border-color: #1e3d6f;
+  box-shadow: 0 4px 12px rgba(45, 90, 160, 0.3);
+  color: var(--bs-body-color) !important;
+}
+
+.toggle-btn, .toggle-placeholder {
+  width: 18px;
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 8px;
+  color: var(--bs-body-color) !important;
+}
+
+.dept-name {
+  flex-grow: 1;
+  color: var(--bs-body-color) !important;
+}
+
+.controls {
+  display: none;
+}
+
+.dept-label:hover .controls {
+  display: inline-block;
+}
+
+.dept-subtree {
+  list-style: none;
+  margin-left: 24px;
+  padding-left: 12px;
+  border-left: 1px solid var(--bs-border-color, #555);
+}
+
+.hidden {
+  display: none;
+}
+
+/* Theme-aware Select Dropdown Styling */
+select,
+select option {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color) !important;
+  border: 1px solid var(--bs-border-color, #444);
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+/* Additional text visibility fixes */
+.dept-tree li, .dept-tree ul, .dept-subtree {
+  color: var(--bs-body-color) !important;
+}
+
+
+
+select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.5);
+}
+
+/* Empty State Styling */
+.empty-state {
+  background-color: var(--bs-body-bg);
+  border: 3px solid var(--bs-border-color, #2d5aa0);
+  border-radius: 6px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  color: var(--bs-body-color);
+}
+
+.empty-state h3 {
+  color: var(--bs-body-color) !important;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  color: var(--bs-body-color) !important;
+  margin-bottom: 1.5rem;
+}
+

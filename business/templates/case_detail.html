@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Business Case {{ business_case.code }} - DeciFrame{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>Business Case {{ business_case.code }}</h3>
+                            <div class="mt-1">
+                                <span class="badge bg-{{ 'primary' if business_case.case_type.value == 'Reactive' else 'info' }}">
+                                    {{ business_case.case_type.value }}
+                                </span>
+                                <span class="badge bg-{{ 'success' if business_case.case_depth.value == 'Full' else 'warning' }}">
+                                    {{ business_case.case_depth.value }} Case
+                                </span>
+                                {% if business_case.full_case_requested %}
+                                    <span class="badge bg-info">
+                                        Full Case Requested
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="badge bg-{{ 'success' if business_case.status.value == 'Approved' else ('primary' if business_case.status.value == 'Open' else 'secondary') }} fs-6">
+                            {{ business_case.status.value }}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h4>{{ business_case.title }}</h4>
+                        
+                        {% if business_case.case_type.value == 'Reactive' and business_case.problem %}
+                            <div class="mb-3">
+                                <strong>Related Problem:</strong>
+                                <span class="badge bg-secondary">{{ business_case.problem.code }}</span>
+                                {{ business_case.problem.title }}
+                            </div>
+                        {% elif business_case.case_type.value == 'Proactive' and business_case.initiative_name %}
+                            <div class="mb-3">
+                                <strong>Initiative:</strong>
+                                <span class="text-info">{{ business_case.initiative_name }}</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <strong>Description:</strong>
+                            <p class="mt-2">{{ business_case.description }}</p>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-warning">Cost Estimate</h5>
+                                        <h3 class="text-warning">{{ currency_symbol }}{{ "{:,.2f}".format(business_case.cost_estimate) }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-success">Benefit Estimate</h5>
+                                        <h3 class="text-success">{{ currency_symbol }}{{ "{:,.2f}".format(business_case.benefit_estimate) }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">ROI</h5>
+                                        {% if business_case.roi %}
+                                            <h3 class="text-{{ 'success' if business_case.roi > 0 else 'danger' }}">
+                                                {{ "{:.1f}".format(business_case.roi) }}%
+                                            </h3>
+                                        {% else %}
+                                            <h3 class="text-muted">N/A</h3>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if business_case.roi %}
+                            <div class="alert alert-{{ 'success' if business_case.roi > 0 else 'warning' }}">
+                                <strong>Financial Analysis:</strong>
+                                {% if business_case.roi > 0 %}
+                                    This business case shows a positive return on investment of {{ "{:.1f}".format(business_case.roi) }}%.
+                                    The net benefit would be {{ format_currency(business_case.benefit_estimate - business_case.cost_estimate) }}.
+                                {% else %}
+                                    This business case shows a negative return on investment of {{ "{:.1f}".format(business_case.roi) }}%.
+                                    The net loss would be {{ format_currency(business_case.cost_estimate - business_case.benefit_estimate) }}.
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Approval Status -->
+                        {% if business_case.status.value == 'Approved' and business_case.approved_at %}
+                            <div class="alert alert-success">
+                                <h5 class="alert-heading"><i class="fas fa-check-circle"></i> Approved Business Case</h5>
+                                <p class="mb-1">
+                                    <strong>Approved by:</strong> 
+                                    {% if business_case.approver %}
+                                        {{ business_case.approver.name }}
+                                    {% else %}
+                                        System
+                                    {% endif %}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Approved on:</strong> {{ format_datetime(business_case.approved_at) }}
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Full Case Elaboration Details -->
+                        {% if business_case.case_depth.value == 'Full' %}
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Full Case Analysis</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% if business_case.strategic_alignment %}
+                                                <div class="mb-3">
+                                                    <strong>Strategic Alignment:</strong>
+                                                    <p class="mt-1">{{ business_case.strategic_alignment }}</p>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if business_case.benefit_breakdown %}
+                                                <div class="mb-3">
+                                                    <strong>Benefit Breakdown:</strong>
+                                                    <p class="mt-1">{{ business_case.benefit_breakdown }}</p>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if business_case.risk_mitigation %}
+                                                <div class="mb-3">
+                                                    <strong>Risk & Mitigation:</strong>
+                                                    <p class="mt-1">{{ business_case.risk_mitigation }}</p>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if business_case.sensitivity_analysis %}
+                                                <div class="mb-3">
+                                                    <strong>Sensitivity Analysis:</strong>
+                                                    <p class="mt-1">{{ business_case.sensitivity_analysis }}</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            {% if business_case.stakeholder_analysis %}
+                                                <div class="mb-3">
+                                                    <strong>Stakeholder Analysis:</strong>
+                                                    <p class="mt-1">{{ business_case.stakeholder_analysis }}</p>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if business_case.dependencies %}
+                                                <div class="mb-3">
+                                                    <strong>Dependencies:</strong>
+                                                    <p class="mt-1">{{ business_case.dependencies }}</p>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if business_case.roadmap %}
+                                                <div class="mb-3">
+                                                    <strong>Implementation Roadmap:</strong>
+                                                    <p class="mt-1">{{ business_case.roadmap }}</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Requirements & Epics Section -->
+                        {% if epics %}
+                            <div class="mt-4">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-tasks"></i> Generated Requirements & Epics
+                                    <span class="badge bg-success ms-2">{{ epics|length }} Epics</span>
+                                </h5>
+                                
+                                <div class="accordion" id="epicsAccordion">
+                                    {% for epic in epics %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading{{ epic.id }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ epic.id }}" aria-expanded="false">
+                                                <strong>Epic {{ loop.index }}: {{ epic.title }}</strong>
+                                                {% if epic.project_id %}
+                                                    <span class="badge bg-success ms-2">✅ Synced to Project</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary ms-2">⚠️ Not Synced</span>
+                                                {% endif %}
+                                                {% if epic.stories %}
+                                                    <span class="badge bg-info ms-2">{{ epic.stories|length }} Stories</span>
+                                                {% endif %}
+                                            </button>
+                                        </h2>
+                                        <div id="collapse{{ epic.id }}" class="accordion-collapse collapse" data-bs-parent="#epicsAccordion">
+                                            <div class="accordion-body">
+                                                <p class="text-light mb-3">{{ epic.description }}</p>
+                                                
+                                                {% if epic.stories %}
+                                                    <h6 class="mb-2">User Stories:</h6>
+                                                    <div class="row">
+                                                        {% for story in epic.stories %}
+                                                        <div class="col-md-6 mb-2">
+                                                            <div class="card bg-dark">
+                                                                <div class="card-body p-2">
+                                                                    <h6 class="card-title text-light mb-1">{{ story.title }}</h6>
+                                                                    <p class="card-text small text-light">{{ story.description }}</p>
+                                                                    <div class="d-flex justify-content-between">
+                                                                        <span class="badge bg-warning">{{ story.priority or 'Medium' }}</span>
+                                                                        <span class="badge bg-secondary">{{ story.effort or '3' }} pts</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Full Case Request Information -->
+                        {% if business_case.full_case_requested %}
+                            <div class="alert alert-info mt-4">
+                                <strong>Full Case Requested:</strong>
+                                {% if business_case.full_case_requester %}
+                                    Requested by {{ business_case.full_case_requester.name }} 
+                                {% endif %}
+                                {% if business_case.full_case_requested_at %}
+                                    on {{ business_case.full_case_requested_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                {% endif %}
+                                <br>
+                                <small>The assigned Business Analyst should complete the full case elaboration sections.</small>
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                {% if business_case.created_at %}
+                                    Created on {{ business_case.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                {% else %}
+                                    Created on (date not available)
+                                {% endif %}
+                                {% if business_case.creator %}
+                                    by {{ business_case.creator.name }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if linked_project %}
+                            <a href="{{ url_for('projects.project_backlog', id=linked_project.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-success">
+                                <i class="fas fa-tasks"></i> View Project Backlog ({{ linked_project.code }})
+                            </a>
+                            {% endif %}
+                            {% if user.role.value == 'BA' and epics_count > 0 %}
+                            <a href="{{ url_for('business.refine_stories_page', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Refine Stories ({{ epics_count }} epics)
+                            </a>
+                            {% endif %}
+                            {% if epics %}
+                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-success">
+                                <i class="fas fa-eye"></i> View Generated Requirements
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-info">
+                                <i class="fas fa-list-check"></i> Generate Requirements
+                            </a>
+                            {% endif %}
+                            <a href="{{ url_for('business.edit_case', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                                Edit Business Case
+                            </a>
+                            {% if user.role.value in ['Manager', 'Director', 'CEO', 'Admin'] and business_case.status.value != 'Approved' %}
+                                <form method="POST" action="{{ url_for('business.approve_case', id=business_case.id) }}" class="d-inline">
+                                    <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Approve this business case? This action will trigger project workflows.')">
+                                        <i class="fas fa-check"></i> Approve Business Case
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if business_case.case_depth.value == 'Light' and not business_case.full_case_requested %}
+                                <form method="POST" action="{{ url_for('business.request_full_case', id=business_case.id) }}" class="d-inline">
+                                    <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                                    <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Request full case elaboration? This will notify the assigned Business Analyst to complete additional sections.')">
+                                        Request Full Case
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                Delete Business Case
+                            </button>
+                            <a href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
+                                Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if business_case.problem %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6>Related Problem Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Code:</strong> {{ business_case.problem.code }}</p>
+                            <p><strong>Priority:</strong> 
+                                <span class="badge bg-{{ 'danger' if business_case.problem.priority.value == 'High' else 'warning' if business_case.problem.priority.value == 'Medium' else 'secondary' }}">
+                                    {{ business_case.problem.priority.value }}
+                                </span>
+                            </p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge bg-{{ 'primary' if business_case.problem.status.value == 'Open' else 'secondary' }}">
+                                    {{ business_case.problem.status.value }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- BA Assignment Section -->
+                {% if can_assign and form %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-tie me-2"></i>Assign Business Analyst
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            <strong>Current Assignment:</strong>
+                            {% if business_case.assigned_ba %}
+                                <span class="badge bg-info">{{ business_case.assigned_ba.name }}</span>
+                            {% else %}
+                                <span class="text-muted">No BA assigned</span>
+                            {% endif %}
+                        </p>
+                        
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        {{ form.assigned_ba.label(class="form-label") }}
+                                        {{ form.assigned_ba(class="form-select") }}
+                                        {% if form.assigned_ba.errors %}
+                                            <div class="text-danger">{{ form.assigned_ba.errors[0] }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">&nbsp;</label><br>
+                                        {{ form.submit(class="btn btn-primary") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete Business Case {{ business_case.code }}? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ url_for('business.delete_case', id=business_case.id) }}" class="d-inline">
+                        <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
