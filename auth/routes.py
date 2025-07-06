@@ -6,7 +6,7 @@ from auth.forms import LoginForm, RegistrationForm, ProfileForm
 from auth.oauth import oauth_manager, UserManager, OAuthError
 from auth.oidc import oauth, get_oidc_client
 from models import User
-from extensions import db
+from app import db
 import logging
 
 logger = logging.getLogger(__name__)

@@ -5,7 +5,7 @@ Handles automated notification triggers for business workflow events
 
 from datetime import date, timedelta
 from flask import url_for
-from extensions import db
+from app import db
 from models import (
     BusinessCase, Problem, Project, ProjectMilestone, User, Department,
     NotificationEventEnum, StatusEnum

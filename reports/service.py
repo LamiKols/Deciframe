@@ -12,7 +12,7 @@ import requests
 from jinja2 import Template
 import weasyprint
 from flask import current_app, url_for
-from extensions import db
+from app import db
 from models import ReportTemplate, ReportRun, User, RoleEnum
 from notifications.service import NotificationService
 

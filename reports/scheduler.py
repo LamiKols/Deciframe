@@ -8,7 +8,7 @@ import time
 import logging
 from datetime import datetime, timedelta
 from typing import List
-from extensions import db
+from app import db
 from models import ReportTemplate, ReportFrequencyEnum
 from reports.service import ReportService
 

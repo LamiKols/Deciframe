@@ -6,7 +6,7 @@ Handles CRUD operations for epics and stories with BA role restrictions
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from stateless_auth import require_auth, get_current_user
 from models import BusinessCase, Epic, Story, RoleEnum
-from extensions import db
+from app import db
 import json
 import logging
 

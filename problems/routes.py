@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
-from extensions import db
+from app import db
 from models import Problem, PriorityEnum, StatusEnum, Department, OrgUnit
 from problems.forms import ProblemForm, ProblemFilterForm
 from flask_login import login_required, current_user

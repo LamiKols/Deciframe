@@ -5,7 +5,7 @@ Triggers real-time actions based on ML predictions
 
 from flask import url_for, current_app
 from datetime import datetime, timedelta
-from extensions import db
+from app import db
 from models import (
     Project, ProjectMilestone, BusinessCase, User, AIThresholdSettings,
     Notification, NotificationEventEnum

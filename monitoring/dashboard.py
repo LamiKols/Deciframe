@@ -8,7 +8,7 @@ import time
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, jsonify, request
 from sqlalchemy import text, func
-from extensions import db
+from app import db
 from models import AuditLog, User, Problem, BusinessCase, Project
 from monitoring.config import monitoring_config
 

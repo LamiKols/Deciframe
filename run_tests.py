@@ -8,7 +8,7 @@ import os
 from flask import Flask
 from flask_login import login_user
 from models import Problem, Department, User, PriorityEnum, StatusEnum
-from extensions import db
+from app import db
 from app import app
 
 def setup_test_data():

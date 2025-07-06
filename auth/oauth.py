@@ -11,7 +11,7 @@ from authlib.integrations.flask_client import OAuth
 from authlib.common.errors import AuthlibBaseError
 from werkzeug.security import generate_password_hash
 from models import User, db
-from extensions import login_manager
+from app import login_manager
 import logging
 
 logger = logging.getLogger(__name__)

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from flask import current_app, render_template_string
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email, To, Content
-from extensions import db
+from app import db
 from models import NotificationTemplate, Notification, NotificationEventEnum, User, NotificationSetting, FrequencyEnum
 
 

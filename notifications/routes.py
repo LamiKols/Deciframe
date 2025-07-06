@@ -5,7 +5,7 @@ Handles notification management UI and API endpoints
 
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from stateless_auth import get_current_user, redirect_with_auth
-from extensions import db
+from app import db
 from models import Notification, NotificationTemplate, NotificationEventEnum
 from notifications.service import notification_service
 from functools import wraps

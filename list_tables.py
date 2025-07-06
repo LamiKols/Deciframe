@@ -1,4 +1,4 @@
-from extensions import db
+from app import db
 from app import app
 from sqlalchemy import inspect
 

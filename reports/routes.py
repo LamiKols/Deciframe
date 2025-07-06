@@ -7,7 +7,7 @@ import json
 import logging
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, make_response
 from flask_login import login_required, current_user
-from extensions import db
+from app import db
 from models import ReportTemplate, ReportRun, User, RoleEnum, ReportFrequencyEnum, ReportTypeEnum
 from reports.service import ReportService
 from reports.scheduler import report_scheduler

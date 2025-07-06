@@ -17,7 +17,7 @@ import pandas as pd
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from extensions import db
+from app import db
 from models import Project, BusinessCase, PredictionFeedback, User, RoleEnum, StatusEnum, PriorityEnum
 
 predict_bp = Blueprint('predict', __name__, url_prefix='/api/predict')
