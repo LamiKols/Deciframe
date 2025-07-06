@@ -11,30 +11,7 @@ from models import Problem, BusinessCase, Project, ProjectMilestone, User, Impor
 from models import StatusEnum, PriorityEnum, RoleEnum
 from app import db
 
-def require_dashboard_auth(f):
-    """Custom authentication decorator for dashboard routes"""
-    from functools import wraps
-    from flask import request
-    
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # Check session-based authentication first
-        if 'user_id' in session:
-            try:
-                user = User.query.get(session['user_id'])
-                if user:
-                    # Ensure Flask-Login is synchronized
-                    if not current_user.is_authenticated:
-                        login_user(user)
-                    return f(*args, **kwargs)
-            except:
-                pass
-        
-        # If not authenticated, redirect to login
-        flash('Please log in to access this page.', 'info')
-        return redirect(url_for('auth.login', next=request.url))
-    
-    return decorated_function
+
 
 dash_bp = Blueprint('dashboards', __name__, url_prefix='/dashboard')
 
@@ -123,7 +100,7 @@ def staff_dashboard():
                          user=current_user)
 
 @dash_bp.route('/manager')
-@require_dashboard_auth
+@login_required
 def manager_dashboard():
     """Manager dashboard - shows department problems and pending cases"""
     dept_id = current_user.dept_id
