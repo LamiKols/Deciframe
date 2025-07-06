@@ -127,10 +127,7 @@ textarea[readonly], input[readonly] {
   border-color: var(--bs-border-color) !important;
 }
 
-/* Ensure proper contrast for all text */
-* {
-  color: inherit !important;
-}
+/* Remove problematic universal color inheritance that breaks text visibility */
 
 /* Toast Notification Styling */
 .toast {
@@ -172,9 +169,9 @@ textarea[readonly], input[readonly] {
 
 /* Base button styling */
 .btn {
-  padding: 10px 18px !important;
+  padding: 8px 16px !important;
   border-radius: 6px !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   font-size: 0.95rem !important;
   border: none !important;
   transition: background-color 0.2s ease, transform 0.1s ease !important;
@@ -182,7 +179,10 @@ textarea[readonly], input[readonly] {
   text-decoration: none !important;
   display: inline-block !important;
   cursor: pointer !important;
-  line-height: 1.4 !important;
+  line-height: 1.5 !important;
+  min-height: 38px !important;
+  min-width: 80px !important;
+  box-sizing: border-box !important;
 }
 
 /* Primary button styling */

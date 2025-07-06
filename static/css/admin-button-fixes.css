@@ -110,11 +110,11 @@
 
 /* Improved button visibility on admin screens */
 .table .btn {
-  min-width: 36px;
-  min-height: 36px;
-  font-size: 1rem;
-  padding: 0.375rem 0.75rem;
-  line-height: 1.6;
+  min-width: 80px;
+  min-height: 38px;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  line-height: 1.5;
   font-weight: 500;
 }
 
@@ -167,8 +167,8 @@ input[type="submit"]:not(.btn):hover {
 .admin-dashboard .btn,
 .admin-interface .btn,
 [class*="admin"] .btn {
-  min-width: 44px; /* Accessibility minimum touch target */
-  min-height: 44px;
+  min-width: 80px; /* Consistent button width */
+  min-height: 38px;
   position: relative;
 }
 
