@@ -65,7 +65,7 @@
 .nav-link.active {
   background-color: var(--bs-primary) !important;
   border-color: var(--bs-primary) !important;
-  color: #fff !important;
+  /* Let Bootstrap handle active text color properly */
 }
 
 /* Tab navigation specific fixes for admin workflows */

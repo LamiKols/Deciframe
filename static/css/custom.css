@@ -34,9 +34,9 @@ h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
   background-color: var(--bs-form-control-bg) !important;
 }
 
-/* Button text fixes */
+/* Button text fixes - theme aware */
 .btn {
-  color: #fff !important;
+  /* Let Bootstrap handle button text colors properly */
 }
 
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
