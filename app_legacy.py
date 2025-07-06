@@ -63,11 +63,17 @@ def to_json_filter(value):
     except (TypeError, ValueError):
         return json.dumps([])
 
-app = Flask(__name__)
-app.config.from_object(Config)
-
-# Initialize Prometheus metrics
-metrics = PrometheusMetrics(app, group_by='endpoint')
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+    
+    # Initialize extensions
+    db.init_app(app)
+    migrate.init_app(app, db)
+    login_manager.init_app(app)
+    
+    # Initialize Prometheus metrics
+    metrics = PrometheusMetrics(app, group_by='endpoint')
 # Custom metrics for API monitoring
 request_counter = metrics.counter(
     'api_requests_total', 'Total API Requests', 

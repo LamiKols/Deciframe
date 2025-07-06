@@ -6,7 +6,7 @@ Applies automated triage rules to trigger status updates, notifications, and esc
 from datetime import datetime, timedelta
 from sqlalchemy import and_, or_
 from models import TriageRule, Epic, BusinessCase, Project, Notification, User, AuditLog, NotificationEventEnum
-from app import db
+from app_new import db
 import logging
 
 logger = logging.getLogger(__name__)

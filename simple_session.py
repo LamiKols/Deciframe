@@ -3,7 +3,7 @@ import json
 import uuid
 from datetime import datetime, timedelta
 from flask import session, request
-from app import db
+from app_new import db
 
 class SimpleSessionData(db.Model):
     __tablename__ = 'simple_sessions'

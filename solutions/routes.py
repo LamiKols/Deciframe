@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from models import Solution, StatusEnum
-from app import db
+from app_new import db
 
 solutions_bp = Blueprint('solutions', __name__, template_folder='templates')
 
