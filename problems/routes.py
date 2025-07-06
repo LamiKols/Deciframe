@@ -6,6 +6,8 @@ from flask_login import login_required, current_user
 from auth.session_auth import require_session_auth
 
 problems = Blueprint('problems', __name__, template_folder='templates')
+# Create alias for blueprint registration
+problems_bp = problems
 
 @problems.route('/')
 @login_required

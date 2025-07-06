@@ -11,10 +11,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 
-# Initialize extensions
-db = SQLAlchemy()
+# Import shared extensions to avoid circular imports
+from app import db, login_manager
 migrate = Migrate()
-login_manager = LoginManager()
 
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
@@ -181,16 +180,41 @@ def create_app():
         from flask_login import current_user
         from flask import current_app
         
+        # Create org_settings object with currency method
+        class OrgSettings:
+            def __init__(self, currency, date_format, timezone, theme):
+                self.currency = currency
+                self.date_format = date_format
+                self.timezone = timezone
+                self.theme = theme
+            
+            def get_currency_symbol(self):
+                currency_symbols = {
+                    'USD': '$',
+                    'EUR': '€',
+                    'GBP': '£',
+                    'JPY': '¥',
+                    'CAD': 'C$',
+                    'AUD': 'A$'
+                }
+                return currency_symbols.get(self.currency, '$')
+        
         # Only inject if user is authenticated
         if not current_user.is_authenticated:
             print(f"🔧 Context Processor Debug: User not authenticated, using defaults")
+            default_currency = current_app.config.get('DEFAULT_CURRENCY', 'USD')
+            default_date_format = current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')
+            default_timezone = current_app.config.get('DEFAULT_TIMEZONE', 'UTC')
+            default_theme = 'light'
+            
             return {
                 'org_prefs': {
-                    'currency': current_app.config.get('DEFAULT_CURRENCY', 'USD'),
-                    'date_format': current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO'),
-                    'timezone': current_app.config.get('DEFAULT_TIMEZONE', 'UTC'),
-                    'theme': 'light'
-                }
+                    'currency': default_currency,
+                    'date_format': default_date_format,
+                    'timezone': default_timezone,
+                    'theme': default_theme
+                },
+                'org_settings': OrgSettings(default_currency, default_date_format, default_timezone, default_theme)
             }
         
         # Get organization from user
@@ -206,13 +230,18 @@ def create_app():
         print(f"   Org Theme: {org_theme}")
         print(f"   Final Theme: {theme}")
         
+        currency = getattr(org, 'currency', current_app.config.get('DEFAULT_CURRENCY', 'USD'))
+        date_format = getattr(org, 'date_format', current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO'))
+        timezone = getattr(org, 'timezone', current_app.config.get('DEFAULT_TIMEZONE', 'UTC'))
+        
         return {
             'org_prefs': {
-                'currency': getattr(org, 'currency', current_app.config.get('DEFAULT_CURRENCY', 'USD')),
-                'date_format': getattr(org, 'date_format', current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')),
-                'timezone': getattr(org, 'timezone', current_app.config.get('DEFAULT_TIMEZONE', 'UTC')),
+                'currency': currency,
+                'date_format': date_format,
+                'timezone': timezone,
                 'theme': theme
-            }
+            },
+            'org_settings': OrgSettings(currency, date_format, timezone, theme)
         }
     
     @app.context_processor
@@ -344,7 +373,7 @@ def create_app():
         
         # Redirect authenticated users to appropriate dashboard
         if current_user.is_authenticated:
-            return redirect(url_for('dashboard.user_dashboard'))
+            return redirect(url_for('dashboards.dashboard_home'))
         
         # Show landing page for anonymous users
         return render_template('landing.html')
@@ -515,11 +544,18 @@ def create_app():
         
         # Register other blueprints
         try:
-            from auth.routes import auth_bp
+            from auth import bp as auth_bp
             app.register_blueprint(auth_bp, url_prefix='/auth')
             print("✓ Auth blueprint registered")
+            # Debug: List auth routes
+            with app.app_context():
+                for rule in app.url_map.iter_rules():
+                    if rule.endpoint.startswith('auth.'):
+                        print(f"  Auth route: {rule.rule} -> {rule.endpoint}")
         except Exception as e:
             print(f"⚠️ Auth blueprint registration failed: {e}")
+            import traceback
+            traceback.print_exc()
         
         try:
             from dept.routes import dept_bp
@@ -557,8 +593,8 @@ def create_app():
             print(f"⚠️ Notifications blueprint registration failed: {e}")
         
         try:
-            from notifications.config import notifications_config_bp
-            app.register_blueprint(notifications_config_bp, url_prefix='/notifications/config')
+            from notifications.config_routes import notifications_config_bp
+            app.register_blueprint(notifications_config_bp)
             print("✓ Notifications config blueprint registered")
         except Exception as e:
             print(f"⚠️ Notifications config blueprint registration failed: {e}")
@@ -641,9 +677,14 @@ def create_app():
             print(f"⚠️ Analytics blueprint registration failed: {e}")
         
         try:
-            from dashboards.routes import dashboards_bp
-            app.register_blueprint(dashboards_bp, url_prefix='/dashboards')
+            from dashboards.routes import dash_bp
+            app.register_blueprint(dash_bp)
             print("✓ Dashboards blueprint registered")
+            # Debug: Print available routes
+            with app.app_context():
+                for rule in app.url_map.iter_rules():
+                    if 'dashboard' in rule.endpoint:
+                        print(f"  Dashboard route: {rule.rule} -> {rule.endpoint}")
         except Exception as e:
             print(f"⚠️ Dashboards blueprint registration failed: {e}")
         

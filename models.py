@@ -11,7 +11,7 @@ from sqlalchemy import Enum as SQLEnum, Enum as SAEnum
 import enum
 import pytz
 
-from app_new import db
+from app import db
 
 # Enums for consistent data validation
 class UserRoleEnum(enum.Enum):
