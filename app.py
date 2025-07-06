@@ -1,6 +1,5 @@
 from flask import Flask, request, session
 from config import Config
-from extensions import db, migrate, login_manager
 import os
 import logging
 import json
@@ -8,6 +7,14 @@ import secrets
 import uuid
 from datetime import datetime
 from sqlalchemy import text
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_login import LoginManager
+
+# Initialize extensions
+db = SQLAlchemy()
+migrate = Migrate()
+login_manager = LoginManager()
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from prometheus_flask_exporter import PrometheusMetrics
@@ -305,10 +312,11 @@ db.init_app(app)
 migrate.init_app(app, db)
 
 # Initialize Flask-Login with proper user loader
-from flask_login import LoginManager
-login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login'
+login_manager.login_message = 'Please log in to access this page.'
+login_manager.login_message_category = 'info'
+login_manager.session_protection = None
 
 # Configure user loader to bridge JWT and session authentication
 @login_manager.user_loader
