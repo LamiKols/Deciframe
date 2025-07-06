@@ -74,11 +74,12 @@
   </div>
 
   <!-- Navbar -->
-  {% set logged_in = user and user.is_authenticated %}
+  {% set logged_in = current_user and current_user.is_authenticated %}
+  {% set user = current_user %}
   {% include 'partials/navbar.html' %}
 
   <!-- Onboarding Modal -->
-  {% if user and user.is_authenticated and not user.onboarded %}
+  {% if current_user and current_user.is_authenticated and not current_user.onboarded %}
   <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">

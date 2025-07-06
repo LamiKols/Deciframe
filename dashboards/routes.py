@@ -117,8 +117,8 @@ def manager_dashboard():
     kpis = compute_department_kpis(dept_id)
     
     return render_template('dashboards/manager.html', 
-                         problems=problems, 
-                         cases=cases,
+                         dept_problems=problems, 
+                         pending_cases=cases,
                          kpis=kpis,
                          user=current_user)
 
