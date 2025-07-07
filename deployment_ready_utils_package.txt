@@ -1,86 +1,78 @@
-COMPLETE UTILS MODULE FOR GITHUB DEPLOYMENT
+PHASED GITHUB UPLOAD STRATEGY FOR COMPLETE DEPLOYMENT
 
-Since git operations are restricted, here are the exact files you need to manually upload to GitHub:
+Based on app.py blueprint imports analysis, here are the modules needed in priority phases:
 
-=== FILE: utils/currency.py ===
-def format_currency(amount):
-    """
-    Format currency amount with organization-specific currency symbol.
-    
-    Args:
-        amount: Numeric value to format
-        
-    Returns:
-        Formatted currency string (e.g., "$1,234.56", "€1,234.56")
-    """
-    if amount is None:
-        return "N/A"
-    
-    # Get organization settings from database
-    try:
-        from models import OrganizationSettings
-        org_settings = OrganizationSettings.get_organization_settings()
-        currency_code = org_settings.currency if org_settings else 'USD'
-        print(f"🔧 utils/currency.py Debug: Retrieved currency_code={currency_code} from org_settings")
-    except Exception as e:
-        print(f"🔧 utils/currency.py Debug: Error getting org settings: {e}")
-        currency_code = 'USD'
-    
-    # Currency symbol mapping
-    symbol_map = {
-        'USD': '$',
-        'GBP': '£',
-        'EUR': '€',
-        'CAD': 'C$',
-        'NGN': '₦',
-        'AUD': 'A$',
-        'JPY': '¥',
-        'CNY': '¥',
-        'INR': '₹'
-    }
-    
-    # Determine currency symbol
-    symbol = symbol_map.get(currency_code.upper() if currency_code else 'USD', '$')
-    
-    # Format amount with proper number formatting
-    try:
-        result = f"{symbol}{amount:,.2f}"
-        print(f"🔧 utils/currency.py Debug: amount={amount}, currency_code={currency_code}, symbol={symbol}, result={result}")
-        return result
-    except (ValueError, TypeError):
-        result = f"{symbol}0.00"
-        print(f"🔧 utils/currency.py Debug: Error formatting amount={amount}, returning={result}")
-        return result
+========================================
+PHASE 1: CRITICAL DEPLOYMENT BLOCKERS
+========================================
+1. auth/ folder (HIGHEST PRIORITY - currently failing)
+   - Fix: auth/__init__.py (change line 5: from . import routes)
+   - Contains: routes.py, forms.py, templates/, __init__.py
 
-def get_currency_symbol(currency_code=None):
-    """
-    Get currency symbol for organization or specified currency.
-    
-    Args:
-        currency_code: Optional currency code override
-        
-    Returns:
-        Currency symbol string
-    """
-    try:
-        from models import OrganizationSettings
-        org_settings = OrganizationSettings.get_organization_settings()
-        currency_code = currency_code or (org_settings.currency if org_settings else 'USD')
-    except Exception:
-        currency_code = currency_code or 'USD'
-    
-    symbol_map = {
-        'USD': '$',
-        'GBP': '£',
-        'EUR': '€',
-        'CAD': 'C$',
-        'NGN': '₦',
-        'AUD': 'A$',
-        'JPY': '¥',
-        'CNY': '¥',
-        'INR': '₹'
-    }
-    
-    return symbol_map.get(currency_code.upper() if currency_code else 'USD', '$')
+2. utils/ folder (ALREADY UPLOADED - working)
+   - Contains: currency.py, date.py, __init__.py
 
-=== FILE: utils/date.py ===
+========================================
+PHASE 2: CORE BUSINESS MODULES
+========================================
+3. business/ folder
+   - Required by: from business.routes import business_bp
+
+4. problems/ folder  
+   - Required by: from problems.routes import problems_bp
+
+5. projects/ folder
+   - Required by: from projects.routes import projects_bp
+
+6. solutions/ folder
+   - Required by: from solutions.routes import solutions_bp
+
+7. dept/ folder
+   - Required by: from dept.routes import dept
+
+========================================
+PHASE 3: CORE FUNCTIONALITY MODULES
+========================================
+8. ai/ folder
+   - Required by: from ai.routes import ai_bp
+
+9. predict/ folder
+   - Required by: from predict.routes import predict_bp
+
+10. reports/ folder
+    - Required by: from reports.routes import reports_bp
+
+11. notifications/ folder
+    - Required by: from notifications.config_routes import notifications_config_bp
+
+========================================
+PHASE 4: OPTIONAL MODULES (try/except wrapped)
+========================================
+12. review/ folder
+13. search/ folder  
+14. help/ folder
+15. waitlist/ folder
+16. public/ folder
+17. dashboards/ folder
+18. monitoring/ folder
+19. settings/ folder
+
+========================================
+PHASE 5: SUPPORTING FILES
+========================================
+20. templates/ folder (all HTML templates)
+21. static/ folder (CSS, JS, images)
+22. workflows/ folder (automation)
+23. analytics/ folder (ML models)
+24. scheduled/ folder (background jobs)
+
+========================================
+DEPLOYMENT PRIORITY ORDER:
+========================================
+IMMEDIATE: auth/ (fixes current blocker)
+CRITICAL: business/, problems/, projects/, solutions/, dept/
+IMPORTANT: ai/, predict/, reports/, notifications/
+OPTIONAL: All others (app has try/except handling)
+
+Start with Phase 1 (auth/) to fix immediate deployment failure,
+then proceed through phases as needed.
