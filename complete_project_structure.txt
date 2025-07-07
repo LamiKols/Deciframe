@@ -1,0 +1,326 @@
+COMPLETE PROJECT STRUCTURE FOR GITHUB UPLOAD
+Generated: July 7, 2025
+
+ROOT FILES (Upload to repository root):
+========================================
+app.py - Main Flask application
+main.py - Application entry point
+models.py - Database models
+config.py - Configuration settings
+requirements.txt - Python dependencies
+pyproject.toml - Project configuration
+.env - Environment variables template
+.gitignore - Git ignore rules
+.replit - Replit configuration
+render.yaml - Render deployment config
+replit.md - Project documentation
+
+CORE BUSINESS MODULES:
+========================================
+problems/
+├── __init__.py
+├── forms.py
+├── routes.py
+└── templates/
+    ├── problem_detail.html
+    ├── problem_form.html
+    └── problems.html
+
+business/
+├── __init__.py
+├── epic_management.py
+├── forms.py
+├── routes.py
+└── templates/
+    ├── business_case_detail.html
+    ├── business_case_form.html
+    ├── business_cases.html
+    ├── case_detail.html
+    ├── case_form.html
+    ├── cases.html
+    ├── refine_stories.html
+    ├── refine_stories_simple.html
+    ├── requirements.html
+    └── requirements_clean.html
+
+projects/
+├── __init__.py
+├── forms.py
+└── routes.py
+
+solutions/
+├── __init__.py
+├── routes.py
+└── templates/
+    └── solution_detail.html
+
+dept/
+├── __init__.py
+├── forms.py
+├── routes.py
+└── templates/
+    ├── department_form.html
+    ├── department_node.html
+    ├── departments.html
+    └── dept/
+
+predict/
+├── __init__.py
+└── routes.py
+
+reports/
+├── __init__.py
+├── routes.py
+├── scheduler.py
+└── service.py
+
+notifications/
+├── __init__.py
+├── config_routes.py
+├── events.py
+├── routes.py
+└── service.py
+
+ai/
+├── __init__.py
+├── problem_classifier.py
+├── routes.py
+└── summary_routes.py
+
+AUTH & UTILITIES:
+========================================
+auth/
+├── __init__.py
+├── forms.py
+├── routes.py
+└── templates/
+    ├── login.html
+    ├── logout.html
+    ├── profile.html
+    └── register.html
+
+utils/
+├── __init__.py
+├── currency.py
+└── date.py
+
+ADMIN & CONFIGURATION:
+========================================
+admin/
+├── __init__.py
+├── forms.py
+├── routes.py
+└── templates/
+    └── admin/
+        ├── admin_dashboard.html
+        ├── admin_users.html
+        ├── audit_logs.html
+        ├── help_center.html
+        ├── import_data.html
+        ├── organization_settings.html
+        ├── role_permissions.html
+        ├── settings.html
+        ├── triage_rules.html
+        ├── workflows.html
+        └── data_management/
+            ├── import_map.html
+            ├── import_result.html
+            └── import_upload.html
+
+dashboard/
+├── __init__.py
+└── routes.py
+
+dashboards/
+├── __init__.py
+└── routes.py
+
+review/
+├── __init__.py
+├── routes.py
+└── templates/
+    └── review/
+        ├── pending_reviews.html
+        ├── review_business_case.html
+        ├── review_epic.html
+        └── review_project.html
+
+workflows/
+├── __init__.py
+├── automation.py
+├── integration.py
+├── models.py
+├── routes.py
+├── scheduler.py
+└── service.py
+
+monitoring/
+├── __init__.py
+├── dashboard.py
+└── routes.py
+
+USER FEATURES:
+========================================
+search/
+├── __init__.py
+├── routes.py
+└── service.py
+
+help/
+├── __init__.py
+└── routes.py
+
+waitlist/
+├── __init__.py
+└── routes.py
+
+public/
+├── __init__.py
+└── routes.py
+
+analytics/
+├── __init__.py
+├── ai_workflows.py
+└── routes.py
+
+scheduled/
+└── send_exec_report.py
+
+services/
+├── __init__.py
+└── ml_service.py
+
+settings/
+├── __init__.py
+└── routes.py
+
+TEMPLATE SYSTEM:
+========================================
+templates/
+├── base.html
+├── index.html
+├── dropdown_demo.html
+├── admin_dashboard_demo.html
+├── executive_dashboard_pdf.html
+├── admin/
+│   ├── admin_base.html
+│   ├── admin_dashboard.html
+│   ├── admin_users.html
+│   ├── audit_logs.html
+│   ├── help_center.html
+│   ├── import_data.html
+│   ├── organization_settings.html
+│   ├── role_permissions.html
+│   ├── settings.html
+│   ├── triage_rules.html
+│   ├── workflows.html
+│   └── data_management/
+│       ├── import_map.html
+│       ├── import_result.html
+│       └── import_upload.html
+├── dashboards/
+│   ├── admin_dashboard.html
+│   ├── ba_dashboard.html
+│   ├── director_dashboard.html
+│   ├── executive_dashboard.html
+│   ├── manager_dashboard.html
+│   ├── personal_dashboard.html
+│   ├── pm_dashboard.html
+│   └── staff_dashboard.html
+├── epics/
+│   ├── epic_detail.html
+│   ├── epic_form.html
+│   └── epics.html
+├── help/
+│   ├── help_article.html
+│   └── help_center.html
+├── includes/
+│   ├── flash_messages.html
+│   └── pagination.html
+├── macros/
+│   ├── dropdown_macros.html
+│   └── form_macros.html
+├── monitoring/
+│   └── dashboard.html
+├── notifications/
+│   ├── notification_detail.html
+│   ├── notifications.html
+│   └── config/
+│       └── notification_settings.html
+├── partials/
+│   └── navbar.html
+├── platform_admin/
+│   └── platform_dashboard.html
+├── projects/
+│   ├── project_detail.html
+│   ├── project_form.html
+│   └── projects.html
+├── public/
+│   ├── privacy.html
+│   └── terms.html
+└── search/
+    └── search_results.html
+
+STATIC ASSETS:
+========================================
+static/
+├── css/
+│   ├── admin-button-fixes.css
+│   ├── button-text-fix.css
+│   ├── custom.css
+│   ├── navbar.css
+│   ├── styles.css
+│   ├── theme-dark.css
+│   └── theme-light.css
+├── js/
+│   ├── admin.js
+│   ├── dashboard.js
+│   ├── notifications.js
+│   └── theme-toggle.js
+├── img/
+│   ├── favicon.svg
+│   └── logo.svg
+└── sample_data/
+    ├── sample_business_cases.csv
+    ├── sample_departments.csv
+    ├── sample_org_chart.csv
+    ├── sample_problems.csv
+    ├── sample_projects.csv
+    └── sample_users.csv
+
+DEVELOPMENT FILES:
+========================================
+tests/
+├── test_auth.py
+├── test_business.py
+├── test_dashboard.py
+├── test_dept.py
+├── test_models.py
+├── test_problems.py
+├── test_projects.py
+└── (additional test files)
+
+DOCUMENTATION FILES:
+========================================
+README.md
+CHANGELOG.md
+AUTH0_CONFIGURATION.md
+BA_FUNCTIONALITY_GUIDE.md
+DROPDOWN_MACROS_GUIDE.md
+INVESTOR_DEMO_GUIDE.md
+SSO_SETUP.md
+github_upload_instructions.md
+core_modules_upload_package.txt
+deployment_sequence_guide.txt
+complete_github_upload_list.txt
+complete_project_structure.txt
+
+TOTAL STRUCTURE:
+========================================
+- 27 main directories
+- 400+ files total
+- Complete Flask application structure
+- All templates and static assets
+- Comprehensive documentation
+- Test suite
+- Sample data files
