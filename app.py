@@ -120,7 +120,9 @@ def create_app():
                 from models import OrganizationSettings
                 org_settings = OrganizationSettings.get_organization_settings()
                 currency_code = org_settings.currency if org_settings else 'USD'
-            except:
+                print(f"🔧 Currency Filter Debug: Retrieved currency_code={currency_code} from org_settings")
+            except Exception as e:
+                print(f"🔧 Currency Filter Debug: Error getting org settings: {e}")
                 currency_code = current_app.config.get('DEFAULT_CURRENCY', 'USD')
         
         # Format the number
@@ -134,7 +136,9 @@ def create_app():
                 'INR': '₹'
             }
             symbol = currency_symbols.get(currency_code, '$')
-            return f"{symbol}{formatted}"
+            result = f"{symbol}{formatted}"
+            print(f"🔧 Currency Filter Debug: value={value}, currency_code={currency_code}, symbol={symbol}, result={result}")
+            return result
         
         return formatted
     
@@ -232,6 +236,27 @@ def create_app():
     # Register CSRF token generator as global function
     app.jinja_env.globals.update(csrf_token=generate_csrf_token)
     
+    # Register get_currency_symbol as global function
+    def get_currency_symbol():
+        """Global template function to get currency symbol"""
+        try:
+            from models import OrganizationSettings
+            org_settings = OrganizationSettings.get_organization_settings()
+            currency_code = org_settings.currency if org_settings else 'USD'
+            currency_symbols = {
+                'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
+                'CAD': 'C$', 'AUD': 'A$', 'CHF': 'CHF', 'CNY': '¥',
+                'INR': '₹'
+            }
+            symbol = currency_symbols.get(currency_code, '$')
+            print(f"🔧 Global Currency Symbol Debug: currency_code={currency_code}, symbol={symbol}")
+            return symbol
+        except Exception as e:
+            print(f"🔧 Global Currency Symbol Debug: Error: {e}")
+            return '$'
+    
+    app.jinja_env.globals.update(get_currency_symbol=get_currency_symbol)
+    
     @app.context_processor
     def inject_org_preferences():
         """Inject organization preferences into all templates"""
@@ -291,6 +316,8 @@ def create_app():
         currency = getattr(org_settings, 'currency', current_app.config.get('DEFAULT_CURRENCY', 'USD')) if org_settings else 'USD'
         date_format = getattr(org_settings, 'date_format', current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')) if org_settings else 'ISO'
         timezone = getattr(org_settings, 'timezone', current_app.config.get('DEFAULT_TIMEZONE', 'UTC')) if org_settings else 'UTC'
+        
+        print(f"🔧 Context Processor Debug: Returning currency={currency}, theme={theme}")
         
         return {
             'org_prefs': {
