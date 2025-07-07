@@ -201,3 +201,52 @@ html * .btn-outline-info {
 * .btn-outline-info:hover {
   color: #ffffff !important;
 }
+
+/* Fix alert text visibility in all themes */
+html[data-bs-theme] .alert,
+html[data-bs-theme="dark"] .alert,
+html[data-bs-theme="light"] .alert,
+.alert {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+html[data-bs-theme="dark"] .alert {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Specific alert types for better visibility */
+html[data-bs-theme] .alert-success,
+html[data-bs-theme="dark"] .alert-success,
+html[data-bs-theme="light"] .alert-success,
+.alert-success {
+  background-color: #d1e7dd !important;
+  border-color: #badbcc !important;
+  color: #0f5132 !important;
+  -webkit-text-fill-color: #0f5132 !important;
+}
+
+html[data-bs-theme="dark"] .alert-success {
+  background-color: #0f5132 !important;
+  border-color: #2ea043 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+html[data-bs-theme] .alert-warning,
+html[data-bs-theme="dark"] .alert-warning,
+html[data-bs-theme="light"] .alert-warning,
+.alert-warning {
+  background-color: #fff3cd !important;
+  border-color: #ffecb5 !important;
+  color: #664d03 !important;
+  -webkit-text-fill-color: #664d03 !important;
+}
+
+html[data-bs-theme="dark"] .alert-warning {
+  background-color: #664d03 !important;
+  border-color: #ffc107 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}Mon Jul  7 10:35:18 AM UTC 2025: Added alert text visibility fix
