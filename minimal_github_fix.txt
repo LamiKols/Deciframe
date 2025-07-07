@@ -1,31 +1,29 @@
-MINIMAL GITHUB FIX FOR DEPLOYMENT ERROR
+GITHUB FIX FOR LINE 34 INDENTATION ERROR:
 
-Current Error: NameError: name 'Base' is not defined
+Current INCORRECT structure in GitHub (causing error):
+```
+class Base(DeclarativeBase):
+    pass
+    db = SQLAlchemy(model_class=Base)  # ← WRONG: This is indented inside the class
+```
 
-SOLUTION: Add these 2 lines to GitHub app.py:
-
-1. ADD IMPORT (around line 5):
-from sqlalchemy.orm import DeclarativeBase
-
-2. ADD CLASS DEFINITION (before line 30):
+Required CORRECT structure:
+```
 class Base(DeclarativeBase):
     pass
 
-GitHub Edit URL: https://github.com/LamiKols/Deciframe/edit/main/app.py
+db = SQLAlchemy(model_class=Base)  # ← CORRECT: This must be at module level (no indentation)
+```
 
-EXPECTED STRUCTURE:
-from flask import Flask, request, session
-from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate  
-from flask_login import LoginManager, current_user
-from sqlalchemy.orm import DeclarativeBase    ← ADD THIS
-import os
-import logging
-...
+EXACT FIX STEPS:
+1. Go to: https://github.com/LamiKols/Deciframe/edit/main/app.py
+2. Find line 34: `    db = SQLAlchemy(model_class=Base)`
+3. Remove the 4 spaces at the beginning of line 34
+4. Ensure there's a blank line between the class and the db initialization
+5. Commit with message: "Fix indentation error on line 34"
 
-class Base(DeclarativeBase):    ← ADD THIS
-    pass                        ← ADD THIS
+The line should look like:
+db = SQLAlchemy(model_class=Base)
 
-# Initialize Flask extensions
-db = SQLAlchemy(model_class=Base)  ← THIS WILL NOW WORK
+NOT:
+    db = SQLAlchemy(model_class=Base)
