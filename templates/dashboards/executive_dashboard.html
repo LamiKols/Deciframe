@@ -32,7 +32,7 @@
     <div class="col-md-3">
       <div class="card shadow-sm text-center p-3">
         <h5>Total Budget Approved</h5>
-        <h2>{{ currency_symbol }}{{ total_budget|int }}</h2>
+        <h2>{{ format_currency(total_budget|int) }}</h2>
       </div>
     </div>
   </div>
@@ -81,7 +81,7 @@
         <td><a href="{{ url_for('projects.view_project', id=proj.id) }}">{{ proj.title }}</a></td>
         <td>{{ proj.owner.name if proj.owner else 'Unassigned' }}</td>
         <td>{{ proj.status }}</td>
-        <td>{{ currency_symbol }}{{ proj.budget|int if proj.budget else 0 }}</td>
+        <td>{{ format_currency(proj.budget|int if proj.budget else 0) }}</td>
       </tr>
       {% else %}
       <tr><td colspan="4">No active projects</td></tr>

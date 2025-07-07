@@ -67,7 +67,7 @@
                                 {% if project.budget %}
                                 <div class="info-group mb-3">
                                     <strong>Budget:</strong>
-                                    <p class="mb-0">{{ currency_symbol }}{{ "{:,.2f}".format(project.budget) }}</p>
+                                    <p class="mb-0">{{ format_currency(project.budget) }}</p>
                                 </div>
                                 {% endif %}
                                 {% if project.end_date %}
@@ -119,7 +119,7 @@
                                             <strong>ROI:</strong> {{ "{:.1f}".format(project.business_case.roi) }}%
                                         </div>
                                         <div class="mb-2">
-                                            <strong>BC Cost:</strong> {{ currency_symbol }}{{ "{:,.2f}".format(project.business_case.cost_estimate) }}
+                                            <strong>BC Cost:</strong> {{ format_currency(project.business_case.cost_estimate) }}
                                         </div>
                                         {% if project.budget and project.business_case.cost_estimate %}
                                             {% set variance = ((project.budget - project.business_case.cost_estimate) / project.business_case.cost_estimate * 100) %}

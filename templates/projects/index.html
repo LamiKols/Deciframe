@@ -217,7 +217,7 @@
                                                 </td>
                                                 <td>
                                                     {% if project.budget %}
-                                                        {{ currency_symbol }}{{ "{:,.2f}".format(project.budget) }}
+                                                        {{ format_currency(project.budget) }}
                                                     {% else %}
                                                         <span class="text-muted">Not set</span>
                                                     {% endif %}

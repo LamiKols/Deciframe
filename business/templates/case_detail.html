@@ -54,7 +54,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h5 class="card-title text-warning">Cost Estimate</h5>
-                                        <h3 class="text-warning">{{ currency_symbol }}{{ "{:,.2f}".format(business_case.cost_estimate) }}</h3>
+                                        <h3 class="text-warning">{{ format_currency(business_case.cost_estimate) }}</h3>
                                     </div>
                                 </div>
                             </div>
@@ -62,7 +62,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h5 class="card-title text-success">Benefit Estimate</h5>
-                                        <h3 class="text-success">{{ currency_symbol }}{{ "{:,.2f}".format(business_case.benefit_estimate) }}</h3>
+                                        <h3 class="text-success">{{ format_currency(business_case.benefit_estimate) }}</h3>
                                     </div>
                                 </div>
                             </div>
