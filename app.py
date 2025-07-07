@@ -155,11 +155,17 @@ def create_app():
                 return value
         
         # Get format from org preferences if available
-        if not format_override and current_user and current_user.is_authenticated:
-            org = getattr(current_user, 'organization', None)
-            date_format = getattr(org, 'date_format', 'ISO') if org else 'ISO'
+        if not format_override:
+            try:
+                from models import OrganizationSettings
+                org_settings = OrganizationSettings.get_organization_settings()
+                date_format = org_settings.date_format if org_settings else 'ISO'
+                print(f"🔧 Date Filter Debug: Retrieved date_format={date_format}")
+            except Exception as e:
+                print(f"🔧 Date Filter Debug: Error getting org settings: {e}")
+                date_format = current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')
         else:
-            date_format = format_override or current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')
+            date_format = format_override
         
         # Format mapping
         format_mapping = {
@@ -185,15 +191,14 @@ def create_app():
                 return value
         
         # Get timezone and format from org preferences if available
-        if current_user and current_user.is_authenticated:
-            org = getattr(current_user, 'organization', None)
-            if org:
-                timezone_name = getattr(org, 'timezone', 'UTC')
-                date_format = getattr(org, 'date_format', 'ISO')
-            else:
-                timezone_name = 'UTC'
-                date_format = 'ISO'
-        else:
+        try:
+            from models import OrganizationSettings
+            org_settings = OrganizationSettings.get_organization_settings()
+            timezone_name = org_settings.timezone if org_settings else 'UTC'
+            date_format = org_settings.date_format if org_settings else 'ISO'
+            print(f"🔧 Date Filter Debug: Retrieved timezone={timezone_name}, date_format={date_format}")
+        except Exception as e:
+            print(f"🔧 Date Filter Debug: Error getting org settings: {e}")
             timezone_name = current_app.config.get('DEFAULT_TIMEZONE', 'UTC')
             date_format = current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')
         
