@@ -1,0 +1,111 @@
+COMPLETE GITHUB UPLOAD LIST - ALL DIRECTORIES NEEDED
+========================================
+
+CRITICAL DIRECTORIES (Must upload first):
+========================================
+
+CORE BUSINESS MODULES (Required for deployment):
+1. problems/ - Problem tracking system (9 files)
+2. business/ - Business case management (17 files) 
+3. projects/ - Project management (6 files)
+4. solutions/ - Solution recommendations (5 files)
+5. dept/ - Department hierarchy (11 files)
+6. predict/ - ML predictions (4 files) 
+7. reports/ - Reporting system (8 files)
+8. notifications/ - Notification system (10 files)
+9. ai/ - AI-powered features (8 files)
+
+AUTHENTICATION & UTILITIES (Already uploaded but verify):
+10. auth/ - Authentication system (20 files) ✅ Already committed
+11. utils/ - Utility functions (12 files) ✅ Already working
+
+========================================
+
+IMPORTANT DIRECTORIES (Upload second):
+========================================
+
+ADMIN & CONFIGURATION:
+12. admin/ - Admin interface (25 files)
+13. dashboard/ - User dashboards (4 files)
+14. dashboards/ - Additional dashboards (4 files)
+15. review/ - Review workflows (12 files)
+16. workflows/ - Workflow automation (17 files)
+17. monitoring/ - System monitoring (6 files)
+
+USER FEATURES:
+18. search/ - Full-text search (6 files)
+19. help/ - Help center (4 files)
+20. waitlist/ - Landing page & waitlist (4 files)
+21. public/ - Public pages (4 files)
+
+SUPPORTING MODULES:
+22. analytics/ - Analytics system (5 files)
+23. scheduled/ - Background jobs (1 file)
+24. services/ - Service layer (2 files)
+25. settings/ - Settings management (2 files)
+
+========================================
+
+TEMPLATE & STATIC FILES (Upload third):
+========================================
+
+26. templates/ - HTML templates (90 files)
+    - templates/admin/ (admin interface templates)
+    - templates/dashboards/ (dashboard templates)
+    - templates/epics/ (epic templates)
+    - templates/help/ (help templates)
+    - templates/includes/ (shared templates)
+    - templates/macros/ (reusable macros)
+    - templates/monitoring/ (monitoring templates)
+    - templates/notifications/ (notification templates)
+    - templates/partials/ (partial templates)
+    - templates/platform_admin/ (platform admin templates)
+    - templates/projects/ (project templates)
+    - templates/public/ (public templates)
+    - templates/search/ (search templates)
+
+27. static/ - Static assets (34 files)
+    - static/css/ (stylesheets)
+    - static/js/ (JavaScript files)
+    - static/img/ (images)
+    - static/sample_data/ (sample data files)
+
+========================================
+
+OPTIONAL DIRECTORIES (Upload last):
+========================================
+
+28. tests/ - Test files (36 files)
+29. attached_assets/ - Development assets (46 files)
+
+SKIP THESE DIRECTORIES (Don't upload):
+❌ uploads/ (empty runtime directory)
+❌ .pythonlibs/ (Python dependencies - managed by requirements.txt)
+❌ .upm/ (Replit package manager cache)
+
+========================================
+
+UPLOAD PRIORITY ORDER:
+========================================
+
+PHASE 1 (Critical): Upload directories 1-11 first
+PHASE 2 (Important): Upload directories 12-25 second  
+PHASE 3 (Templates): Upload directories 26-27 third
+PHASE 4 (Optional): Upload directories 28-29 last
+
+========================================
+
+VERIFICATION CHECKLIST:
+========================================
+
+After uploading, verify these directories exist in GitHub:
+✅ All 9 core business modules (problems, business, projects, solutions, dept, predict, reports, notifications, ai)
+✅ auth/ and utils/ directories  
+✅ admin/ directory (largest module)
+✅ templates/ directory (all HTML files)
+✅ static/ directory (CSS, JS, images)
+✅ Root files: app.py, main.py, models.py, config.py, requirements.txt
+
+Total directories to upload: 27 directories
+Total files: ~400+ files
+Estimated upload time: 15-30 minutes depending on method
