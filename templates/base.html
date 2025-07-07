@@ -33,6 +33,9 @@
   <link href="{{ url_for('static', filename='css/responsive.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/inter-font.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/admin-button-fixes.css') }}" rel="stylesheet">
+  
+  <!-- CRITICAL: Button text visibility fix - must load LAST -->
+  <link href="{{ url_for('static', filename='css/button-text-fix.css') }}?v=20250707082500" rel="stylesheet">
 
   {% block extra_head %}{% endblock %}
 
