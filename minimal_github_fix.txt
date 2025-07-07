@@ -1,29 +1,29 @@
-GITHUB FIX FOR LINE 34 INDENTATION ERROR:
+CRITICAL GITHUB UPLOAD REQUIRED FOR DEPLOYMENT FIX
 
-Current INCORRECT structure in GitHub (causing error):
-```
-class Base(DeclarativeBase):
-    pass
-    db = SQLAlchemy(model_class=Base)  # ← WRONG: This is indented inside the class
-```
+The deployment is failing because the auth module fix hasn't been uploaded to GitHub yet.
 
-Required CORRECT structure:
+REQUIRED FILE CHANGE:
+File: auth/__init__.py
+Current content causing error:
 ```
-class Base(DeclarativeBase):
-    pass
+from flask import Blueprint
 
-db = SQLAlchemy(model_class=Base)  # ← CORRECT: This must be at module level (no indentation)
+bp = Blueprint('auth', __name__, template_folder='templates')
+
+from auth import routes
 ```
 
-EXACT FIX STEPS:
-1. Go to: https://github.com/LamiKols/Deciframe/edit/main/app.py
-2. Find line 34: `    db = SQLAlchemy(model_class=Base)`
-3. Remove the 4 spaces at the beginning of line 34
-4. Ensure there's a blank line between the class and the db initialization
-5. Commit with message: "Fix indentation error on line 34"
+MUST BE CHANGED TO:
+```
+from flask import Blueprint
 
-The line should look like:
-db = SQLAlchemy(model_class=Base)
+bp = Blueprint('auth', __name__, template_folder='templates')
 
-NOT:
-    db = SQLAlchemy(model_class=Base)
+from . import routes
+```
+
+CRITICAL: Change line 5 from "from auth import routes" to "from . import routes"
+
+This single line change will resolve the "ModuleNotFoundError: No module named 'auth'" error and allow deployment to succeed.
+
+The issue is a circular import where the auth module tries to import from itself, creating an infinite loop during import resolution on the deployment server.
