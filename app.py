@@ -29,6 +29,8 @@ def generate_csrf_token():
     return session['_csrf_token']
 class Base(DeclarativeBase):
     pass
+
+db = SQLAlchemy(model_class=Base)  # ← CORRECT: Outside class
     db = SQLAlchemy(model_class=Base)
 # Initialize Flask extensions
 db = SQLAlchemy(model_class=Base)
