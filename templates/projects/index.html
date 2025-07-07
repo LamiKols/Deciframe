@@ -247,12 +247,12 @@
                                                 <td>
                                                     <div class="btn-group">
                                                         <a href="{{ url_for('projects.view_project', id=project.id, auth_token=request.args.get('auth_token')) }}" 
-                                                           class="btn btn-sm btn-outline-primary">
-                                                            <i class="fas fa-eye"></i>
+                                                           class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye"></i> View
                                                         </a>
                                                         <a href="{{ url_for('projects.edit_project', id=project.id, auth_token=request.args.get('auth_token')) }}" 
-                                                           class="btn btn-sm btn-outline-secondary">
-                                                            <i class="fas fa-edit"></i>
+                                                           class="btn btn-sm btn-secondary">
+                                                            <i class="fas fa-edit"></i> Edit
                                                         </a>
                                                     </div>
                                                 </td>
