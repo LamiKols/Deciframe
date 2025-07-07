@@ -39,19 +39,53 @@ h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
   /* Let Bootstrap handle button text colors properly */
 }
 
-/* Ensure button text is visible in both themes */
-[data-bs-theme="dark"] .btn {
-  color: #fff !important;
+/* CRITICAL: Ensure button text is visible in all themes and button types */
+
+/* Dark theme solid buttons - force white text */
+[data-bs-theme="dark"] .btn-primary,
+[data-bs-theme="dark"] .btn-secondary,
+[data-bs-theme="dark"] .btn-success,
+[data-bs-theme="dark"] .btn-danger,
+[data-bs-theme="dark"] .btn-warning,
+[data-bs-theme="dark"] .btn-info {
+  color: #ffffff !important;
+  background-color: var(--bs-primary) !important;
 }
 
+/* Light theme solid buttons - force white text */
 [data-bs-theme="light"] .btn-primary,
 [data-bs-theme="light"] .btn-secondary,
 [data-bs-theme="light"] .btn-success,
 [data-bs-theme="light"] .btn-danger,
 [data-bs-theme="light"] .btn-warning,
 [data-bs-theme="light"] .btn-info {
-  color: #fff !important;
+  color: #ffffff !important;
 }
+
+/* Dark theme outline buttons - light text */
+[data-bs-theme="dark"] .btn-outline-primary,
+[data-bs-theme="dark"] .btn-outline-secondary,
+[data-bs-theme="dark"] .btn-outline-success,
+[data-bs-theme="dark"] .btn-outline-danger,
+[data-bs-theme="dark"] .btn-outline-warning,
+[data-bs-theme="dark"] .btn-outline-info {
+  color: #e0e0e0 !important;
+}
+
+/* Fallback for any remaining button visibility issues */
+[data-bs-theme="dark"] .btn {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="light"] .btn {
+  color: #212529 !important;
+}
+
+/* Override for buttons with specific classes to ensure proper text color */
+.btn-primary { color: #ffffff !important; }
+.btn-secondary { color: #ffffff !important; }
+.btn-success { color: #ffffff !important; }
+.btn-danger { color: #ffffff !important; }
 
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
   color: var(--bs-body-color) !important;
