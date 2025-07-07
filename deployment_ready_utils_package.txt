@@ -1,78 +1,111 @@
-PHASED GITHUB UPLOAD STRATEGY FOR COMPLETE DEPLOYMENT
-
-Based on app.py blueprint imports analysis, here are the modules needed in priority phases:
-
-========================================
-PHASE 1: CRITICAL DEPLOYMENT BLOCKERS
-========================================
-1. auth/ folder (HIGHEST PRIORITY - currently failing)
-   - Fix: auth/__init__.py (change line 5: from . import routes)
-   - Contains: routes.py, forms.py, templates/, __init__.py
-
-2. utils/ folder (ALREADY UPLOADED - working)
-   - Contains: currency.py, date.py, __init__.py
+DEPLOYMENT READY UTILITIES PACKAGE
+Supporting modules and utilities for core functionality
 
 ========================================
-PHASE 2: CORE BUSINESS MODULES
+SUPPORTING MODULES (Upload after core modules)
 ========================================
-3. business/ folder
-   - Required by: from business.routes import business_bp
 
-4. problems/ folder  
-   - Required by: from problems.routes import problems_bp
+1. utils/ folder (Already working - currency/date formatting)
+   - utils/__init__.py
+   - utils/currency.py (Organization currency formatting)
+   - utils/date.py (Organization date formatting)
+   Status: ✅ Already deployed and working
 
-5. projects/ folder
-   - Required by: from projects.routes import projects_bp
+2. scheduled/ folder (Background job automation)
+   - scheduled/send_exec_report.py (Executive report automation)
+   - scheduled/__init__.py (if exists)
 
-6. solutions/ folder
-   - Required by: from solutions.routes import solutions_bp
+3. workflows/ folder (Workflow automation)
+   - workflows/integration.py (Triage rule automation)
+   - workflows/__init__.py (if exists)
 
-7. dept/ folder
-   - Required by: from dept.routes import dept
+4. monitoring/ folder (System monitoring)
+   - monitoring/dashboard.py (Monitoring dashboard)
+   - monitoring/__init__.py (if exists)
 
-========================================
-PHASE 3: CORE FUNCTIONALITY MODULES
-========================================
-8. ai/ folder
-   - Required by: from ai.routes import ai_bp
-
-9. predict/ folder
-   - Required by: from predict.routes import predict_bp
-
-10. reports/ folder
-    - Required by: from reports.routes import reports_bp
-
-11. notifications/ folder
-    - Required by: from notifications.config_routes import notifications_config_bp
+5. analytics/ folder (Analytics and insights)
+   - analytics/ai_workflows.py (AI workflow analysis)
+   - analytics/__init__.py (if exists)
 
 ========================================
-PHASE 4: OPTIONAL MODULES (try/except wrapped)
+ADMIN AND CONFIGURATION MODULES
 ========================================
-12. review/ folder
-13. search/ folder  
-14. help/ folder
-15. waitlist/ folder
-16. public/ folder
-17. dashboards/ folder
-18. monitoring/ folder
-19. settings/ folder
+
+6. admin/ folder (Admin interface - Large module)
+   - All admin interface files
+   - admin_working.py (Main admin routes)
+   - Platform administration features
+
+7. dashboard/ folder (User dashboards)
+   - Role-specific dashboard implementations
+   - Executive dashboard features
+
+8. dashboards/ folder (Additional dashboard features)
+   - Specialized dashboard components
+
+9. review/ folder (Review and approval workflows)
+   - Epic review system
+   - Business case review system
+   - Project review system
 
 ========================================
-PHASE 5: SUPPORTING FILES
+SPECIALIZED FEATURES
 ========================================
-20. templates/ folder (all HTML templates)
-21. static/ folder (CSS, JS, images)
-22. workflows/ folder (automation)
-23. analytics/ folder (ML models)
-24. scheduled/ folder (background jobs)
+
+10. search/ folder (Full-text search)
+    - PostgreSQL tsvector search implementation
+    - Search API and interfaces
+
+11. help/ folder (Help center)
+    - Help article management
+    - Contextual help system
+
+12. waitlist/ folder (Landing page and waitlist)
+    - Public waitlist functionality
+    - Landing page management
+
+13. public/ folder (Public-facing content)
+    - Terms of service
+    - Privacy policy
+    - Public interfaces
 
 ========================================
-DEPLOYMENT PRIORITY ORDER:
+UPLOAD SEQUENCE AFTER CORE MODULES
 ========================================
-IMMEDIATE: auth/ (fixes current blocker)
-CRITICAL: business/, problems/, projects/, solutions/, dept/
-IMPORTANT: ai/, predict/, reports/, notifications/
-OPTIONAL: All others (app has try/except handling)
 
-Start with Phase 1 (auth/) to fix immediate deployment failure,
-then proceed through phases as needed.
+Phase 3A: Supporting Systems
+- scheduled/
+- workflows/ 
+- monitoring/
+- analytics/
+
+Phase 3B: Admin Features
+- admin/ (largest - upload separately)
+- dashboard/
+- dashboards/
+- review/
+
+Phase 3C: User Features  
+- search/
+- help/
+- waitlist/
+- public/
+
+========================================
+EXPECTED DEPLOYMENT TIMELINE
+========================================
+1. Core modules upload: ~5-10 minutes
+2. Supporting systems: ~5 minutes  
+3. Admin features: ~10-15 minutes
+4. User features: ~5 minutes
+5. Total deployment: 25-35 minutes for complete system
+
+========================================
+SUCCESS INDICATORS
+========================================
+✅ Application starts without import errors
+✅ All route blueprints register successfully
+✅ Database models create without errors
+✅ Admin interface accessible
+✅ User dashboards load properly
+✅ Core business workflows functional
