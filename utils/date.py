@@ -1,4 +1,3 @@
-from flask import g
 from datetime import datetime
 
 def format_date(dt):
@@ -14,24 +13,35 @@ def format_date(dt):
     if dt is None:
         return "N/A"
     
-    # Get organization from Flask g object
-    org = getattr(g, 'current_org', None)
+    # Get organization settings from database
+    try:
+        from models import OrganizationSettings
+        org_settings = OrganizationSettings.get_organization_settings()
+        date_format = org_settings.date_format if org_settings else 'ISO'
+        print(f"🔧 utils/date.py format_date Debug: Retrieved date_format={date_format}")
+    except Exception as e:
+        print(f"🔧 utils/date.py format_date Debug: Error getting org settings: {e}")
+        date_format = 'ISO'
     
-    # Determine date format
-    if org and org.date_format:
-        fmt = org.date_format
-    else:
-        fmt = "%d/%m/%Y"  # Default to European format
+    # Format mapping
+    format_mapping = {
+        'US': '%m/%d/%Y',      # 12/31/2023
+        'EU': '%d/%m/%Y',      # 31/12/2023
+        'ISO': '%Y-%m-%d',     # 2023-12-31
+        'Long': '%B %d, %Y'    # December 31, 2023
+    }
     
-    # Handle ISO format special case
-    if fmt == 'ISO':
-        fmt = "%Y-%m-%d"
+    fmt = format_mapping.get(date_format, '%Y-%m-%d')
     
     # Format date with proper error handling
     try:
-        return dt.strftime(fmt)
+        result = dt.strftime(fmt)
+        print(f"🔧 utils/date.py format_date Debug: dt={dt}, date_format={date_format}, fmt={fmt}, result={result}")
+        return result
     except (ValueError, AttributeError):
-        return dt.strftime("%d/%m/%Y") if dt else "N/A"
+        result = dt.strftime("%d/%m/%Y") if dt else "N/A"
+        print(f"🔧 utils/date.py format_date Debug: Error formatting, fallback result={result}")
+        return result
 
 def format_datetime(dt):
     """
@@ -46,22 +56,50 @@ def format_datetime(dt):
     if dt is None:
         return "N/A"
     
-    # Get organization from Flask g object
-    org = getattr(g, 'current_org', None)
+    # Get organization settings from database
+    try:
+        from models import OrganizationSettings
+        org_settings = OrganizationSettings.get_organization_settings()
+        date_format = org_settings.date_format if org_settings else 'ISO'
+        timezone_name = org_settings.timezone if org_settings else 'UTC'
+        print(f"🔧 utils/date.py format_datetime Debug: Retrieved date_format={date_format}, timezone={timezone_name}")
+    except Exception as e:
+        print(f"🔧 utils/date.py format_datetime Debug: Error getting org settings: {e}")
+        date_format = 'ISO'
+        timezone_name = 'UTC'
     
-    # Determine formats
-    date_fmt = org.date_format if org and org.date_format else "%d/%m/%Y"
-    time_fmt = org.time_format if org and org.time_format else "%H:%M:%S"
+    # Handle timezone conversion
+    try:
+        import pytz
+        if dt.tzinfo is None:
+            # Assume UTC if no timezone info
+            dt = pytz.UTC.localize(dt)
+        
+        # Convert to org timezone
+        org_tz = pytz.timezone(timezone_name)
+        dt = dt.astimezone(org_tz)
+    except Exception as e:
+        print(f"🔧 utils/date.py format_datetime Debug: Timezone conversion error: {e}")
+        # Continue with original datetime
     
-    # Handle ISO format special case
-    if date_fmt == 'ISO':
-        date_fmt = "%Y-%m-%d"
+    # Format mapping
+    format_mapping = {
+        'US': '%m/%d/%Y',      # 12/31/2023
+        'EU': '%d/%m/%Y',      # 31/12/2023
+        'ISO': '%Y-%m-%d',     # 2023-12-31
+        'Long': '%B %d, %Y'    # December 31, 2023
+    }
     
-    # Combine date and time formats
+    date_fmt = format_mapping.get(date_format, '%Y-%m-%d')
+    time_fmt = '%I:%M %p'  # 12-hour format with AM/PM
     datetime_fmt = f"{date_fmt} {time_fmt}"
     
     # Format datetime with proper error handling
     try:
-        return dt.strftime(datetime_fmt)
+        result = dt.strftime(datetime_fmt)
+        print(f"🔧 utils/date.py format_datetime Debug: dt={dt}, date_format={date_format}, result={result}")
+        return result
     except (ValueError, AttributeError):
-        return dt.strftime("%d/%m/%Y %H:%M:%S") if dt else "N/A"
+        result = dt.strftime("%d/%m/%Y %H:%M:%S") if dt else "N/A"
+        print(f"🔧 utils/date.py format_datetime Debug: Error formatting, fallback result={result}")
+        return result

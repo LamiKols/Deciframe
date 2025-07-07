@@ -108,7 +108,7 @@
                                     {% endif %}
                                 </p>
                                 <p class="mb-0">
-                                    <strong>Approved on:</strong> {{ format_datetime(business_case.approved_at) }}
+                                    <strong>Approved on:</strong> {{ business_case.approved_at | format_org_datetime }}
                                 </p>
                             </div>
                         {% endif %}
@@ -255,7 +255,7 @@
                         <div class="mt-4">
                             <small class="text-muted">
                                 {% if business_case.created_at %}
-                                    Created on {{ business_case.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                    Created on {{ business_case.created_at | format_org_datetime }}
                                 {% else %}
                                     Created on (date not available)
                                 {% endif %}
