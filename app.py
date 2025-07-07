@@ -31,7 +31,7 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)  # ← CORRECT: Outside class
-    db = SQLAlchemy(model_class=Base)
+db = SQLAlchemy(model_class=Base)
 # Initialize Flask extensions
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
