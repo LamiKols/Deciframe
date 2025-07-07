@@ -360,7 +360,7 @@
                         
                         <form method="POST">
                             {{ form.hidden_tag() }}
-                            <div class="row">
+                            <div class="row align-items-end">
                                 <div class="col-md-8">
                                     <div class="mb-3">
                                         {{ form.assigned_ba.label(class="form-label") }}
@@ -372,8 +372,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label class="form-label">&nbsp;</label><br>
-                                        {{ form.submit(class="btn btn-primary") }}
+                                        {{ form.submit(class="btn btn-primary w-100") }}
                                     </div>
                                 </div>
                             </div>
