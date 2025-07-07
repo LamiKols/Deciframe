@@ -44,24 +44,76 @@ h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
   color: #ffffff !important;
   background-color: #0d6efd !important;
   border-color: #0d6efd !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for primary buttons */
+.btn-primary:hover {
+  color: #ffffff !important;
+  background-color: #0b5ed7 !important;
+  border-color: #0a58ca !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
 .btn-secondary {
   color: #ffffff !important;
   background-color: #6c757d !important;
   border-color: #6c757d !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for secondary buttons */
+.btn-secondary:hover {
+  color: #ffffff !important;
+  background-color: #5c636a !important;
+  border-color: #565e64 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
 .btn-success {
   color: #ffffff !important;
   background-color: #198754 !important;
   border-color: #198754 !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for success buttons */
+.btn-success:hover {
+  color: #ffffff !important;
+  background-color: #157347 !important;
+  border-color: #146c43 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
 .btn-danger {
   color: #ffffff !important;
   background-color: #dc3545 !important;
   border-color: #dc3545 !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for danger buttons */
+.btn-danger:hover {
+  color: #ffffff !important;
+  background-color: #bb2d3b !important;
+  border-color: #b02a37 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
 /* Outline Button Fixes for Quick Actions */
