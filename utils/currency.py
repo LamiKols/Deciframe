@@ -1,5 +1,3 @@
-from flask import g
-
 def format_currency(amount):
     """
     Format currency amount with organization-specific currency symbol.
@@ -13,8 +11,15 @@ def format_currency(amount):
     if amount is None:
         return "N/A"
     
-    # Get organization from Flask g object
-    org = getattr(g, 'current_org', None)
+    # Get organization settings from database
+    try:
+        from models import OrganizationSettings
+        org_settings = OrganizationSettings.get_organization_settings()
+        currency_code = org_settings.currency if org_settings else 'USD'
+        print(f"🔧 utils/currency.py Debug: Retrieved currency_code={currency_code} from org_settings")
+    except Exception as e:
+        print(f"🔧 utils/currency.py Debug: Error getting org settings: {e}")
+        currency_code = 'USD'
     
     # Currency symbol mapping
     symbol_map = {
@@ -30,13 +35,14 @@ def format_currency(amount):
     }
     
     # Determine currency symbol
-    if org and org.currency:
-        symbol = symbol_map.get(org.currency.upper(), org.currency)
-    else:
-        symbol = '$'  # Default to USD
+    symbol = symbol_map.get(currency_code.upper() if currency_code else 'USD', '$')
     
     # Format amount with proper number formatting
     try:
-        return f"{symbol}{amount:,.2f}"
+        result = f"{symbol}{amount:,.2f}"
+        print(f"🔧 utils/currency.py Debug: amount={amount}, currency_code={currency_code}, symbol={symbol}, result={result}")
+        return result
     except (ValueError, TypeError):
-        return f"{symbol}0.00"
+        result = f"{symbol}0.00"
+        print(f"🔧 utils/currency.py Debug: Error formatting amount={amount}, returning={result}")
+        return result
