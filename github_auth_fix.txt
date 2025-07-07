@@ -1,0 +1,14 @@
+CRITICAL AUTH MODULE FIX FOR GITHUB DEPLOYMENT
+
+Fixed circular import issue in auth/__init__.py:
+
+BEFORE (causing ModuleNotFoundError):
+from auth import routes
+
+AFTER (fixed relative import):
+from . import routes
+
+This resolves the deployment error:
+"ModuleNotFoundError: No module named 'auth'" at line 400 in app.py
+
+The auth blueprint now imports correctly and the deployment should proceed successfully.
