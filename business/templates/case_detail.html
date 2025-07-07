@@ -349,16 +349,16 @@
                 <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="fas fa-user-tie me-2"></i>Assign Business Analyst
+                            <i class="fas fa-user-tie me-2"></i>Business Analyst Assignment
                         </h5>
                     </div>
                     <div class="card-body">
                         <p class="text-muted mb-3">
-                            <strong>Current Assignment:</strong>
+                            <strong>Current Status:</strong>
                             {% if business_case.assigned_ba %}
                                 <span class="badge bg-info">{{ business_case.assigned_ba.name }}</span>
                             {% else %}
-                                <span class="text-muted">No BA assigned</span>
+                                <span class="text-muted">No analyst assigned</span>
                             {% endif %}
                         </p>
                         
@@ -367,7 +367,7 @@
                             <div class="row align-items-end">
                                 <div class="col-md-7">
                                     <div class="mb-3">
-                                        {{ form.assigned_ba.label(class="form-label") }}
+                                        <label class="form-label">Select Business Analyst</label>
                                         {{ form.assigned_ba(class="form-select") }}
                                         {% if form.assigned_ba.errors %}
                                             <div class="text-danger">{{ form.assigned_ba.errors[0] }}</div>
