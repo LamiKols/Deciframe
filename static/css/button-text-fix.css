@@ -351,4 +351,34 @@ html[data-bs-theme="dark"] .badge.bg-info {
   background-color: #0dcaf0 !important;
   color: #000 !important;
   -webkit-text-fill-color: #000 !important;
+}
+
+/* Fix button text truncation and ensure full text display */
+* .btn,
+* button,
+* input[type="submit"],
+* input[type="button"],
+* a.btn,
+html * .btn,
+html * button,
+html * input[type="submit"],
+html * input[type="button"],
+html * a.btn {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: auto !important;
+  width: auto !important;
+  padding: 8px 16px !important;
+  line-height: 1.5 !important;
+  font-size: 14px !important;
+  border-radius: 6px !important;
+}
+
+/* Ensure assign BA button displays full text */
+.btn:contains("Assign"),
+button:contains("Assign"),
+input[value*="Assign"] {
+  min-width: 120px !important;
+  padding: 10px 20px !important;
 }Mon Jul  7 10:35:18 AM UTC 2025: Added alert text visibility fix
