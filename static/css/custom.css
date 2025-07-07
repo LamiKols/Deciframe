@@ -168,6 +168,36 @@ h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
   border-color: #6edff6 !important;
 }
 
+/* FINAL FIX: Maximum specificity button text visibility */
+html[data-bs-theme="dark"] .btn-outline-primary,
+html[data-bs-theme="dark"] .btn-outline-secondary,
+html[data-bs-theme="dark"] .btn-outline-success,
+html[data-bs-theme="dark"] .btn-outline-danger,
+html[data-bs-theme="dark"] .btn-outline-warning,
+html[data-bs-theme="dark"] .btn-outline-info {
+  color: #ffffff !important;
+  border-width: 2px !important;
+}
+
+html[data-bs-theme="light"] .btn-outline-primary,
+html[data-bs-theme="light"] .btn-outline-secondary,
+html[data-bs-theme="light"] .btn-outline-success,
+html[data-bs-theme="light"] .btn-outline-danger,
+html[data-bs-theme="light"] .btn-outline-warning,
+html[data-bs-theme="light"] .btn-outline-info {
+  color: #212529 !important;
+  border-width: 2px !important;
+}
+
+/* Force visibility for ALL buttons regardless of theme */
+.btn, .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info,
+.btn-outline-primary, .btn-outline-secondary, .btn-outline-success, 
+.btn-outline-danger, .btn-outline-warning, .btn-outline-info {
+  font-weight: 600 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
   color: var(--bs-body-color) !important;
 }
