@@ -253,8 +253,11 @@ input[type="submit"].btn, input[type="button"].btn {
   border-radius: 6px !important;
 }
 
-/* UNIVERSAL INPUT SUBMIT BUTTON STYLING */
-input[type="submit"].btn {
+/* UNIVERSAL INPUT SUBMIT BUTTON STYLING WITH MAXIMUM SPECIFICITY */
+html body div.container div.card div.card-body form div input[type="submit"].btn,
+html body div.container form div input[type="submit"].btn,
+html body form input[type="submit"].btn,
+html input[type="submit"].btn {
   color: #ffffff !important;
   font-weight: 600 !important;
   padding: 8px 16px !important;
@@ -262,22 +265,35 @@ input[type="submit"].btn {
   text-shadow: none !important;
   text-decoration: none !important;
   border: 1px solid !important;
+  cursor: pointer !important;
 }
 
-/* Specific input submit button colors */
-input[type="submit"].btn-primary {
+/* MAXIMUM SPECIFICITY: Specific input submit button colors */
+html body div.container div.card div.card-body form div input[type="submit"].btn-primary,
+html body div.container form div input[type="submit"].btn-primary,
+html body form input[type="submit"].btn-primary,
+html input[type="submit"].btn-primary {
   background-color: #0d6efd !important;
   border-color: #0d6efd !important;
+  color: #ffffff !important;
 }
 
-input[type="submit"].btn-success {
+html body div.container div.card div.card-body form div input[type="submit"].btn-success,
+html body div.container form div input[type="submit"].btn-success,
+html body form input[type="submit"].btn-success,
+html input[type="submit"].btn-success {
   background-color: #198754 !important;
   border-color: #198754 !important;
+  color: #ffffff !important;
 }
 
-input[type="submit"].btn-secondary {
+html body div.container div.card div.card-body form div input[type="submit"].btn-secondary,
+html body div.container form div input[type="submit"].btn-secondary,
+html body form input[type="submit"].btn-secondary,
+html input[type="submit"].btn-secondary {
   background-color: #6c757d !important;
   border-color: #6c757d !important;
+  color: #ffffff !important;
 }
 
 /* MAXIMUM SPECIFICITY: Force all button types to have consistent styling */
@@ -792,4 +808,58 @@ textarea:disabled,
 
 .card .card-body .form-group:last-child {
   margin-bottom: 0 !important;
+}
+
+/* =================================
+   NUCLEAR OPTION: FORCE ALL SUBMIT BUTTONS
+   ================================= */
+
+/* FINAL OVERRIDE: Force all submit buttons to have proper styling */
+input[type="submit"] {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  cursor: pointer !important;
+  border: 1px solid !important;
+  min-height: 38px !important;
+  text-decoration: none !important;
+}
+
+input[type="submit"].btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+input[type="submit"].btn-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+}
+
+input[type="submit"].btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+
+/* Target specific Create Business Case button */
+input[type="submit"][value*="Create Business Case"] {
+  color: #ffffff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* TESTING: Make ALL submit buttons bright red to test if CSS is loading */
+* input[type="submit"] {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  border: 1px solid #ff0000 !important;
 }
