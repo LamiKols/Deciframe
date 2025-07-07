@@ -853,13 +853,48 @@ input[type="submit"][value*="Create Business Case"] {
   text-shadow: none !important;
 }
 
-/* TESTING: Make ALL submit buttons bright red to test if CSS is loading */
-* input[type="submit"] {
-  background-color: #ff0000 !important;
+/* COMPREHENSIVE BUTTON TEXT VISIBILITY FIX */
+.btn, button, input[type="submit"], input[type="button"], a.btn {
   color: #ffffff !important;
   font-weight: 600 !important;
   padding: 8px 16px !important;
   border-radius: 6px !important;
   text-shadow: none !important;
-  border: 1px solid #ff0000 !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+  border: 1px solid !important;
+}
+
+/* Ensure all primary buttons have white text */
+.btn-primary, 
+button.btn-primary, 
+input[type="submit"].btn-primary, 
+input[type="button"].btn-primary, 
+a.btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+/* Ensure all secondary buttons have white text */
+.btn-secondary, 
+button.btn-secondary, 
+input[type="submit"].btn-secondary, 
+input[type="button"].btn-secondary, 
+a.btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+/* Ensure all success buttons have white text */
+.btn-success, 
+button.btn-success, 
+input[type="submit"].btn-success, 
+input[type="button"].btn-success, 
+a.btn-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
 }
