@@ -410,4 +410,32 @@ input[value*="Assign"] {
   flex-shrink: 0 !important;
   margin-left: 8px !important;
   white-space: nowrap !important;
+}
+
+/* Ensure uniform epic container widths */
+.accordion-item {
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
+
+.accordion-button {
+  width: 100% !important;
+  min-height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.accordion-item .accordion-button div:first-child {
+  flex: 1 !important;
+  min-width: 0 !important;
+  margin-right: 15px !important;
+  overflow: hidden !important;
+}
+
+.accordion-item .accordion-button div:last-child {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  gap: 6px !important;
+  align-items: center !important;
 }Mon Jul  7 10:35:18 AM UTC 2025: Added alert text visibility fix
