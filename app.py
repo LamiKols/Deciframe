@@ -3,6 +3,7 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate  
 from flask_login import LoginManager, current_user
+from sqlalchemy.orm import DeclarativeBase
 import os
 import logging
 import json
@@ -26,6 +27,9 @@ def generate_csrf_token():
     if '_csrf_token' not in session:
         session['_csrf_token'] = secrets.token_hex(16)
     return session['_csrf_token']
+class Base(DeclarativeBase):
+    pass
+    db = SQLAlchemy(model_class=Base)
 # Initialize Flask extensions
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
