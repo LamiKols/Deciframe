@@ -161,7 +161,7 @@
                                                     {{ project.status.value }}
                                                 </span>
                                                 <br>
-                                                <small class="text-muted">{{ project.created_at.strftime('%m/%d/%Y') if project.created_at else 'Date unknown' }}</small>
+                                                <small class="text-muted">{{ project.created_at | format_org_date if project.created_at else 'Date unknown' }}</small>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -195,7 +195,7 @@
                                                 </div>
                                                 <div class="text-end">
                                                     <small style="color: #dc3545; font-weight: bold;">
-                                                        Due: {{ milestone.due_date.strftime('%m/%d/%Y') }}
+                                                        Due: {{ milestone.due_date | format_org_date }}
                                                     </small>
                                                     <br>
                                                     <small style="color: #856404;">{{ milestone.owner.name }}</small>
@@ -239,7 +239,7 @@
                                                                 </small>
                                                             </div>
                                                             <div class="text-end">
-                                                                <span class="badge bg-info">{{ milestone.due_date.strftime('%m/%d') }}</span>
+                                                                <span class="badge bg-info">{{ milestone.due_date | format_org_date }}</span>
                                                                 <br>
                                                                 <small class="text-muted">{{ milestone.owner.name }}</small>
                                                             </div>

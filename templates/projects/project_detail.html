@@ -59,7 +59,7 @@
                                 {% if project.start_date %}
                                 <div class="info-group mb-3">
                                     <strong>Start Date:</strong>
-                                    <p class="mb-0">{{ project.start_date.strftime('%B %d, %Y') }}</p>
+                                    <p class="mb-0">{{ project.start_date | format_org_date }}</p>
                                 </div>
                                 {% endif %}
                             </div>
@@ -73,14 +73,14 @@
                                 {% if project.end_date %}
                                 <div class="info-group mb-3">
                                     <strong>End Date:</strong>
-                                    <p class="mb-0">{{ project.end_date.strftime('%B %d, %Y') }}</p>
+                                    <p class="mb-0">{{ project.end_date | format_org_date }}</p>
                                 </div>
                                 {% endif %}
                                 <div class="info-group mb-3">
                                     <strong>Created:</strong>
                                     <p class="mb-0">
                                         {% if project.created_at %}
-                                            {{ project.created_at.strftime('%B %d, %Y') }}
+                                            {{ project.created_at | format_org_date }}
                                         {% else %}
                                             Not specified
                                         {% endif %}
@@ -329,11 +329,11 @@
                                                         {% endif %}
                                                         
                                                         <div class="small">
-                                                            <div><strong>Due:</strong> {{ milestone.due_date.strftime('%m/%d/%Y') }}</div>
+                                                            <div><strong>Due:</strong> {{ milestone.due_date | format_org_date }}</div>
                                                             <div><strong>Owner:</strong> {{ milestone.owner.name }}</div>
                                                             {% if milestone.completed and milestone.completion_date %}
                                                                 <div class="text-success">
-                                                                    <strong>Completed:</strong> {{ milestone.completion_date.strftime('%m/%d/%Y') }}
+                                                                    <strong>Completed:</strong> {{ milestone.completion_date | format_org_date }}
                                                                 </div>
                                                             {% endif %}
                                                         </div>
@@ -459,14 +459,14 @@
                                 <div class="alert alert-info py-2 px-3 mb-2">
                                     <i class="fas fa-clock"></i> Project submitted for review
                                     {% if project.submitted_at %}
-                                        <br><small>Submitted: {{ project.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                                        <br><small>Submitted: {{ project.submitted_at | format_org_datetime }}</small>
                                     {% endif %}
                                 </div>
                             {% elif project.status.value == 'Approved' %}
                                 <div class="alert alert-success py-2 px-3 mb-2">
                                     <i class="fas fa-check-circle"></i> Project approved
                                     {% if project.approved_at %}
-                                        <br><small>Approved: {{ project.approved_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                                        <br><small>Approved: {{ project.approved_at | format_org_datetime }}</small>
                                     {% endif %}
                                 </div>
                             {% endif %}
