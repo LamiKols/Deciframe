@@ -115,12 +115,13 @@ def create_app():
                 return "$0.00"
         
         # Get currency from org preferences if available
-        if not currency_code and current_user and current_user.is_authenticated:
-            org = getattr(current_user, 'organization', None)
-            currency_code = getattr(org, 'currency', 'USD') if org else 'USD'
-        
         if not currency_code:
-            currency_code = current_app.config.get('DEFAULT_CURRENCY', 'USD')
+            try:
+                from models import OrganizationSettings
+                org_settings = OrganizationSettings.get_organization_settings()
+                currency_code = org_settings.currency if org_settings else 'USD'
+            except:
+                currency_code = current_app.config.get('DEFAULT_CURRENCY', 'USD')
         
         # Format the number
         formatted = f"{value:,.2f}"
@@ -129,7 +130,8 @@ def create_app():
             # Currency symbols mapping
             currency_symbols = {
                 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
-                'CAD': 'C$', 'AUD': 'A$', 'CHF': 'CHF', 'CNY': '¥'
+                'CAD': 'C$', 'AUD': 'A$', 'CHF': 'CHF', 'CNY': '¥',
+                'INR': '₹'
             }
             symbol = currency_symbols.get(currency_code, '$')
             return f"{symbol}{formatted}"
@@ -268,12 +270,17 @@ def create_app():
                 'org_settings': OrgSettings(default_currency, default_date_format, default_timezone, default_theme)
             }
         
-        # Get organization from user
-        org = getattr(current_user, 'organization', None)
+        # Get organization settings from database
+        try:
+            from models import OrganizationSettings
+            org_settings = OrganizationSettings.get_organization_settings()
+        except Exception as e:
+            print(f"🔧 Context Processor Debug: Error getting org settings: {e}")
+            org_settings = None
         
         # Use user theme preference first, then organization default, then 'light'
         user_theme = getattr(current_user, 'theme', None)
-        org_theme = getattr(org, 'default_theme', 'light') if org else 'light'
+        org_theme = getattr(org_settings, 'default_theme', 'light') if org_settings else 'light'
         theme = user_theme if user_theme else org_theme
         
         print(f"🔧 Context Processor Debug:")
@@ -281,9 +288,9 @@ def create_app():
         print(f"   Org Theme: {org_theme}")
         print(f"   Final Theme: {theme}")
         
-        currency = getattr(org, 'currency', current_app.config.get('DEFAULT_CURRENCY', 'USD'))
-        date_format = getattr(org, 'date_format', current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO'))
-        timezone = getattr(org, 'timezone', current_app.config.get('DEFAULT_TIMEZONE', 'UTC'))
+        currency = getattr(org_settings, 'currency', current_app.config.get('DEFAULT_CURRENCY', 'USD')) if org_settings else 'USD'
+        date_format = getattr(org_settings, 'date_format', current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')) if org_settings else 'ISO'
+        timezone = getattr(org_settings, 'timezone', current_app.config.get('DEFAULT_TIMEZONE', 'UTC')) if org_settings else 'UTC'
         
         return {
             'org_prefs': {
