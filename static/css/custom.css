@@ -39,6 +39,20 @@ h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
   /* Let Bootstrap handle button text colors properly */
 }
 
+/* Ensure button text is visible in both themes */
+[data-bs-theme="dark"] .btn {
+  color: #fff !important;
+}
+
+[data-bs-theme="light"] .btn-primary,
+[data-bs-theme="light"] .btn-secondary,
+[data-bs-theme="light"] .btn-success,
+[data-bs-theme="light"] .btn-danger,
+[data-bs-theme="light"] .btn-warning,
+[data-bs-theme="light"] .btn-info {
+  color: #fff !important;
+}
+
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
   color: var(--bs-body-color) !important;
 }
