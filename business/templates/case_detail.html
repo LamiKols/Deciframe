@@ -190,16 +190,20 @@
                                     {% for epic in epics %}
                                     <div class="accordion-item">
                                         <h2 class="accordion-header" id="heading{{ epic.id }}">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ epic.id }}" aria-expanded="false">
-                                                <strong>Epic {{ loop.index }}: {{ epic.title }}</strong>
-                                                {% if epic.project_id %}
-                                                    <span class="badge bg-success ms-2">✅ Synced to Project</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary ms-2">⚠️ Not Synced</span>
-                                                {% endif %}
-                                                {% if epic.stories %}
-                                                    <span class="badge bg-info ms-2">{{ epic.stories|length }} Stories</span>
-                                                {% endif %}
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ epic.id }}" aria-expanded="false" style="display: flex; flex-wrap: wrap; align-items: center;">
+                                                <div style="flex: 1; min-width: 0; margin-right: 10px;">
+                                                    <strong>Epic {{ loop.index }}: {{ epic.title }}</strong>
+                                                </div>
+                                                <div style="flex-shrink: 0; display: flex; gap: 5px;">
+                                                    {% if epic.project_id %}
+                                                        <span class="badge bg-success">✅ Synced to Project</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">⚠️ Not Synced</span>
+                                                    {% endif %}
+                                                    {% if epic.stories %}
+                                                        <span class="badge bg-info">{{ epic.stories|length }} Stories</span>
+                                                    {% endif %}
+                                                </div>
                                             </button>
                                         </h2>
                                         <div id="collapse{{ epic.id }}" class="accordion-collapse collapse" data-bs-parent="#epicsAccordion">
