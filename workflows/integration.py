@@ -223,7 +223,7 @@ def setup_scheduled_workflows():
         def run_triage_rules():
             """Execute triage rules periodically"""
             try:
-                from app_new import app
+                from app import app
                 from services.triage_engine import apply_rules
                 
                 with app.app_context():

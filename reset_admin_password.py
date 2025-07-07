@@ -5,7 +5,7 @@ Reset admin password script
 import os
 import sys
 from werkzeug.security import generate_password_hash
-from app_new import app, db
+from app import app, db
 from models import User
 
 def reset_admin_password():

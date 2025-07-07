@@ -1,4 +1,4 @@
-from app_new import db, app
+from app import db, app
 from sqlalchemy import inspect
 
 with app.app_context():

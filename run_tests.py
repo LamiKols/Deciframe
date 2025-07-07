@@ -8,7 +8,7 @@ import os
 from flask import Flask
 from flask_login import login_user
 from models import Problem, Department, User, PriorityEnum, StatusEnum
-from app_new import db, app
+from app import db, app
 
 def setup_test_data():
     """Create test department and user"""
