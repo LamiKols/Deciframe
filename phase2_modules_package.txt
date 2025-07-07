@@ -1,0 +1,44 @@
+PHASE 2: CORE BUSINESS MODULES UPLOAD PACKAGE
+
+After auth/ is uploaded and deployment succeeds, these modules are required next:
+
+PRIORITY ORDER FOR UPLOAD:
+
+1. problems/ folder
+   - Required by: from problems.routes import problems_bp (line 459)
+   - Files: __init__.py, routes.py, forms.py, templates/
+
+2. business/ folder  
+   - Required by: from business.routes import business_bp (line 462)
+   - Files: __init__.py, routes.py, forms.py, templates/
+
+3. projects/ folder
+   - Required by: from projects.routes import projects_bp (line 465) 
+   - Files: __init__.py, routes.py, forms.py, templates/
+
+4. solutions/ folder
+   - Required by: from solutions.routes import solutions_bp (line 468)
+   - Files: __init__.py, routes.py, forms.py, templates/
+
+5. dept/ folder
+   - Required by: from dept.routes import dept (line 471)
+   - Files: __init__.py, routes.py, forms.py, templates/
+
+6. predict/ folder
+   - Required by: from predict.routes import predict_bp (line 474)
+   - Files: __init__.py, routes.py, templates/
+
+7. reports/ folder
+   - Required by: from reports.routes import reports_bp (line 477)
+   - Files: __init__.py, routes.py, service.py, scheduler.py, templates/
+
+8. notifications/ folder
+   - Required by: from notifications.config_routes import notifications_config_bp (line 480)
+   - Files: __init__.py, config_routes.py, routes.py, events.py, service.py, templates/
+
+9. ai/ folder
+   - Required by: from ai.routes import ai_bp (line 483)
+   - Files: __init__.py, routes.py, summary_routes.py, problem_classifier.py, templates/
+
+NOTE: These imports are NOT wrapped in try/except, so deployment will fail if any are missing.
+Upload in order listed for sequential deployment success.

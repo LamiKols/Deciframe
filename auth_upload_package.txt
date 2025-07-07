@@ -1,0 +1,37 @@
+AUTH MODULE UPLOAD PACKAGE - CRITICAL DEPLOYMENT FIX
+
+PRIORITY 1: IMMEDIATE UPLOAD REQUIRED
+
+File: auth/__init__.py
+CRITICAL CHANGE: Line 5 must be changed from:
+  from auth import routes
+TO:
+  from . import routes
+
+Complete auth/__init__.py content should be:
+```python
+from flask import Blueprint
+
+bp = Blueprint('auth', __name__, template_folder='templates')
+
+from . import routes
+```
+
+FILES TO UPLOAD IN auth/ folder:
+- auth/__init__.py (with above fix)
+- auth/routes.py
+- auth/forms.py
+- auth/oauth.py
+- auth/oidc.py
+- auth/session_auth.py
+- auth/routes_oidc.py
+- auth/templates/ (entire folder)
+  - auth/templates/base.html
+  - auth/templates/login.html
+  - auth/templates/profile.html
+  - auth/templates/register.html
+
+This fix resolves:
+ModuleNotFoundError: No module named 'auth'
+
+Status: CRITICAL - deployment currently failing without this fix
