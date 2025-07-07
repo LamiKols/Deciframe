@@ -249,4 +249,106 @@ html[data-bs-theme="dark"] .alert-warning {
   border-color: #ffc107 !important;
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
+}
+
+/* Fix alert-info visibility */
+html[data-bs-theme] .alert-info,
+html[data-bs-theme="dark"] .alert-info,
+html[data-bs-theme="light"] .alert-info,
+.alert-info {
+  background-color: #d1ecf1 !important;
+  border-color: #bee5eb !important;
+  color: #0c5460 !important;
+  -webkit-text-fill-color: #0c5460 !important;
+}
+
+html[data-bs-theme="dark"] .alert-info {
+  background-color: #0c5460 !important;
+  border-color: #17a2b8 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Fix alert-primary visibility */
+html[data-bs-theme] .alert-primary,
+html[data-bs-theme="dark"] .alert-primary,
+html[data-bs-theme="light"] .alert-primary,
+.alert-primary {
+  background-color: #cce7ff !important;
+  border-color: #b3d9ff !important;
+  color: #004085 !important;
+  -webkit-text-fill-color: #004085 !important;
+}
+
+html[data-bs-theme="dark"] .alert-primary {
+  background-color: #004085 !important;
+  border-color: #0d6efd !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Nuclear option: Force ALL alert text to be visible */
+* .alert,
+* .alert-primary,
+* .alert-secondary, 
+* .alert-success,
+* .alert-danger,
+* .alert-warning,
+* .alert-info,
+* .alert-light,
+* .alert-dark,
+html * .alert,
+html * .alert-primary,
+html * .alert-secondary,
+html * .alert-success,
+html * .alert-danger,
+html * .alert-warning,
+html * .alert-info,
+html * .alert-light,
+html * .alert-dark {
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Dark theme alert text override */
+html[data-bs-theme="dark"] .alert,
+html[data-bs-theme="dark"] .alert-primary,
+html[data-bs-theme="dark"] .alert-secondary,
+html[data-bs-theme="dark"] .alert-success,
+html[data-bs-theme="dark"] .alert-danger,
+html[data-bs-theme="dark"] .alert-warning,
+html[data-bs-theme="dark"] .alert-info,
+html[data-bs-theme="dark"] .alert-light,
+html[data-bs-theme="dark"] .alert-dark {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Fix badge text visibility */
+html[data-bs-theme] .badge,
+html[data-bs-theme="dark"] .badge,
+html[data-bs-theme="light"] .badge,
+.badge {
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Specific badge types */
+html[data-bs-theme] .badge.bg-info,
+html[data-bs-theme="dark"] .badge.bg-info,
+html[data-bs-theme="light"] .badge.bg-info,
+.badge.bg-info {
+  background-color: #0dcaf0 !important;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+html[data-bs-theme="dark"] .badge.bg-info {
+  background-color: #0dcaf0 !important;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
 }Mon Jul  7 10:35:18 AM UTC 2025: Added alert text visibility fix
