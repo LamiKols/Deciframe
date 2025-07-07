@@ -361,7 +361,7 @@
                         <form method="POST">
                             {{ form.hidden_tag() }}
                             <div class="row align-items-end">
-                                <div class="col-md-8">
+                                <div class="col-md-7">
                                     <div class="mb-3">
                                         {{ form.assigned_ba.label(class="form-label") }}
                                         {{ form.assigned_ba(class="form-select") }}
@@ -370,9 +370,9 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <div class="mb-3">
-                                        {{ form.submit(class="btn btn-primary", style="min-width: 120px; white-space: nowrap;") }}
+                                        {{ form.submit(class="btn btn-primary", style="min-width: 120px; white-space: nowrap; margin-left: -15px;") }}
                                     </div>
                                 </div>
                             </div>
