@@ -244,10 +244,81 @@ html[data-bs-theme="light"] .btn-outline-info {
 /* Force visibility for ALL buttons regardless of theme */
 .btn, .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info,
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, 
-.btn-outline-danger, .btn-outline-warning, .btn-outline-info {
+.btn-outline-danger, .btn-outline-warning, .btn-outline-info,
+input[type="submit"].btn, input[type="button"].btn {
   font-weight: 600 !important;
   text-shadow: none !important;
   opacity: 1 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+}
+
+/* UNIVERSAL INPUT SUBMIT BUTTON STYLING */
+input[type="submit"].btn {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+  border: 1px solid !important;
+}
+
+/* Specific input submit button colors */
+input[type="submit"].btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+input[type="submit"].btn-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+}
+
+input[type="submit"].btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+
+/* MAXIMUM SPECIFICITY: Force all button types to have consistent styling */
+html .btn-success,
+html body .btn-success,
+html body div .btn-success,
+html body .container .btn-success,
+html body .card .btn-success,
+html input[type="submit"].btn-success,
+html body input[type="submit"].btn-success,
+html body div input[type="submit"].btn-success,
+html body .container input[type="submit"].btn-success,
+html body .card input[type="submit"].btn-success {
+  color: #ffffff !important;
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+}
+
+html .btn-primary,
+html body .btn-primary,
+html body div .btn-primary,
+html body .container .btn-primary,
+html body .card .btn-primary,
+html input[type="submit"].btn-primary,
+html body input[type="submit"].btn-primary,
+html body div input[type="submit"].btn-primary,
+html body .container input[type="submit"].btn-primary,
+html body .card input[type="submit"].btn-primary {
+  color: #ffffff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
 }
 
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
