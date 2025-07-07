@@ -1,0 +1,31 @@
+MINIMAL GITHUB FIX FOR DEPLOYMENT ERROR
+
+Current Error: NameError: name 'Base' is not defined
+
+SOLUTION: Add these 2 lines to GitHub app.py:
+
+1. ADD IMPORT (around line 5):
+from sqlalchemy.orm import DeclarativeBase
+
+2. ADD CLASS DEFINITION (before line 30):
+class Base(DeclarativeBase):
+    pass
+
+GitHub Edit URL: https://github.com/LamiKols/Deciframe/edit/main/app.py
+
+EXPECTED STRUCTURE:
+from flask import Flask, request, session
+from config import Config
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate  
+from flask_login import LoginManager, current_user
+from sqlalchemy.orm import DeclarativeBase    ← ADD THIS
+import os
+import logging
+...
+
+class Base(DeclarativeBase):    ← ADD THIS
+    pass                        ← ADD THIS
+
+# Initialize Flask extensions
+db = SQLAlchemy(model_class=Base)  ← THIS WILL NOW WORK
