@@ -87,6 +87,24 @@ h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
 .btn-success { color: #ffffff !important; }
 .btn-danger { color: #ffffff !important; }
 
+/* URGENT FIX: Force button text visibility in dark theme */
+[data-bs-theme="dark"] a.btn {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] button.btn {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] input.btn {
+  color: #ffffff !important;
+}
+
+/* Nuclear option: Force all button text to be visible */
+.btn:not(.btn-outline-primary):not(.btn-outline-secondary):not(.btn-outline-success):not(.btn-outline-danger):not(.btn-outline-warning):not(.btn-outline-info) {
+  color: #ffffff !important;
+}
+
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
   color: var(--bs-body-color) !important;
 }
