@@ -128,7 +128,7 @@
                                                 {{ problem.status.value }}
                                             </span>
                                         </td>
-                                        <td>{{ problem.created_at.strftime('%m/%d') if problem.created_at else 'N/A' }}</td>
+                                        <td>{{ problem.created_at | format_org_date if problem.created_at else 'N/A' }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -180,7 +180,7 @@
                                                 {{ case.status.value }}
                                             </span>
                                         </td>
-                                        <td>{{ case.created_at.strftime('%m/%d') if case.created_at else 'N/A' }}</td>
+                                        <td>{{ case.created_at | format_org_date if case.created_at else 'N/A' }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

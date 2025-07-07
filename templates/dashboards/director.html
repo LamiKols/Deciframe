@@ -115,7 +115,7 @@
                                                 <span class="text-muted">N/A</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ case.created_at.strftime('%m/%d/%Y') }}</td>
+                                        <td>{{ case.created_at | format_org_date }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="{{ url_for('business.view_case', id=case.id) }}" class="btn btn-xs btn-info">Review</a>

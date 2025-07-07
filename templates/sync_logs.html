@@ -31,7 +31,7 @@
                                 {{ log.action }}
                             </span>
                         </td>
-                        <td>{{ format_datetime(log.timestamp) if log.timestamp else 'N/A' }}</td>
+                        <td>{{ log.timestamp | format_org_datetime if log.timestamp else 'N/A' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

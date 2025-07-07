@@ -64,7 +64,7 @@
                                         </td>
                                         <td>
                                             {% if project.due_date %}
-                                                {{ project.due_date.strftime('%m/%d/%Y') }}
+                                                {{ project.due_date | format_org_date }}
                                             {% else %}
                                                 <span class="text-muted">N/A</span>
                                             {% endif %}
@@ -105,7 +105,7 @@
                                     <tr class="{% if milestone.due_date < datetime.utcnow() %}table-danger{% elif milestone.due_date < (datetime.utcnow() + timedelta(days=3)) %}table-warning{% endif %}">
                                         <td>{{ milestone.project.code }}</td>
                                         <td>{{ milestone.name[:20] }}{% if milestone.name|length > 20 %}...{% endif %}</td>
-                                        <td>{{ milestone.due_date.strftime('%m/%d/%Y') }}</td>
+                                        <td>{{ milestone.due_date | format_org_date }}</td>
                                         <td>
                                             {% if milestone.completed_at %}
                                                 <span class="badge bg-success">Complete</span>
@@ -150,7 +150,7 @@
                             <tr>
                                 <td>{{ milestone.project.code }}</td>
                                 <td>{{ milestone.name }}</td>
-                                <td>{{ milestone.due_date.strftime('%m/%d/%Y') }}</td>
+                                <td>{{ milestone.due_date | format_org_date }}</td>
                                 <td>{{ (datetime.utcnow() - milestone.due_date).days }} days</td>
                                 <td>
                                     <a href="{{ url_for('projects.project_detail', id=milestone.project.id) }}" class="btn btn-xs btn-primary">Review</a>

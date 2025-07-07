@@ -97,7 +97,7 @@
                                         <td><a href="{{ url_for('business.view_case', id=case.id) }}">{{ case.code }}</a></td>
                                         <td>{{ case.title[:30] }}{% if case.title|length > 30 %}...{% endif %}</td>
                                         <td>{{ case.department.name if case.department else 'N/A' }}</td>
-                                        <td>{{ case.created_at.strftime('%m/%d/%Y') }}</td>
+                                        <td>{{ case.created_at | format_org_date }}</td>
                                         <td>
                                             <a href="{{ url_for('business.requirements', id=case.id) }}" class="btn btn-xs btn-info">Generate</a>
                                         </td>
@@ -172,7 +172,7 @@
                         <div class="list-group list-group-flush">
                             {% for case in recent_cases[:3] %}
                             <div class="list-group-item border-0 p-2">
-                                <small class="text-muted">{{ case.created_at.strftime('%m/%d') }}</small>
+                                <small class="text-muted">{{ case.created_at | format_org_date }}</small>
                                 <div><a href="{{ url_for('business.view_case', id=case.id) }}">{{ case.code }}</a></div>
                             </div>
                             {% endfor %}

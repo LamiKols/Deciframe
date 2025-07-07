@@ -51,7 +51,7 @@
                                                 {{ problem.priority.value }}
                                             </span>
                                         </td>
-                                        <td data-label="Date">{{ problem.created_at.strftime('%m/%d/%Y') }}</td>
+                                        <td data-label="Date">{{ problem.created_at | format_org_date }}</td>
                                         <td data-label="Actions">
                                             <a href="{{ url_for('problems.view', id=problem.id) }}" class="btn btn-sm btn-outline-primary">View</a>
                                         </td>

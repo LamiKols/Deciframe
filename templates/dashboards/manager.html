@@ -100,7 +100,7 @@
                                                 <span class="text-muted">N/A</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ case.created_at.strftime('%m/%d/%Y') }}</td>
+                                        <td>{{ case.created_at | format_org_date }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
