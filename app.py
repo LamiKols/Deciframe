@@ -1,6 +1,8 @@
 from flask import Flask, request, session
 from config import Config
-from extensions import db, migrate, login_manager
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate  
+from flask_login import LoginManager, current_user
 import os
 import logging
 import json
@@ -24,7 +26,10 @@ def generate_csrf_token():
     if '_csrf_token' not in session:
         session['_csrf_token'] = secrets.token_hex(16)
     return session['_csrf_token']
-
+# Initialize Flask extensions
+db = SQLAlchemy(model_class=Base)
+migrate = Migrate()
+login_manager = LoginManager()
 # Initialize Sentry error tracking
 sentry_dsn = os.getenv('SENTRY_DSN')
 if sentry_dsn:
