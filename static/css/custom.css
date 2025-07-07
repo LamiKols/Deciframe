@@ -39,70 +39,29 @@ h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
   /* Let Bootstrap handle button text colors properly */
 }
 
-/* CRITICAL: Ensure button text is visible in all themes and button types */
-
-/* Dark theme solid buttons - force white text */
-[data-bs-theme="dark"] .btn-primary,
-[data-bs-theme="dark"] .btn-secondary,
-[data-bs-theme="dark"] .btn-success,
-[data-bs-theme="dark"] .btn-danger,
-[data-bs-theme="dark"] .btn-warning,
-[data-bs-theme="dark"] .btn-info {
+/* SIMPLE BUTTON FIX: Force button text visibility */
+.btn-primary {
   color: #ffffff !important;
-  background-color: var(--bs-primary) !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
 }
 
-/* Light theme solid buttons - force white text */
-[data-bs-theme="light"] .btn-primary,
-[data-bs-theme="light"] .btn-secondary,
-[data-bs-theme="light"] .btn-success,
-[data-bs-theme="light"] .btn-danger,
-[data-bs-theme="light"] .btn-warning,
-[data-bs-theme="light"] .btn-info {
+.btn-secondary {
   color: #ffffff !important;
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
 }
 
-/* Dark theme outline buttons - light text */
-[data-bs-theme="dark"] .btn-outline-primary,
-[data-bs-theme="dark"] .btn-outline-secondary,
-[data-bs-theme="dark"] .btn-outline-success,
-[data-bs-theme="dark"] .btn-outline-danger,
-[data-bs-theme="dark"] .btn-outline-warning,
-[data-bs-theme="dark"] .btn-outline-info {
-  color: #e0e0e0 !important;
-}
-
-/* Fallback for any remaining button visibility issues */
-[data-bs-theme="dark"] .btn {
+.btn-success {
   color: #ffffff !important;
+  background-color: #198754 !important;
+  border-color: #198754 !important;
 }
 
-[data-bs-theme="light"] .btn {
-  color: #212529 !important;
-}
-
-/* Override for buttons with specific classes to ensure proper text color */
-.btn-primary { color: #ffffff !important; }
-.btn-secondary { color: #ffffff !important; }
-.btn-success { color: #ffffff !important; }
-.btn-danger { color: #ffffff !important; }
-
-/* URGENT FIX: Force button text visibility in dark theme */
-[data-bs-theme="dark"] a.btn {
+.btn-danger {
   color: #ffffff !important;
-}
-
-[data-bs-theme="dark"] button.btn {
-  color: #ffffff !important;
-}
-
-[data-bs-theme="dark"] input.btn {
-  color: #ffffff !important;
-}
-
-/* Nuclear option: Force all button text to be visible */
-.btn:not(.btn-outline-primary):not(.btn-outline-secondary):not(.btn-outline-success):not(.btn-outline-danger):not(.btn-outline-warning):not(.btn-outline-info) {
-  color: #ffffff !important;
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
 }
 
 .btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
