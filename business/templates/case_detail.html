@@ -245,7 +245,7 @@
                                     Requested by {{ business_case.full_case_requester.name }} 
                                 {% endif %}
                                 {% if business_case.full_case_requested_at %}
-                                    on {{ business_case.full_case_requested_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                    on {{ business_case.full_case_requested_at | format_org_datetime }}
                                 {% endif %}
                                 <br>
                                 <small>The assigned Business Analyst should complete the full case elaboration sections.</small>

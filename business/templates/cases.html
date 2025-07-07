@@ -149,7 +149,7 @@
                                         <td>
                                             <small class="text-muted">
                                                 {% if case.created_at %}
-                                                    {{ case.created_at.strftime('%m/%d/%Y') }}
+                                                    {{ case.created_at | format_org_date }}
                                                 {% else %}
                                                     Not specified
                                                 {% endif %}

@@ -102,7 +102,7 @@
                             
                             <div class="mb-3">
                                 <strong>Created At:</strong>
-                                <div class="text-muted">{{ business_case.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                                <div class="text-muted">{{ business_case.created_at | format_org_datetime }}</div>
                             </div>
                         </div>
                     </div>

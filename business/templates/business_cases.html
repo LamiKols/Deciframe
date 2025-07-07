@@ -83,7 +83,7 @@
                                             {{ case.status.value }}
                                         </span>
                                     </td>
-                                    <td>{{ case.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ case.created_at | format_org_date }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a href="{{ url_for('business_cases.view', id=case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-outline-primary btn-sm">

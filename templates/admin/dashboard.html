@@ -315,7 +315,7 @@
                                     <tr>
                                         <td>
                                             <small class="text-muted">
-                                                {{ log.timestamp.strftime('%m/%d %H:%M') if log.timestamp else '-' }}
+                                                {{ log.timestamp | format_org_datetime if log.timestamp else '-' }}
                                             </small>
                                         </td>
                                         <td>
@@ -374,7 +374,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
                             <div>
                                 <small class="fw-bold text-info">{{ log.action }}</small><br>
-                                <small class="text-muted">{{ log.timestamp.strftime('%m/%d %H:%M') if log.timestamp else '-' }}</small>
+                                <small class="text-muted">{{ log.timestamp | format_org_datetime if log.timestamp else '-' }}</small>
                             </div>
                             <span class="badge bg-info">
                                 {{ log.target }} #{{ log.target_id }}

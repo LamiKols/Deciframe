@@ -73,7 +73,7 @@
                             
                             <div class="mb-3">
                                 <strong>Created At:</strong>
-                                <div class="text-muted">{{ problem.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                                <div class="text-muted">{{ problem.created_at | format_org_datetime }}</div>
                             </div>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <small class="text-muted">
-                                        Created on {{ case.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        Created on {{ case.created_at | format_org_datetime }}
                                         {% if case.assigned_ba %}by {{ case.assigned_ba.name }}{% endif %}
                                     </small>
                                     <span class="badge {% if case.case_depth.value == 'Full' %}bg-primary{% else %}bg-secondary{% endif %}">
@@ -194,7 +194,7 @@
                                 <p class="card-text">{{ solution.description }}</p>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <small class="text-muted">
-                                        Created by {{ solution.creator.name }} on {{ solution.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        Created by {{ solution.creator.name }} on {{ solution.created_at | format_org_datetime }}
                                     </small>
                                     {% if solution.priority %}
                                     <span class="badge {% if solution.priority.value == 'High' %}bg-danger{% elif solution.priority.value == 'Medium' %}bg-warning{% else %}bg-secondary{% endif %}">

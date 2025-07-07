@@ -95,7 +95,7 @@
                                         </span>
                                     </td>
                                     <td>{{ problem.department.name if problem.department else 'N/A' }}</td>
-                                    <td>{{ problem.created_at.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ problem.created_at | format_org_date }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a href="{{ url_for('problems.view', id=problem.id, auth_token=request.args.get('auth_token')) }}" 
