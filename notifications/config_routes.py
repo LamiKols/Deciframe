@@ -129,7 +129,7 @@ def notification_settings():
     except Exception as e:
         logging.error(f"Error loading notification settings: {e}")
         flash('Error loading notification settings', 'danger')
-        return redirect(url_for('admin.dashboard'))
+        return redirect(url_for('admin_dashboard'))
 
 @notifications_config_bp.route('/edit/<int:setting_id>', methods=['GET', 'POST'])
 @admin_required
