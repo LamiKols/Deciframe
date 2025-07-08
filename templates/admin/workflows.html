@@ -2,6 +2,10 @@
 
 {% block title %}Workflow Templates - Admin Center{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/workflow-button-fix.css') }}?v={{ range(1000, 9999) | random }}">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -20,11 +24,10 @@
                     </div>
                     
                     <!-- My Workflows Actions -->
-                    <div id="workflow-actions" style="display: block; visibility: visible;">
-                        <div class="d-flex align-items-center">
-                            <small class="text-muted me-3">Manage your workflow templates</small>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkflowModal" 
-                                    style="display: inline-block; visibility: visible; color: white !important; background-color: var(--bs-primary) !important;">
+                    <div id="workflow-actions" class="workflow-action-container">
+                        <div class="d-flex align-items-center gap-3">
+                            <small class="text-muted">Manage your workflow templates</small>
+                            <button type="button" class="btn btn-primary workflow-add-btn" data-bs-toggle="modal" data-bs-target="#addWorkflowModal">
                                 <i class="fas fa-plus me-1"></i>Add New Workflow
                             </button>
                         </div>

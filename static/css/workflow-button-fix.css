@@ -1,0 +1,67 @@
+/* Emergency workflow button visibility fix */
+#actionButtons {
+    display: block !important;
+    visibility: visible !important;
+    min-height: 40px;
+}
+
+.workflow-action-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#workflow-actions {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.workflow-add-btn {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: white !important;
+    background-color: #0d6efd !important;
+    border: 1px solid #0d6efd !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 1rem !important;
+    border-radius: 0.375rem !important;
+    text-decoration: none !important;
+}
+
+.workflow-add-btn:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+    color: white !important;
+}
+
+.workflow-add-btn:focus {
+    color: white !important;
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}
+
+/* Global button fixes */
+.btn-primary {
+    color: white !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+/* Text visibility */
+.text-light {
+    color: #f8f9fa !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Debug helper */
+#workflow-actions::before {
+    content: "DEBUG: Actions should be visible";
+    display: none;
+    color: red;
+    font-size: 12px;
+}
