@@ -5,6 +5,13 @@ from app import db
 
 solutions_bp = Blueprint('solutions', __name__, template_folder='templates')
 
+@solutions_bp.route('/')
+@login_required
+def index():
+    """Solutions module index - list all solutions"""
+    solutions = Solution.query.filter_by(organization_id=current_user.organization_id).all()
+    return render_template('solutions/index.html', solutions=solutions)
+
 @solutions_bp.route('/solution/<int:solution_id>')
 @login_required
 def view_solution(solution_id):

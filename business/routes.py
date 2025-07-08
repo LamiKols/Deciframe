@@ -11,6 +11,12 @@ import logging
 
 business_bp = Blueprint('business', __name__, template_folder='templates')
 
+@business_bp.route('/')
+@login_required
+def index():
+    """Business module index - redirect to business cases listing"""
+    return redirect(url_for('business.cases'))
+
 def sync_epics_to_project(business_case_id, project_id):
     """Auto-link all epics in a business case to the project when case is approved"""
     try:
