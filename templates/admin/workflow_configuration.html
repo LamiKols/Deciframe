@@ -2,6 +2,49 @@
 
 {% block title %}Configure Workflow - {{ workflow.name }} | DeciFrame Admin{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Enhanced checkbox styling for better usability */
+.form-check-input {
+    width: 1.5em !important;
+    height: 1.5em !important;
+    margin-top: 0.125em !important;
+    vertical-align: top !important;
+    border: 2px solid #6c757d !important;
+    border-radius: 0.375em !important;
+    cursor: pointer !important;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+.form-check-input:focus {
+    border-color: #86b7fe !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.form-check-label {
+    cursor: pointer !important;
+    margin-left: 0.5em !important;
+    font-weight: 500 !important;
+}
+
+/* Improve form check container spacing */
+.form-check {
+    margin-bottom: 0.75rem !important;
+    padding-left: 2rem !important;
+}
+
+/* Make the entire checkbox area clickable */
+.form-check:hover .form-check-input {
+    border-color: #0d6efd !important;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row">
