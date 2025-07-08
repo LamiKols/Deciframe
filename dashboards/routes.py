@@ -303,13 +303,51 @@ def exec_dashboard():
     recent_cases = business_cases.order_by(BusinessCase.created_at.desc()).limit(5).all()
     recent_projects = projects.order_by(Project.created_at.desc()).limit(5).all()
     
+    # Calculate total budget from projects
+    try:
+        project_list = projects.all()
+        total_budget = sum([p.budget or 0 for p in project_list])
+    except:
+        project_list = []
+        total_budget = 0
+
+    # Calculate case stats by department for the template
+    case_stats = []
+    for dept in departments.limit(10).all():
+        try:
+            dept_cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id)
+            if hasattr(BusinessCase, 'department_id'):
+                dept_cases = dept_cases.filter_by(department_id=dept.id)
+            
+            total_count = dept_cases.count()
+            approved_count = dept_cases.filter_by(status="Approved").count()
+            rejected_count = dept_cases.filter_by(status="Rejected").count()
+            pending_count = dept_cases.filter_by(status="Submitted").count()
+            
+            case_stats.append({
+                "name": dept.name,
+                "total": total_count,
+                "approved": approved_count,
+                "rejected": rejected_count,
+                "pending": pending_count
+            })
+        except Exception as e:
+            print(f"Warning: Skipping department {dept.name} due to error: {str(e)}")
+            continue
+
     return render_template('dashboards/executive_dashboard.html',
                          metrics=metrics,
                          dept_performance=dept_performance,
                          recent_problems=recent_problems,
                          recent_cases=recent_cases,
                          recent_projects=recent_projects,
-                         user_role=user.role.value)
+                         user_role=user.role.value,
+                         total_budget=total_budget,
+                         case_count=metrics['total_cases'],
+                         project_count=metrics['total_projects'],
+                         problem_count=metrics['total_problems'],
+                         case_stats=case_stats,
+                         projects=project_list)
 
 @dash_bp.route('/executive-dashboard')
 @login_required
