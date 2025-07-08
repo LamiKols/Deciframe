@@ -510,9 +510,10 @@ def init_admin_routes(app):
             # Force close and recreate database session to clear transaction errors
             db.session.close()
             
-            # Use raw SQL to bypass transaction issues
+            # Use raw SQL to bypass transaction issues  
+            from sqlalchemy import text
             result = db.session.execute(
-                "SELECT id, name, description, is_active FROM workflow_templates WHERE organization_id = :org_id",
+                text("SELECT id, name, description, is_active FROM workflow_templates WHERE organization_id = :org_id"),
                 {"org_id": current_user.organization_id}
             )
             workflow_data = result.fetchall()
@@ -529,7 +530,7 @@ def init_admin_routes(app):
                 workflows.append(workflow)
             
             # Get library workflows with raw SQL too
-            lib_result = db.session.execute("SELECT id, name, description FROM workflow_library")
+            lib_result = db.session.execute(text("SELECT id, name, description FROM workflow_library"))
             library_data = lib_result.fetchall()
             
             library_workflows = []
