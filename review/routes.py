@@ -15,11 +15,15 @@ from utils.ai_review_insights import get_ai_review_insights, get_confidence_badg
 
 def notify_reviewers_project_submitted(project):
     """Create notifications for reviewers when a project is submitted"""
-    # Find all users with reviewing roles (Manager, Director, CEO, PM)
-    reviewers = User.query.filter(User.role.in_(['Manager', 'Director', 'CEO', 'PM'])).all()
+    # Find all users with reviewing roles (Manager, Director, CEO, PM) in the same organization
+    reviewers = User.query.filter(
+        User.role.in_(['Manager', 'Director', 'CEO', 'PM']),
+        User.organization_id == project.organization_id
+    ).all()
     
     for reviewer in reviewers:
         notification = Notification(
+            organization_id=project.organization_id,
             user_id=reviewer.id,
             message=f"New Project submitted for review: {project.name}",
             link=url_for('review.project_detail', project_id=project.id),
@@ -128,6 +132,7 @@ def handle_epic_action(epic_id):
     # Create notification for epic creator
     if epic.creator_id != current_user.id:
         notification = Notification(
+            organization_id=epic.organization_id,
             user_id=epic.creator_id,
             type='epic_review',
             title='Epic Review Update',
@@ -167,6 +172,7 @@ def add_comment(epic_id):
     # Create notification for epic creator if they're not the commenter
     if epic.creator_id != current_user.id:
         notification = Notification(
+            organization_id=epic.organization_id,
             user_id=epic.creator_id,
             type='epic_comment',
             title='New Epic Comment',
@@ -307,6 +313,7 @@ def handle_business_case_action(case_id):
         
         # Create notification for case creator
         notification = Notification(
+            organization_id=case.organization_id,
             user_id=case.created_by,
             message=f'Your Business Case "{case.title}" has been approved by {current_user.first_name} {current_user.last_name}.',
             link=url_for('business.view_case', id=case.id),
@@ -323,6 +330,7 @@ def handle_business_case_action(case_id):
         
         # Create notification for case creator
         notification = Notification(
+            organization_id=case.organization_id,
             user_id=case.created_by,
             message=f'Your Business Case "{case.title}" has been sent back for revisions by {current_user.first_name} {current_user.last_name}.',
             link=url_for('business.view_case', id=case.id),
@@ -359,6 +367,7 @@ def add_business_case_comment(case_id):
     # Create notification for case creator (if not the commenter)
     if case.created_by != current_user.id:
         notification = Notification(
+            organization_id=case.organization_id,
             user_id=case.created_by,
             message=f'{current_user.first_name} {current_user.last_name} commented on Business Case "{case.title}".',
             link=url_for('review.business_case_detail', case_id=case.id)
@@ -439,6 +448,7 @@ def handle_project_action(project_id):
         
         # Create notification for project manager and submitter
         notification = Notification(
+            organization_id=project.organization_id,
             user_id=project.project_manager_id,
             message=f'Project "{project.name}" has been approved by {current_user.name}.',
             link=f'/projects/{project.id}',
@@ -449,6 +459,7 @@ def handle_project_action(project_id):
         # Also notify submitter if different from project manager
         if project.submitted_by and project.submitted_by != project.project_manager_id:
             submitter_notification = Notification(
+                organization_id=project.organization_id,
                 user_id=project.submitted_by,
                 message=f'Your submitted project "{project.name}" has been approved.',
                 link=f'/projects/{project.id}',
@@ -465,6 +476,7 @@ def handle_project_action(project_id):
         
         # Create notification for project manager and submitter
         notification = Notification(
+            organization_id=project.organization_id,
             user_id=project.project_manager_id,
             message=f'Project "{project.name}" has been sent back for revisions by {current_user.name}.',
             link=f'/projects/{project.id}',
@@ -475,6 +487,7 @@ def handle_project_action(project_id):
         # Also notify submitter if different from project manager
         if project.submitted_by and project.submitted_by != project.project_manager_id:
             submitter_notification = Notification(
+                organization_id=project.organization_id,
                 user_id=project.submitted_by,
                 message=f'Your submitted project "{project.name}" needs revisions.',
                 link=f'/projects/{project.id}',
