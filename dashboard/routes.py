@@ -34,18 +34,19 @@ def admin_required(f):
 
 
 @dashboard_bp.route('/dashboard-demo')
+@login_required
 def dashboard_demo():
-    """Demo version of executive dashboard - no auth required"""
-    # Same logic as admin dashboard but without authentication
-    problems_count = Problem.query.filter_by(organization_id=1).count()
-    open_cases = BusinessCase.query.filter_by(status=StatusEnum.Open, organization_id=1).count()
+    """Demo version of executive dashboard - uses current user's organization"""
+    # Same logic as admin dashboard but with current user's organization
+    problems_count = Problem.query.filter_by(organization_id=current_user.organization_id).count()
+    open_cases = BusinessCase.query.filter_by(status=StatusEnum.Open, organization_id=current_user.organization_id).count()
     active_projects = Project.query.filter(
         Project.status.in_([StatusEnum.Open, StatusEnum.InProgress]),
-        Project.organization_id == 1
+        Project.organization_id == current_user.organization_id
     ).count()
     
     # Average case approval time
-    resolved_cases = BusinessCase.query.filter_by(status=StatusEnum.Resolved, organization_id=1).all()
+    resolved_cases = BusinessCase.query.filter_by(status=StatusEnum.Resolved, organization_id=current_user.organization_id).all()
     if resolved_cases:
         approval_times = []
         for case in resolved_cases:
@@ -57,16 +58,16 @@ def dashboard_demo():
         avg_case_approval_time = 0
     
     # Average ROI
-    cases_with_roi = BusinessCase.query.filter(BusinessCase.roi != None, BusinessCase.organization_id == 1).all()
+    cases_with_roi = BusinessCase.query.filter(BusinessCase.roi != None, BusinessCase.organization_id == current_user.organization_id).all()
     avg_roi = sum(case.roi for case in cases_with_roi) / len(cases_with_roi) if cases_with_roi else 0
     
     # Total investment and benefits
-    total_investment = sum(case.cost_estimate for case in BusinessCase.query.filter_by(organization_id=1).all())
-    total_benefits = sum(case.benefit_estimate for case in BusinessCase.query.filter_by(organization_id=1).all())
+    total_investment = sum(case.cost_estimate for case in BusinessCase.query.filter_by(organization_id=current_user.organization_id).all())
+    total_benefits = sum(case.benefit_estimate for case in BusinessCase.query.filter_by(organization_id=current_user.organization_id).all())
     
     # Project completion rate
-    total_projects = Project.query.filter_by(organization_id=1).count()
-    completed_projects = Project.query.filter_by(status=StatusEnum.Resolved, organization_id=1).count()
+    total_projects = Project.query.filter_by(organization_id=current_user.organization_id).count()
+    completed_projects = Project.query.filter_by(status=StatusEnum.Resolved, organization_id=current_user.organization_id).count()
     completion_rate = (completed_projects / total_projects * 100) if total_projects > 0 else 0
     
     metrics = {
