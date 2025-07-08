@@ -1704,7 +1704,7 @@ def init_admin_routes(app):
             import csv
             
             # Get all organizational units
-            units = OrgUnit.query.all()
+            units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
             
             # Create CSV content
             output = io.StringIO()
@@ -1740,7 +1740,7 @@ def init_admin_routes(app):
             from models import OrgUnit
             
             # Get all organizational units
-            all_units = OrgUnit.query.all()
+            all_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
             
             # Calculate statistics
             total_units = len(all_units)
@@ -1793,7 +1793,7 @@ def init_admin_routes(app):
             import io
             import csv
             
-            all_units = OrgUnit.query.all()
+            all_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
             
             if format == 'csv':
                 # Generate CSV report

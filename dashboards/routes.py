@@ -18,7 +18,7 @@ dash_bp = Blueprint('dashboards', __name__, url_prefix='/dashboard')
 def compute_department_kpis(dept_id):
     """Compute KPIs for a department"""
     # Get ALL problems in department (organization-wide totals for KPI cards)
-    open_problems = Problem.query.count()
+    open_problems = Problem.query.filter_by(organization_id=current_user.organization_id).count()
     
     # Get ALL pending cases (organization-wide totals for KPI cards)
     pending_cases = BusinessCase.query.filter_by(status=StatusEnum.Open, organization_id=current_user.organization_id).count()
@@ -519,9 +519,9 @@ def admin_dashboard():
     ).count()
     
     # System overview
-    total_problems = Problem.query.count()
-    total_cases = BusinessCase.query.count()
-    total_projects = Project.query.count()
+    total_problems = Problem.query.filter_by(organization_id=current_user.organization_id).count()
+    total_cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id).count()
+    total_projects = Project.query.filter_by(organization_id=current_user.organization_id).count()
     
     # Recent activity
     recent_problems = Problem.query.order_by(desc(Problem.created_at)).limit(5).all()
