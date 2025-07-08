@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Review Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>📊 Review Dashboard</h2>
+    <p class="text-muted">Comprehensive overview of all pending review items</p>
+    
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📈 Review Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="display-4 text-info">{{ total_pending }}</span>
+                                <span class="text-muted">Total Pending</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="display-4 text-warning">{{ epics|length }}</span>
+                                <span class="text-muted">Epics</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="display-4 text-primary">{{ cases|length }}</span>
+                                <span class="text-muted">Business Cases</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="display-4 text-success">{{ projects|length }}</span>
+                                <span class="text-muted">Projects</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🚀 Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('review.review_epics') }}" class="btn btn-outline-warning">
+                            📝 Review Epics ({{ epics|length }})
+                        </a>
+                        <a href="{{ url_for('review.review_business_cases') }}" class="btn btn-outline-primary">
+                            💼 Review Business Cases ({{ cases|length }})
+                        </a>
+                        <a href="{{ url_for('review.review_projects') }}" class="btn btn-outline-success">
+                            🎯 Review Projects ({{ projects|length }})
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Epics -->
+    {% if epics %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>📝 Recent Epic Submissions</h5>
+                    <a href="{{ url_for('review.review_epics') }}" class="btn btn-sm btn-outline-warning">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Epic Title</th>
+                                    <th>Business Case</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for epic in epics[:5] %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ epic.title }}</strong>
+                                        {% if epic.description %}
+                                        <br><small class="text-muted">{{ epic.description[:100] }}{% if epic.description|length > 100 %}...{% endif %}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if epic.business_case %}
+                                        <a href="{{ url_for('business.view_case', id=epic.business_case.id) }}">{{ epic.business_case.title }}</a>
+                                        {% else %}
+                                        <span class="text-muted">No case linked</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ epic.submitted_at.strftime('%m/%d/%Y %H:%M') if epic.submitted_at else 'N/A' }}</td>
+                                    <td>
+                                        <a href="{{ url_for('review.epic_detail', epic_id=epic.id) }}" class="btn btn-sm btn-outline-primary">Review</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Business Cases -->
+    {% if cases %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>💼 Recent Business Case Submissions</h5>
+                    <a href="{{ url_for('review.review_business_cases') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Case Title</th>
+                                    <th>Investment</th>
+                                    <th>ROI</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for case in cases[:5] %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ case.title }}</strong>
+                                        <br><span class="badge bg-secondary">{{ case.case_code }}</span>
+                                    </td>
+                                    <td>{{ "${:,.0f}".format(case.investment_required) if case.investment_required else 'N/A' }}</td>
+                                    <td>
+                                        {% if case.roi_percentage %}
+                                        <span class="badge bg-{% if case.roi_percentage >= 20 %}success{% elif case.roi_percentage >= 10 %}warning{% else %}secondary{% endif %}">
+                                            {{ "%.1f"|format(case.roi_percentage) }}%
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ case.submitted_at.strftime('%m/%d/%Y %H:%M') if case.submitted_at else 'N/A' }}</td>
+                                    <td>
+                                        <a href="{{ url_for('review.business_case_detail', case_id=case.id) }}" class="btn btn-sm btn-outline-primary">Review</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Projects -->
+    {% if projects %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>🎯 Recent Project Submissions</h5>
+                    <a href="{{ url_for('review.review_projects') }}" class="btn btn-sm btn-outline-success">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Project Name</th>
+                                    <th>Budget</th>
+                                    <th>Priority</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in projects[:5] %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ project.name }}</strong>
+                                        <br><span class="badge bg-secondary">{{ project.project_code }}</span>
+                                    </td>
+                                    <td>{{ "${:,.0f}".format(project.budget) if project.budget else 'N/A' }}</td>
+                                    <td>
+                                        {% if project.priority %}
+                                        <span class="badge bg-{% if project.priority.value == 'High' %}danger{% elif project.priority.value == 'Medium' %}warning{% else %}secondary{% endif %}">
+                                            {{ project.priority.value }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">Not set</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ project.submitted_at.strftime('%m/%d/%Y %H:%M') if project.submitted_at else 'N/A' }}</td>
+                                    <td>
+                                        <a href="{{ url_for('review.project_detail', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">Review</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Empty State -->
+    {% if total_pending == 0 %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <h4 class="text-muted">🎉 All Caught Up!</h4>
+                    <p class="text-muted">No items pending review at this time.</p>
+                    <div class="mt-3">
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">Return to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,363 @@
+/**
+ * DeciFrame Dynamic Theme System
+ * Comprehensive CSS variable-based theme system for light/dark mode support
+ */
+
+/* Light Theme Variables */
+:root[data-theme="light"], 
+html[data-theme="light"] {
+  /* Primary color scheme */
+  --bs-primary: #0d6efd;
+  --bs-secondary: #6c757d;
+  --bs-success: #198754;
+  --bs-danger: #dc3545;
+  --bs-warning: #ffc107;
+  --bs-info: #0dcaf0;
+  
+  /* Background colors */
+  --bs-body-bg: #ffffff;
+  --bs-secondary-bg: #f8f9fa;
+  --bs-tertiary-bg: #f1f3f4;
+  
+  /* Text colors */
+  --bs-body-color: #212529;
+  --bs-text-muted: #6c757d;
+  --bs-heading-color: #212529;
+  
+  /* Border colors */
+  --bs-border-color: #dee2e6;
+  --bs-border-color-translucent: rgba(0, 0, 0, 0.175);
+  
+  /* Form controls */
+  --bs-form-control-bg: #ffffff;
+  --bs-form-control-color: #212529;
+  --bs-form-control-border-color: #ced4da;
+  --bs-form-select-bg: #ffffff;
+  
+  /* Cards and containers */
+  --bs-card-bg: #ffffff;
+  --bs-card-border-color: #dee2e6;
+  
+  /* Navigation */
+  --bs-navbar-bg: #f8f9fa;
+  --bs-navbar-color: #212529;
+  --bs-navbar-hover-color: #0d6efd;
+  
+  /* Dropdown */
+  --bs-dropdown-bg: #ffffff;
+  --bs-dropdown-color: #212529;
+  --bs-dropdown-border-color: #dee2e6;
+  --bs-dropdown-link-hover-bg: #f8f9fa;
+  
+  /* Tables */
+  --bs-table-bg: #ffffff;
+  --bs-table-striped-bg: #f8f9fa;
+  --bs-table-hover-bg: #f1f3f4;
+  
+  /* Modal */
+  --bs-modal-bg: #ffffff;
+  --bs-modal-color: #212529;
+  
+  /* Enterprise navbar overrides */
+  --navbar-bg: #f8f9fa;
+  --navbar-color: #212529;
+  --navbar-border: #dee2e6;
+  --navbar-dropdown-bg: #ffffff;
+  --navbar-dropdown-hover: #f8f9fa;
+}
+
+/* Dark Theme Variables */
+:root[data-theme="dark"], 
+html[data-theme="dark"] {
+  /* Primary color scheme - keep brand colors visible in dark mode */
+  --bs-primary: #0d6efd;
+  --bs-secondary: #6c757d;
+  --bs-success: #198754;
+  --bs-danger: #dc3545;
+  --bs-warning: #ffc107;
+  --bs-info: #0dcaf0;
+  
+  /* Background colors */
+  --bs-body-bg: #1a1a2e;
+  --bs-secondary-bg: #16213e;
+  --bs-tertiary-bg: #0f172a;
+  
+  /* Text colors */
+  --bs-body-color: #ffffff;
+  --bs-text-muted: #adb5bd;
+  --bs-heading-color: #ffffff;
+  
+  /* Border colors */
+  --bs-border-color: #495057;
+  --bs-border-color-translucent: rgba(255, 255, 255, 0.175);
+  
+  /* Form controls */
+  --bs-form-control-bg: #2e2e48;
+  --bs-form-control-color: #ffffff;
+  --bs-form-control-border-color: #495057;
+  --bs-form-select-bg: #2e2e48;
+  
+  /* Cards and containers */
+  --bs-card-bg: #2e2e48;
+  --bs-card-border-color: #495057;
+  
+  /* Navigation */
+  --bs-navbar-bg: #1a1a2e;
+  --bs-navbar-color: #ffffff;
+  --bs-navbar-hover-color: #4CAF50;
+  
+  /* Dropdown */
+  --bs-dropdown-bg: #2e2e48;
+  --bs-dropdown-color: #ffffff;
+  --bs-dropdown-border-color: #495057;
+  --bs-dropdown-link-hover-bg: #3a3a5c;
+  
+  /* Tables */
+  --bs-table-bg: #2e2e48;
+  --bs-table-striped-bg: #3a3a5c;
+  --bs-table-hover-bg: #495057;
+  
+  /* Modal */
+  --bs-modal-bg: #2e2e48;
+  --bs-modal-color: #ffffff;
+  
+  /* Enterprise navbar overrides for dark theme */
+  --navbar-bg: #1a1a2e;
+  --navbar-color: #ffffff;
+  --navbar-border: #495057;
+  --navbar-dropdown-bg: #2e2e48;
+  --navbar-dropdown-hover: #3a3a5c;
+}
+
+/* Dynamic Theme Inheritance - All components use CSS variables */
+body {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Card Components */
+.card {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-card-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+.card-header, .card-footer {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+  background-color: var(--bs-form-control-bg) !important;
+  border-color: var(--bs-form-control-border-color) !important;
+  color: var(--bs-form-control-color) !important;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--bs-form-control-bg) !important;
+  border-color: var(--bs-primary) !important;
+  color: var(--bs-form-control-color) !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Dropdown Components */
+.dropdown-menu {
+  background-color: var(--bs-dropdown-bg) !important;
+  border-color: var(--bs-dropdown-border-color) !important;
+}
+
+.dropdown-item {
+  color: var(--bs-dropdown-color) !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: var(--bs-dropdown-link-hover-bg) !important;
+  color: var(--bs-dropdown-color) !important;
+}
+
+/* Table Components */
+.table {
+  --bs-table-bg: var(--bs-table-bg);
+  --bs-table-striped-bg: var(--bs-table-striped-bg);
+  --bs-table-hover-bg: var(--bs-table-hover-bg);
+  color: var(--bs-body-color) !important;
+}
+
+.table th, .table td {
+  border-color: var(--bs-border-color) !important;
+}
+
+/* Modal Components */
+.modal-content {
+  background-color: var(--bs-modal-bg) !important;
+  color: var(--bs-modal-color) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+.modal-header, .modal-footer {
+  border-color: var(--bs-border-color) !important;
+}
+
+/* Navigation Components */
+.navbar {
+  background-color: var(--bs-navbar-bg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+.navbar-brand, .nav-link {
+  color: var(--bs-navbar-color) !important;
+}
+
+.nav-link:hover {
+  color: var(--bs-navbar-hover-color) !important;
+}
+
+/* Enterprise Navbar Specific Styling */
+.enterprise-navbar {
+  background-color: var(--navbar-bg) !important;
+  border-color: var(--navbar-border) !important;
+}
+
+.enterprise-navbar .dropdown-content {
+  background-color: var(--navbar-dropdown-bg) !important;
+  border-color: var(--navbar-border) !important;
+}
+
+.enterprise-navbar .dropdown-content a {
+  color: var(--bs-body-color) !important;
+}
+
+.enterprise-navbar .dropdown-content a:hover {
+  background-color: var(--navbar-dropdown-hover) !important;
+}
+
+/* Badge Components */
+.badge {
+  color: #ffffff !important;
+}
+
+/* Alert Components */
+.alert {
+  border-color: var(--bs-border-color) !important;
+}
+
+/* List Group Components */
+.list-group-item {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Pagination Components */
+.page-link {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+.page-link:hover {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Input Group Components */
+.input-group-text {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Text Color Classes */
+.text-muted {
+  color: var(--bs-text-muted) !important;
+}
+
+/* Background Color Classes */
+.bg-light {
+  background-color: var(--bs-secondary-bg) !important;
+}
+
+.bg-white {
+  background-color: var(--bs-card-bg) !important;
+}
+
+/* Border Color Classes */
+.border {
+  border-color: var(--bs-border-color) !important;
+}
+
+/* Theme Toggle Button Styling */
+#theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+#theme-toggle:hover {
+  transform: translateX(2px);
+}
+
+#theme-icon {
+  font-size: 1.1em;
+  transition: transform 0.3s ease;
+}
+
+#theme-toggle:hover #theme-icon {
+  transform: scale(1.1);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Ensure proper inheritance for all interactive elements */
+button, input, select, textarea {
+  color: inherit;
+}
+
+/* Custom dropdown styling for better theme integration */
+.custom-dropdown select {
+  background-color: var(--bs-form-control-bg) !important;
+  border-color: var(--bs-form-control-border-color) !important;
+  color: var(--bs-form-control-color) !important;
+}
+
+/* Footer styling */
+.bg-dark {
+  background-color: var(--bs-secondary-bg) !important;
+}
+
+/* Specific overrides for complex components */
+.accordion-item {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+.accordion-button {
+  background-color: var(--bs-secondary-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: var(--bs-tertiary-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Toast notifications */
+.toast {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Offcanvas components */
+.offcanvas {
+  background-color: var(--bs-card-bg) !important;
+  color: var(--bs-body-color) !important;
+}

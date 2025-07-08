@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Execute Import - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-play-fill"></i>
+                    Execute Import
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/?auth_token={{ auth_token }}">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/admin/import-data?auth_token={{ auth_token }}">Import Data</a>
+                        </li>
+                        <li class="breadcrumb-item active">Execute</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Ready to Import</h5>
+                            <small class="text-muted">Job ID: {{ job.id }} | File: {{ job.filename }} | Data Type: {{ job.data_type }}</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <h6><i class="bi bi-info-circle"></i> Import Configuration</h6>
+                                <p>Your file has been uploaded and column mapping is complete. Review the details below and click "Execute Import" to proceed.</p>
+                            </div>
+
+                            <!-- Mapping Summary -->
+                            {% if job.mapping %}
+                            <div class="mb-4">
+                                <h6>Column Mapping</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>File Column</th>
+                                                <th>Maps To</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for csv_field, model_field in job.mapping.items() %}
+                                            <tr>
+                                                <td><span class="badge bg-secondary">{{ csv_field }}</span></td>
+                                                <td><span class="badge bg-primary">{{ model_field }}</span></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Import Progress -->
+                            <div id="importProgress" style="display: none;">
+                                <h6>Import Progress</h6>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         role="progressbar" style="width: 100%">
+                                        Processing...
+                                    </div>
+                                </div>
+                                <div id="progressMessage" class="text-center">
+                                    <i class="bi bi-hourglass-split"></i> Importing data, please wait...
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-success btn-lg" id="executeBtn" onclick="executeImport()">
+                                    <i class="bi bi-play-fill"></i> Execute Import
+                                </button>
+                                <a href="/admin/import-data/map/{{ job.id }}?auth_token={{ auth_token }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to Mapping
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function executeImport() {
+    const executeBtn = document.getElementById('executeBtn');
+    const progressDiv = document.getElementById('importProgress');
+    
+    // Show progress and disable button
+    executeBtn.disabled = true;
+    executeBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    progressDiv.style.display = 'block';
+    
+    // Get form data including checkboxes
+    const formData = new FormData();
+    formData.append('auth_token', '{{ auth_token }}');
+    
+    // Include all checked rows
+    const checkboxes = document.querySelectorAll('input[name^="include_row_"]:checked');
+    checkboxes.forEach(checkbox => {
+        formData.append(checkbox.name, '1');
+    });
+    
+    // Execute the import via POST
+    fetch('/admin/import-data/execute/{{ job.id }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Import successful, redirect to results
+            window.location.href = '/admin/import-data/result/{{ job.id }}?auth_token={{ auth_token }}';
+        } else {
+            // Import failed
+            alert('Import failed: ' + (data.error || 'Unknown error'));
+            executeBtn.disabled = false;
+            executeBtn.innerHTML = '<i class="bi bi-play-fill"></i> Execute Import';
+            progressDiv.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error executing import:', error);
+        alert('Import failed: ' + error.message);
+        executeBtn.disabled = false;
+        executeBtn.innerHTML = '<i class="bi bi-play-fill"></i> Execute Import';
+        progressDiv.style.display = 'none';
+    });
+}
+
+// Auto-execute if status indicates ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we should auto-execute
+    {% if job.status == 'Importing' %}
+    executeImport();
+    {% endif %}
+});
+</script>
+{% endblock %}

@@ -1,0 +1,441 @@
+/* 
+   BUTTON TEXT VISIBILITY FIX - July 7, 2025
+   Emergency CSS to force button text visibility across all themes
+   This file must load LAST to override all other stylesheets
+*/
+
+/* NUCLEAR OPTION: Force ALL button text to be visible */
+html[data-bs-theme="dark"] .btn,
+html[data-bs-theme="dark"] button,
+html[data-bs-theme="dark"] input[type="submit"],
+html[data-bs-theme="dark"] input[type="button"],
+html[data-bs-theme="dark"] a.btn,
+html[data-bs-theme="light"] .btn,
+html[data-bs-theme="light"] button,
+html[data-bs-theme="light"] input[type="submit"],
+html[data-bs-theme="light"] input[type="button"],
+html[data-bs-theme="light"] a.btn,
+* .btn,
+* button,
+* input[type="submit"],
+* input[type="button"],
+* a.btn,
+html * .btn,
+html * button,
+html * input[type="submit"],
+html * input[type="button"],
+html * a.btn {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Force primary button colors - DARK & LIGHT THEME */
+html[data-bs-theme="dark"] .btn-primary,
+html[data-bs-theme="dark"] button.btn-primary,
+html[data-bs-theme="dark"] input[type="submit"].btn-primary,
+html[data-bs-theme="dark"] input[type="button"].btn-primary,
+html[data-bs-theme="dark"] a.btn-primary,
+html[data-bs-theme="light"] .btn-primary,
+html[data-bs-theme="light"] button.btn-primary,
+html[data-bs-theme="light"] input[type="submit"].btn-primary,
+html[data-bs-theme="light"] input[type="button"].btn-primary,
+html[data-bs-theme="light"] a.btn-primary,
+* .btn-primary,
+* button.btn-primary,
+* input[type="submit"].btn-primary,
+* input[type="button"].btn-primary,
+* a.btn-primary,
+html * .btn-primary,
+html * button.btn-primary,
+html * input[type="submit"].btn-primary,
+html * input[type="button"].btn-primary,
+html * a.btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Force secondary button colors - DARK & LIGHT THEME */
+html[data-bs-theme="dark"] .btn-secondary,
+html[data-bs-theme="dark"] button.btn-secondary,
+html[data-bs-theme="dark"] input[type="submit"].btn-secondary,
+html[data-bs-theme="dark"] input[type="button"].btn-secondary,
+html[data-bs-theme="dark"] a.btn-secondary,
+html[data-bs-theme="light"] .btn-secondary,
+html[data-bs-theme="light"] button.btn-secondary,
+html[data-bs-theme="light"] input[type="submit"].btn-secondary,
+html[data-bs-theme="light"] input[type="button"].btn-secondary,
+html[data-bs-theme="light"] a.btn-secondary,
+* .btn-secondary,
+* button.btn-secondary,
+* input[type="submit"].btn-secondary,
+* input[type="button"].btn-secondary,
+* a.btn-secondary,
+html * .btn-secondary,
+html * button.btn-secondary,
+html * input[type="submit"].btn-secondary,
+html * input[type="button"].btn-secondary,
+html * a.btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Force success button colors */
+* .btn-success,
+* button.btn-success,
+* input[type="submit"].btn-success,
+* input[type="button"].btn-success,
+* a.btn-success,
+html * .btn-success,
+html * button.btn-success,
+html * input[type="submit"].btn-success,
+html * input[type="button"].btn-success,
+html * a.btn-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+
+/* Force danger button colors */
+* .btn-danger,
+* button.btn-danger,
+* input[type="submit"].btn-danger,
+* input[type="button"].btn-danger,
+* a.btn-danger,
+html * .btn-danger,
+html * button.btn-danger,
+html * input[type="submit"].btn-danger,
+html * input[type="button"].btn-danger,
+html * a.btn-danger {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #ffffff !important;
+}
+
+/* Force warning button colors */
+* .btn-warning,
+* button.btn-warning,
+* input[type="submit"].btn-warning,
+* input[type="button"].btn-warning,
+* a.btn-warning,
+html * .btn-warning,
+html * button.btn-warning,
+html * input[type="submit"].btn-warning,
+html * input[type="button"].btn-warning,
+html * a.btn-warning {
+  background-color: #ffc107 !important;
+  border-color: #ffc107 !important;
+  color: #000000 !important; /* Black text for warning buttons for better contrast */
+}
+
+/* Force info button colors */
+* .btn-info,
+* button.btn-info,
+* input[type="submit"].btn-info,
+* input[type="button"].btn-info,
+* a.btn-info,
+html * .btn-info,
+html * button.btn-info,
+html * input[type="submit"].btn-info,
+html * input[type="button"].btn-info,
+html * a.btn-info {
+  background-color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
+  color: #000000 !important; /* Black text for info buttons for better contrast */
+}
+
+/* Force outline button colors */
+* .btn-outline-primary,
+* .btn-outline-secondary,
+* .btn-outline-success,
+* .btn-outline-danger,
+* .btn-outline-warning,
+* .btn-outline-info,
+html * .btn-outline-primary,
+html * .btn-outline-secondary,
+html * .btn-outline-success,
+html * .btn-outline-danger,
+html * .btn-outline-warning,
+html * .btn-outline-info {
+  background-color: transparent !important;
+  border-width: 2px !important;
+  font-weight: 600 !important;
+}
+
+/* Specific outline button text colors */
+* .btn-outline-primary {
+  color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+* .btn-outline-secondary {
+  color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+
+* .btn-outline-success {
+  color: #198754 !important;
+  border-color: #198754 !important;
+}
+
+* .btn-outline-danger {
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+/* Hover states for outline buttons */
+* .btn-outline-primary:hover,
+* .btn-outline-secondary:hover,
+* .btn-outline-success:hover,
+* .btn-outline-danger:hover,
+* .btn-outline-warning:hover,
+* .btn-outline-info:hover {
+  color: #ffffff !important;
+}
+
+/* Fix alert text visibility in all themes */
+html[data-bs-theme] .alert,
+html[data-bs-theme="dark"] .alert,
+html[data-bs-theme="light"] .alert,
+.alert {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+html[data-bs-theme="dark"] .alert {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Specific alert types for better visibility */
+html[data-bs-theme] .alert-success,
+html[data-bs-theme="dark"] .alert-success,
+html[data-bs-theme="light"] .alert-success,
+.alert-success {
+  background-color: #d1e7dd !important;
+  border-color: #badbcc !important;
+  color: #0f5132 !important;
+  -webkit-text-fill-color: #0f5132 !important;
+}
+
+html[data-bs-theme="dark"] .alert-success {
+  background-color: #0f5132 !important;
+  border-color: #2ea043 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+html[data-bs-theme] .alert-warning,
+html[data-bs-theme="dark"] .alert-warning,
+html[data-bs-theme="light"] .alert-warning,
+.alert-warning {
+  background-color: #fff3cd !important;
+  border-color: #ffecb5 !important;
+  color: #664d03 !important;
+  -webkit-text-fill-color: #664d03 !important;
+}
+
+html[data-bs-theme="dark"] .alert-warning {
+  background-color: #664d03 !important;
+  border-color: #ffc107 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Fix alert-info visibility */
+html[data-bs-theme] .alert-info,
+html[data-bs-theme="dark"] .alert-info,
+html[data-bs-theme="light"] .alert-info,
+.alert-info {
+  background-color: #d1ecf1 !important;
+  border-color: #bee5eb !important;
+  color: #0c5460 !important;
+  -webkit-text-fill-color: #0c5460 !important;
+}
+
+html[data-bs-theme="dark"] .alert-info {
+  background-color: #0c5460 !important;
+  border-color: #17a2b8 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Fix alert-primary visibility */
+html[data-bs-theme] .alert-primary,
+html[data-bs-theme="dark"] .alert-primary,
+html[data-bs-theme="light"] .alert-primary,
+.alert-primary {
+  background-color: #cce7ff !important;
+  border-color: #b3d9ff !important;
+  color: #004085 !important;
+  -webkit-text-fill-color: #004085 !important;
+}
+
+html[data-bs-theme="dark"] .alert-primary {
+  background-color: #004085 !important;
+  border-color: #0d6efd !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Nuclear option: Force ALL alert text to be visible */
+* .alert,
+* .alert-primary,
+* .alert-secondary, 
+* .alert-success,
+* .alert-danger,
+* .alert-warning,
+* .alert-info,
+* .alert-light,
+* .alert-dark,
+html * .alert,
+html * .alert-primary,
+html * .alert-secondary,
+html * .alert-success,
+html * .alert-danger,
+html * .alert-warning,
+html * .alert-info,
+html * .alert-light,
+html * .alert-dark {
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Dark theme alert text override */
+html[data-bs-theme="dark"] .alert,
+html[data-bs-theme="dark"] .alert-primary,
+html[data-bs-theme="dark"] .alert-secondary,
+html[data-bs-theme="dark"] .alert-success,
+html[data-bs-theme="dark"] .alert-danger,
+html[data-bs-theme="dark"] .alert-warning,
+html[data-bs-theme="dark"] .alert-info,
+html[data-bs-theme="dark"] .alert-light,
+html[data-bs-theme="dark"] .alert-dark {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Fix badge text visibility */
+html[data-bs-theme] .badge,
+html[data-bs-theme="dark"] .badge,
+html[data-bs-theme="light"] .badge,
+.badge {
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Specific badge types */
+html[data-bs-theme] .badge.bg-info,
+html[data-bs-theme="dark"] .badge.bg-info,
+html[data-bs-theme="light"] .badge.bg-info,
+.badge.bg-info {
+  background-color: #0dcaf0 !important;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+html[data-bs-theme="dark"] .badge.bg-info {
+  background-color: #0dcaf0 !important;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+/* Fix button text truncation and ensure full text display */
+* .btn,
+* button,
+* input[type="submit"],
+* input[type="button"],
+* a.btn,
+html * .btn,
+html * button,
+html * input[type="submit"],
+html * input[type="button"],
+html * a.btn {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: auto !important;
+  width: auto !important;
+  padding: 8px 16px !important;
+  line-height: 1.5 !important;
+  font-size: 14px !important;
+  border-radius: 6px !important;
+}
+
+/* Ensure assign BA button displays full text */
+.btn:contains("Assign"),
+button:contains("Assign"),
+input[value*="Assign"] {
+  min-width: 120px !important;
+  padding: 10px 20px !important;
+}
+
+/* Fix epic title text overflow in accordion buttons */
+.accordion-button {
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow: visible !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  line-height: 1.4 !important;
+  padding: 12px 16px !important;
+}
+
+.accordion-button strong {
+  display: block !important;
+  width: 100% !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  max-width: calc(100% - 120px) !important;
+  margin-right: 10px !important;
+}
+
+/* Ensure badges don't interfere with text wrapping */
+.accordion-button .badge {
+  flex-shrink: 0 !important;
+  margin-left: 8px !important;
+  white-space: nowrap !important;
+}
+
+/* Ensure uniform epic container widths */
+.accordion-item {
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
+
+.accordion-button {
+  width: 100% !important;
+  min-height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.accordion-item .accordion-button div:first-child {
+  flex: 1 !important;
+  min-width: 0 !important;
+  margin-right: 15px !important;
+  overflow: hidden !important;
+}
+
+.accordion-item .accordion-button div:last-child {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  gap: 6px !important;
+  align-items: center !important;
+}Mon Jul  7 10:35:18 AM UTC 2025: Added alert text visibility fix

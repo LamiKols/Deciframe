@@ -1,0 +1,545 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Admin Dashboard</h2>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-users me-1"></i>Manage Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Alerts -->
+    {% if alerts %}
+    <div class="row mb-4">
+        <div class="col-12">
+            {% for alert in alerts %}
+            <div class="alert alert-{{ alert.type }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-{% if alert.type == 'warning' %}exclamation-triangle{% elif alert.type == 'info' %}info-circle{% else %}bell{% endif %} me-2"></i>
+                {{ alert.message }}
+                {% if alert.action_url %}
+                    <a href="{{ alert.action_url }}" class="btn btn-sm btn-outline-{{ alert.type }} ms-2">Take Action</a>
+                {% endif %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Core Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-primary">Total Users</h6>
+                            <h3 class="mb-0">{{ stats.users }}</h3>
+                            <small class="text-muted">Active system users</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x text-primary opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-success">Departments</h6>
+                            <h3 class="mb-0">{{ stats.departments }}</h3>
+                            <small class="text-muted">Organizational units</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-building fa-2x text-success opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-warning">Business Cases</h6>
+                            <h3 class="mb-0">{{ stats.business_cases }}</h3>
+                            <small class="text-muted">Total cases</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-briefcase fa-2x text-warning opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-info h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-info">Projects</h6>
+                            <h3 class="mb-0">{{ stats.projects }}</h3>
+                            <small class="text-muted">Active projects</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-project-diagram fa-2x text-info opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary Statistics -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Epics</h6>
+                            <h4 class="mb-0">{{ stats.epics }}</h4>
+                        </div>
+                        <i class="fas fa-tasks fa-lg opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Triage Rules</h6>
+                            <h4 class="mb-0">{{ stats.active_triage_rules }}</h4>
+                        </div>
+                        <i class="fas fa-cogs fa-lg opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Audit Logs</h6>
+                            <h4 class="mb-0">{{ stats.total_audit_logs }}</h4>
+                        </div>
+                        <i class="fas fa-history fa-lg opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Problems</h6>
+                            <h4 class="mb-0">{{ stats.problems }}</h4>
+                        </div>
+                        <i class="fas fa-exclamation-triangle fa-lg opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Review Metrics -->
+    {% if pending_metrics.total_pending > 0 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Pending Review Items
+                        <span class="badge bg-light text-danger ms-2">{{ pending_metrics.total_pending }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-warning h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Business Cases</h6>
+                                    <h3 class="text-warning mb-2">{{ pending_metrics.cases_submitted }}</h3>
+                                    <a href="{{ url_for('review.review_business_cases') }}" class="btn btn-outline-warning btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Review
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-info h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Projects</h6>
+                                    <h3 class="text-info mb-2">{{ pending_metrics.projects_submitted }}</h3>
+                                    <a href="{{ url_for('review.review_projects') }}" class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Review
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-success h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Epics</h6>
+                                    <h3 class="text-success mb-2">{{ pending_metrics.epics_submitted }}</h3>
+                                    <a href="{{ url_for('review.review_epics') }}" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Review
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('review.review_summary') }}" class="btn btn-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            View Review Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Role Distribution -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>User Role Distribution</h5>
+                </div>
+                <div class="card-body">
+                    {% for role, count in role_distribution.items() %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge 
+                            {% if role == 'Admin' %}bg-danger
+                            {% elif role == 'Director' %}bg-warning
+                            {% elif role == 'Manager' %}bg-primary
+                            {% elif role == 'BA' %}bg-success
+                            {% elif role == 'PM' %}bg-info
+                            {% else %}bg-secondary{% endif %} me-2">{{ role }}</span>
+                        <span class="fw-bold">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Health Metrics -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-heartbeat me-2"></i>System Health</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-2">
+                                <h6 class="text-muted mb-1">Active Notifications</h6>
+                                <h4 class="mb-0 {% if health_metrics.active_notifications > 50 %}text-warning{% else %}text-success{% endif %}">
+                                    {{ health_metrics.active_notifications }}
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-2">
+                                <h6 class="text-muted mb-1">Failed Triage</h6>
+                                <h4 class="mb-0 {% if health_metrics.failed_triage_actions > 0 %}text-danger{% else %}text-success{% endif %}">
+                                    {{ health_metrics.failed_triage_actions }}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity and Triage Activity -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-3">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+                    <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-external-link-alt me-1"></i>View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_activity %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Target</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in recent_activity %}
+                                    <tr>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ log.timestamp | format_org_datetime if log.timestamp else '-' }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            {% if log.user_id %}
+                                                <small class="text-primary">User #{{ log.user_id }}</small>
+                                            {% else %}
+                                                <small class="text-muted">System</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-sm
+                                                {% if 'CREATE' in log.action %}bg-success
+                                                {% elif 'UPDATE' in log.action %}bg-warning
+                                                {% elif 'DELETE' in log.action %}bg-danger
+                                                {% elif 'triage:' in log.action %}bg-info
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ log.action }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if log.target %}
+                                                <small>{{ log.target }}</small>
+                                                {% if log.target_id %}
+                                                    <small class="text-muted">#{{ log.target_id }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <small class="text-muted">-</small>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-history fa-2x mb-3 opacity-25"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Triage Activity</h5>
+                    <a href="{{ url_for('admin_triage_rules') }}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-cog me-1"></i>Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if triage_activity %}
+                        {% for log in triage_activity %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                            <div>
+                                <small class="fw-bold text-info">{{ log.action }}</small><br>
+                                <small class="text-muted">{{ log.timestamp | format_org_datetime if log.timestamp else '-' }}</small>
+                            </div>
+                            <span class="badge bg-info">
+                                {{ log.target }} #{{ log.target_id }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                        <div class="text-center mt-3">
+                            <form method="POST" action="{{ url_for('admin.run_triage_rules') }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="fas fa-play me-1"></i>Run Triage Now
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-cogs fa-2x mb-2 opacity-25"></i>
+                            <p class="small">No triage activity</p>
+                            <form method="POST" action="{{ url_for('admin.run_triage_rules') }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-play me-1"></i>Run Triage
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Primary Admin Functions -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-3">System Management</h6>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <span>Manage Users</span>
+                                <small class="text-muted">{{ stats.users }} users</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_triage_rules') }}" class="btn btn-outline-success w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-cogs fa-2x mb-2"></i>
+                                <span>Triage Rules</span>
+                                <small class="text-muted">{{ stats.active_triage_rules }} active</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-history fa-2x mb-2"></i>
+                                <span>Audit Trail</span>
+                                <small class="text-muted">{{ stats.total_audit_logs }} logs</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('monitoring.dashboard') }}" class="btn btn-outline-info w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-heartbeat fa-2x mb-2"></i>
+                                <span>System Health</span>
+                                <small class="text-muted">Monitor status</small>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuration -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-3">Configuration</h6>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_organization_settings') }}" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-building fa-2x mb-2"></i>
+                                <span>Organization</span>
+                                <small class="text-muted">Settings & preferences</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('notifications_config.notification_settings') }}" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-bell fa-2x mb-2"></i>
+                                <span>Notifications</span>
+                                <small class="text-muted">Event configuration</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_role_permissions') }}" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-shield-alt fa-2x mb-2"></i>
+                                <span>Permissions</span>
+                                <small class="text-muted">Role management</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_workflows') }}" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-project-diagram fa-2x mb-2"></i>
+                                <span>Workflows</span>
+                                <small class="text-muted">Template management</small>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Management -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-3">Data Management</h6>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_import_data') }}" class="btn btn-outline-dark w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-upload fa-2x mb-2"></i>
+                                <span>Import Data</span>
+                                <small class="text-muted">Bulk data wizard</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('data_management.data_overview') }}" class="btn btn-outline-dark w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-database fa-2x mb-2"></i>
+                                <span>Data Export</span>
+                                <small class="text-muted">Export & retention</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('admin_help_center') }}" class="btn btn-outline-dark w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-question-circle fa-2x mb-2"></i>
+                                <span>Help Center</span>
+                                <small class="text-muted">Content management</small>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <a href="{{ url_for('org_reports') }}" class="btn btn-outline-dark w-100 h-100 d-flex flex-column justify-content-center">
+                                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                <span>Reports</span>
+                                <small class="text-muted">Organizational reports</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Refresh JavaScript -->
+<script>
+function refreshDashboard() {
+    fetch('{{ url_for("admin.quick_stats") }}')
+        .then(response => response.json())
+        .then(data => {
+            // Update stats if needed
+            console.log('Dashboard stats updated:', data);
+            // Reload the page for full refresh
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error refreshing dashboard:', error);
+        });
+}
+
+// Auto-refresh every 5 minutes
+setInterval(refreshDashboard, 300000);
+</script>
+
+{% endblock %}

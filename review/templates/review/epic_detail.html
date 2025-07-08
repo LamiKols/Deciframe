@@ -1,0 +1,350 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Review Epic: {{ epic.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-clipboard-check"></i> Epic Review</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ url_for('review.review_epics') }}">Epic Review</a></li>
+                            <li class="breadcrumb-item active">{{ epic.title }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <a href="{{ url_for('review.review_epics') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Review List
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Epic Details -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Epic Details</h5>
+                            <div>
+                                {% if epic.status == 'Submitted' %}
+                                    <span class="badge bg-warning">Submitted</span>
+                                {% elif epic.status == 'Approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif epic.status == 'Rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% elif epic.status == 'Changes Requested' %}
+                                    <span class="badge bg-info">Changes Requested</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ epic.status }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h4>{{ epic.title }}</h4>
+                            <p class="text-muted mb-3">{{ epic.description }}</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Business Case:</strong>
+                                    <p><a href="{{ url_for('business.view_case', id=epic.case_id) }}" class="text-decoration-none">
+                                        {{ epic.business_case.title }}
+                                    </a></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Created By:</strong>
+                                    <p><i class="fas fa-user"></i> {{ epic.creator.name }} ({{ epic.creator.role.value }})</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Created Date:</strong>
+                                    <p>{{ epic.created_at | format_org_datetime }}</p>
+                                </div>
+                                {% if epic.submitted_at %}
+                                <div class="col-md-6">
+                                    <strong>Submitted Date:</strong>
+                                    <p>{{ epic.submitted_at | format_org_datetime }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if epic.approved_at and epic.approver %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Reviewed By:</strong>
+                                    <p><i class="fas fa-user-check"></i> {{ epic.approver.name }} ({{ epic.approver.role.value }})</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Reviewed Date:</strong>
+                                    <p>{{ epic.approved_at | format_datetime }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- AI Reviewer Insights -->
+                    {% if ai_insights and ai_insights.success %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-robot"></i> AI Reviewer Insights</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info mb-3">
+                                <h6><i class="fas fa-eye"></i> Executive Summary</h6>
+                                <p class="mb-0">{{ ai_insights.summary }}</p>
+                            </div>
+                            
+                            {% if ai_insights.considerations %}
+                            <div class="mb-3">
+                                <h6><i class="fas fa-exclamation-triangle"></i> Critical Review Factors</h6>
+                                <ul class="list-unstyled">
+                                    {% for consideration in ai_insights.considerations %}
+                                    <li class="mb-2">
+                                        <span class="badge bg-warning me-2">{{ loop.index }}</span>
+                                        {{ consideration }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                AI insights are generated to assist in review decisions and should be considered alongside your professional judgment.
+                            </small>
+                        </div>
+                    </div>
+                    {% elif ai_insights and not ai_insights.success %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-robot"></i> AI Reviewer Insights</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                {{ ai_insights.summary or "AI insights are temporarily unavailable." }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Enhanced AI Review Insights -->
+                    {% if enhanced_ai_insights and enhanced_ai_insights.confidence_score %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-brain"></i> Enhanced AI Review Analysis
+                                <span class="badge {{ get_confidence_badge_class(enhanced_ai_insights.confidence_score) }} ms-2">
+                                    {{ get_confidence_label(enhanced_ai_insights.confidence_score) }}
+                                </span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-gauge-high"></i> Approval Confidence</h6>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="progress flex-grow-1 me-3" style="height: 20px;">
+                                            <div class="progress-bar {{ get_confidence_badge_class(enhanced_ai_insights.confidence_score) }}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ enhanced_ai_insights.confidence_score }}%">
+                                                {{ enhanced_ai_insights.confidence_score }}%
+                                            </div>
+                                        </div>
+                                        <span class="fw-bold">{{ enhanced_ai_insights.confidence_score }}%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-lightbulb"></i> AI Recommendation</h6>
+                                    <p class="mb-3">{{ enhanced_ai_insights.recommendation or 'Review content for optimal decision making.' }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if enhanced_ai_insights.risks %}
+                            <div class="mb-3">
+                                <h6><i class="fas fa-shield-alt"></i> Key Risk Assessment</h6>
+                                <div class="list-group list-group-flush">
+                                    {% for risk in enhanced_ai_insights.risks %}
+                                    <div class="list-group-item d-flex align-items-start p-3">
+                                        <i class="fas fa-exclamation-triangle text-warning me-3 mt-1"></i>
+                                        <span>{{ risk }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                Enhanced AI analysis provides confidence scoring and risk assessment to support informed decision making.
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Comments Section -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-comments"></i> Comments & Discussion</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if comments %}
+                                <div class="comments-list">
+                                    {% for comment in comments %}
+                                    <div class="comment-item border rounded p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-user-circle fa-lg me-2"></i>
+                                                <div>
+                                                    <strong>{{ comment.author_user.name if comment.author_user else comment.author }}</strong>
+                                                    {% if comment.author_user %}
+                                                        <span class="badge bg-primary ms-2">{{ comment.author_user.role.value }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">{{ comment.created_at | format_org_datetime }}</small>
+                                        </div>
+                                        <div class="comment-content">
+                                            <p class="mb-0">{{ comment.content or comment.message }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-comment-slash fa-2x text-muted mb-3"></i>
+                                    <p class="text-muted">No comments yet. Be the first to leave feedback!</p>
+                                </div>
+                            {% endif %}
+
+                            <!-- Add Comment Form -->
+                            <div class="mt-4">
+                                <h6><i class="fas fa-plus-circle"></i> Add Comment</h6>
+                                <form method="POST" action="{{ url_for('review.add_comment', epic_id=epic.id) }}">
+                                    <div class="mb-3">
+                                        <textarea name="comment" class="form-control" rows="3" placeholder="Leave a comment or feedback..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-comment"></i> Add Comment
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Panel -->
+                <div class="col-lg-4">
+                    {% if epic.status == 'Submitted' %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-gavel"></i> Review Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('review.handle_epic_action', epic_id=epic.id) }}" id="review-form">
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label">Reviewer Comment</label>
+                                    <textarea name="comment" id="comment" class="form-control" rows="4" 
+                                              placeholder="Add a comment about your decision (optional)"></textarea>
+                                    <div class="form-text">This comment will be visible to the epic creator and other reviewers.</div>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-lg">
+                                        <i class="fas fa-check-circle"></i> Approve Epic
+                                    </button>
+                                    <button type="submit" name="action" value="request_changes" class="btn btn-warning">
+                                        <i class="fas fa-edit"></i> Request Changes
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger">
+                                        <i class="fas fa-times-circle"></i> Reject Epic
+                                    </button>
+                                    <button type="submit" name="action" value="send_back" class="btn btn-outline-secondary">
+                                        <i class="fas fa-undo"></i> Send Back to Draft
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Epic Info Panel -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-info"></i> Epic Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Business Case Priority:</strong>
+                                {% set priority = epic.business_case.priority %}
+                                {% if priority == 'High' %}
+                                    <span class="badge bg-danger ms-2">High</span>
+                                {% elif priority == 'Medium' %}
+                                    <span class="badge bg-warning ms-2">Medium</span>
+                                {% else %}
+                                    <span class="badge bg-secondary ms-2">Low</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Department:</strong>
+                                <p class="mb-0">{{ epic.creator.department.name if epic.creator.department else 'Not specified' }}</p>
+                            </div>
+                            
+                            {% if epic.project_id %}
+                            <div class="mb-3">
+                                <strong>Linked Project:</strong>
+                                <p class="mb-0">
+                                    <a href="{{ url_for('projects.view_project', id=epic.project_id) }}" class="text-decoration-none">
+                                        <i class="fas fa-project-diagram"></i> View Project
+                                    </a>
+                                </p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <strong>Epic ID:</strong>
+                                <p class="mb-0 font-monospace">#{{ epic.id }}</p>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <a href="{{ url_for('business.view_case', id=epic.case_id) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-external-link-alt"></i> View Business Case
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add confirmation for rejection action
+    const reviewForm = document.getElementById('review-form');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            const action = e.submitter.value;
+            if (action === 'reject') {
+                if (!confirm('Are you sure you want to reject this epic? This action will notify the creator.')) {
+                    e.preventDefault();
+                }
+            } else if (action === 'approve') {
+                if (!confirm('Are you sure you want to approve this epic? This will move it to approved status.')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

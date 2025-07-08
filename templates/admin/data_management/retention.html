@@ -1,0 +1,244 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Data Retention - DeciFrame{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Data Retention Management</h1>
+</div>
+
+<!-- System Retention Policies -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Default System Retention Policies</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Data Type</th>
+                                <th>Default Retention Period</th>
+                                <th>Archival Process</th>
+                                <th>Current Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Problems</strong></td>
+                                <td>2 years after resolution</td>
+                                <td>Move to archived_problems → Delete from live database</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Business Cases</strong></td>
+                                <td>3 years after project completion</td>
+                                <td>Move to archived_business_cases → Delete from live database</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Projects</strong></td>
+                                <td>5 years after completion</td>
+                                <td>Move to archived_projects → Delete from live database</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Project Milestones</strong></td>
+                                <td>5 years (linked to parent project)</td>
+                                <td>Move to archived_project_milestones → Delete from live database</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Epics & User Stories</strong></td>
+                                <td>3 years after project completion</td>
+                                <td>Move to archived_epics/stories → Delete from live database</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Notifications</strong></td>
+                                <td>1 year after creation</td>
+                                <td>Move to archived_notifications → Delete from live database</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>User Accounts</strong></td>
+                                <td>3 years after account deactivation</td>
+                                <td>Move to archived_users → Anonymize and delete from live database</td>
+                                <td><span class="badge bg-warning">Manual Review Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Audit Logs</strong></td>
+                                <td>7 years (compliance requirement)</td>
+                                <td>Move to archived_audit_logs → Delete from live database</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Organizational Units</strong></td>
+                                <td>Permanent (unless manually archived)</td>
+                                <td>Manual archival only for restructuring purposes</td>
+                                <td><span class="badge bg-info">Manual Only</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Data Summary -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Data Eligible for Archival</h5>
+            </div>
+            <div class="card-body">
+                {% if retention_data %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Data Type</th>
+                                    <th>Total Records</th>
+                                    <th>Eligible for Archive</th>
+                                    <th>Oldest Record</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Problems</td>
+                                    <td>{{ retention_data.problems.total or 0 }}</td>
+                                    <td><span class="badge bg-warning">{{ retention_data.problems.eligible or 0 }}</span></td>
+                                    <td>{{ retention_data.problems.oldest_date or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Business Cases</td>
+                                    <td>{{ retention_data.cases.total or 0 }}</td>
+                                    <td><span class="badge bg-warning">{{ retention_data.cases.eligible or 0 }}</span></td>
+                                    <td>{{ retention_data.cases.oldest_date or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Projects</td>
+                                    <td>{{ retention_data.projects.total or 0 }}</td>
+                                    <td><span class="badge bg-warning">{{ retention_data.projects.eligible or 0 }}</span></td>
+                                    <td>{{ retention_data.projects.oldest_date or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Project Milestones</td>
+                                    <td>{{ retention_data.milestones.total or 0 }}</td>
+                                    <td><span class="badge bg-warning">{{ retention_data.milestones.eligible or 0 }}</span></td>
+                                    <td>{{ retention_data.milestones.oldest_date or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Notifications</td>
+                                    <td>{{ retention_data.notifications.total or 0 }}</td>
+                                    <td><span class="badge bg-warning">{{ retention_data.notifications.eligible or 0 }}</span></td>
+                                    <td>{{ retention_data.notifications.oldest_date or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Epics & Stories</td>
+                                    <td>{{ retention_data.epics.total or 0 }}</td>
+                                    <td><span class="badge bg-warning">{{ retention_data.epics.eligible or 0 }}</span></td>
+                                    <td>{{ retention_data.epics.oldest_date or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Audit Logs</td>
+                                    <td>{{ retention_data.audit_logs.total or 0 }}</td>
+                                    <td><span class="badge bg-warning">{{ retention_data.audit_logs.eligible or 0 }}</span></td>
+                                    <td>{{ retention_data.audit_logs.oldest_date or 'N/A' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Loading retention analysis...</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Archive Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" class="row g-2 mb-3">
+                    <div class="col-12">
+                        <label for="table" class="form-label">Select Data Type:</label>
+                        <div class="custom-dropdown">
+                            <select name="table" id="table" class="form-select" required>
+                                <option value="">Choose data type to archive...</option>
+                                <option value="problems">Problems ({{ retention_data.problems.eligible if retention_data else 0 }} eligible)</option>
+                                <option value="cases">Business Cases ({{ retention_data.cases.eligible if retention_data else 0 }} eligible)</option>
+                                <option value="projects">Projects ({{ retention_data.projects.eligible if retention_data else 0 }} eligible)</option>
+                                <option value="milestones">Project Milestones ({{ retention_data.milestones.eligible if retention_data else 0 }} eligible)</option>
+                                <option value="notifications">Notifications ({{ retention_data.notifications.eligible if retention_data else 0 }} eligible)</option>
+                                <option value="epics">Epics & Stories ({{ retention_data.epics.eligible if retention_data else 0 }} eligible)</option>
+                                <option value="audit_logs">Audit Logs ({{ retention_data.audit_logs.eligible if retention_data else 0 }} eligible)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="cutoff" class="form-label">Archive records older than:</label>
+                        <input type="date" name="cutoff" id="cutoff" class="form-control" required>
+                        <div class="form-text">Records created before this date will be archived and purged.</div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-archive"></i> Archive & Purge Selected Data
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="alert alert-warning">
+                    <strong>Warning:</strong> This action will permanently remove data from the live database after archiving. Ensure you have proper backups before proceeding.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Archival History -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Archival Activity</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_archives %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Data Type</th>
+                                    <th>Records Archived</th>
+                                    <th>Cutoff Date</th>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for archive in recent_archives %}
+                                <tr>
+                                    <td>{{ archive.created_at.strftime('%Y-%m-%d %H:%M') if archive.created_at else 'N/A' }}</td>
+                                    <td>{{ archive.table_name.title() if archive.table_name else 'N/A' }}</td>
+                                    <td><span class="badge bg-info">{{ archive.records_count or 0 }}</span></td>
+                                    <td>{{ archive.cutoff_date.strftime('%Y-%m-%d') if archive.cutoff_date else 'N/A' }}</td>
+                                    <td>{{ archive.user.email if archive.user else 'System' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent archival activity found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

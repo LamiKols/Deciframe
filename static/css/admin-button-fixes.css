@@ -1,0 +1,50 @@
+/*
+ * Admin Button Visibility Fixes - Simplified Version
+ * No CSS variables that could conflict with button styling
+ */
+
+/* Ensure all buttons in admin area have proper visibility */
+.admin-area .btn {
+  min-width: 80px;
+  min-height: 38px;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Improved button visibility on admin screens */
+.table .btn {
+  min-width: 80px;
+  min-height: 38px;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Special handling for modal close buttons */
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-bs-theme="light"] .btn-close {
+  filter: none;
+}
+
+/* Ensure all admin buttons are clearly visible */
+.admin-dashboard .btn,
+.admin-interface .btn,
+[class*="admin"] .btn {
+  min-width: 80px;
+  min-height: 38px;
+  position: relative;
+}
+
+/* Ensure admin action buttons stand out */
+.admin-actions .btn,
+.card-header .btn,
+.d-flex .btn {
+  border: 1px solid currentColor;
+  font-weight: 500;
+}

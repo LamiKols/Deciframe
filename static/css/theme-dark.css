@@ -1,0 +1,258 @@
+/**
+ * DeciFrame Dark Theme
+ */
+
+:root {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --border-color: #333;
+  --input-bg: #2c2c2c;
+  --dropdown-bg: #2c2c2c;
+  --navbar-bg: #1a1a1a;
+  --secondary-bg: #252525;
+  --muted-text: #adb5bd;
+  --hover-bg: #3a3a3a;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card, .form-control, .dropdown-menu {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.card, .section-box, .widget, .form-group, .filter-section, .list-group-item {
+  background-color: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Dashboard and Table Container Standardization */
+.table-container, .dashboard-card, .metric-card, .stats-card, .chart-container {
+  background-color: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(45, 90, 160, 0.2);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.navbar {
+  background-color: var(--navbar-bg) !important;
+}
+
+.navbar-brand, .nav-link {
+  color: var(--text-color) !important;
+}
+
+.dropdown-content {
+  background-color: var(--dropdown-bg);
+  border-color: var(--border-color);
+}
+
+.dropdown-content a {
+  color: var(--text-color);
+}
+
+.dropdown-content a:hover {
+  background-color: var(--hover-bg);
+}
+
+.table {
+  color: var(--text-color);
+}
+
+.table th, .table td {
+  border-color: var(--border-color);
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.text-muted {
+  color: var(--muted-text) !important;
+}
+
+.bg-light {
+  background-color: var(--secondary-bg) !important;
+}
+
+.bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+.border {
+  border-color: var(--border-color) !important;
+}
+
+/* Form elements */
+.form-select {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: #0d6efd;
+}
+
+/* Input groups */
+.input-group-text {
+  background-color: var(--secondary-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Alerts */
+.alert {
+  border-color: var(--border-color);
+}
+
+/* List groups */
+.list-group-item {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Pagination */
+.page-link {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.page-link:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-color);
+}
+
+/* Footer */
+.bg-dark {
+  background-color: var(--secondary-bg) !important;
+}
+
+/* Custom select elements */
+select {
+  background-color: var(--input-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+select option {
+  background-color: var(--input-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+/* Accordion */
+.accordion-item {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.accordion-button {
+  background-color: var(--secondary-bg);
+  color: var(--text-color);
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: var(--hover-bg);
+  color: var(--text-color);
+}
+
+/* Toast */
+.toast {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* =================================
+   STANDARDIZED FORM OVERRIDES FOR DARK THEME
+   ================================= */
+
+/* Dark theme form element overrides to ensure proper visibility */
+[data-bs-theme="dark"] input[type="text"],
+[data-bs-theme="dark"] input[type="email"],
+[data-bs-theme="dark"] input[type="password"],
+[data-bs-theme="dark"] input[type="number"],
+[data-bs-theme="dark"] input[type="tel"],
+[data-bs-theme="dark"] input[type="url"],
+[data-bs-theme="dark"] input[type="search"],
+[data-bs-theme="dark"] input[type="date"],
+[data-bs-theme="dark"] input[type="datetime-local"],
+[data-bs-theme="dark"] input[type="time"],
+[data-bs-theme="dark"] select,
+[data-bs-theme="dark"] textarea,
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+  background-color: var(--input-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-bs-theme="dark"] label,
+[data-bs-theme="dark"] .form-label {
+  color: var(--text-color) !important;
+}
+
+/* Dark theme button overrides to maintain consistency */
+[data-bs-theme="dark"] .btn-primary {
+  background-color: #0d6efd !important;
+  color: #ffffff !important;
+  border-color: #0d6efd !important;
+}
+
+[data-bs-theme="dark"] .btn-secondary {
+  background-color: #6c757d !important;
+  color: #ffffff !important;
+  border-color: #6c757d !important;
+}
+
+[data-bs-theme="dark"] .btn-success {
+  background-color: #198754 !important;
+  color: #ffffff !important;
+  border-color: #198754 !important;
+}
+
+[data-bs-theme="dark"] .btn-danger {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  border-color: #dc3545 !important;
+}

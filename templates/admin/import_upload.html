@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Data - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="bi bi-upload"></i>
+                    Upload Data for Import
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/?auth_token={{ auth_token }}">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/admin/import-data?auth_token={{ auth_token }}">Import Data</a>
+                        </li>
+                        <li class="breadcrumb-item active">Upload</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Step 1: Select Data Type and Upload File</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="auth_token" value="{{ auth_token }}">
+                                
+                                <div class="mb-4">
+                                    <label for="data_type" class="form-label">Data Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="data_type" name="data_type" required>
+                                        <option value="">Select the type of data to import...</option>
+                                        <option value="Problem">Problems</option>
+                                        <option value="BusinessCase">Business Cases</option>
+                                        <option value="Project">Projects</option>
+                                    </select>
+                                    <div class="form-text">
+                                        Choose the type of records you want to import from your file.
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="file" class="form-label">Upload File <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" id="file" name="file" 
+                                           accept=".csv,.xlsx,.xls" required>
+                                    <div class="form-text">
+                                        Supported formats: CSV, Excel (.xlsx, .xls). Maximum file size: 10MB
+                                    </div>
+                                </div>
+
+                                <!-- File requirements information -->
+                                <div class="alert alert-info">
+                                    <h6><i class="bi bi-info-circle"></i> File Requirements</h6>
+                                    <ul class="mb-2">
+                                        <li><strong>First row</strong> must contain column headers</li>
+                                        <li><strong>Each row</strong> represents one record to import</li>
+                                        <li><strong>Required fields</strong> will be mapped in the next step</li>
+                                        <li><strong>Empty cells</strong> will be treated as null values</li>
+                                    </ul>
+                                    <div class="mt-2">
+                                        <a href="/admin/sample-data?auth_token={{ auth_token }}" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-download"></i> Download Sample Files
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Data type specific requirements -->
+                                <div id="problemRequirements" class="alert alert-warning" style="display: none;">
+                                    <h6>Problem Import Requirements</h6>
+                                    <ul class="mb-0">
+                                        <li><strong>Required:</strong> title, description</li>
+                                        <li><strong>Optional:</strong> priority, reporter_email, department_name, status, impact, urgency</li>
+                                    </ul>
+                                </div>
+
+                                <div id="businessCaseRequirements" class="alert alert-warning" style="display: none;">
+                                    <h6>Business Case Import Requirements</h6>
+                                    <ul class="mb-0">
+                                        <li><strong>Required:</strong> title, summary</li>
+                                        <li><strong>Optional:</strong> case_type, cost_estimate, benefit_estimate, submitter_email, department_name, status</li>
+                                    </ul>
+                                </div>
+
+                                <div id="projectRequirements" class="alert alert-warning" style="display: none;">
+                                    <h6>Project Import Requirements</h6>
+                                    <ul class="mb-0">
+                                        <li><strong>Required:</strong> name, description</li>
+                                        <li><strong>Optional:</strong> project_manager_email, department_name, status, budget, start_date, target_end_date</li>
+                                    </ul>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-upload"></i> Upload File and Continue
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Import Jobs -->
+    {% if import_jobs %}
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6><i class="bi bi-clock-history"></i> Recent Import Jobs</h6>
+                <button onclick="refreshJobStatus()" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped" id="jobsTable">
+                        <thead>
+                            <tr>
+                                <th>Job ID</th>
+                                <th>Data Type</th>
+                                <th>File</th>
+                                <th>Status</th>
+                                <th>Records</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jobsTableBody">
+                            {% for job in import_jobs %}
+                            <tr data-job-id="{{ job.id }}">
+                                <td>{{ job.id }}</td>
+                                <td>{{ job.data_type }}</td>
+                                <td>{{ job.filename }}</td>
+                                <td class="job-status">
+                                    {% if job.status == 'Complete' %}
+                                        <span class="badge bg-success">{{ job.status }}</span>
+                                    {% elif job.status == 'Failed' %}
+                                        <span class="badge bg-danger">{{ job.status }}</span>
+                                    {% elif job.status == 'Importing' %}
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-arrow-repeat spin"></i> {{ job.status }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ job.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="job-records">
+                                    <small>
+                                        Success: <span class="success-count">{{ job.rows_success or 0 }}</span><br>
+                                        Failed: <span class="failed-count">{{ job.rows_failed or 0 }}</span>
+                                    </small>
+                                </td>
+                                <td>{{ job.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('admin_import_result', job_id=job.id, auth_token=auth_token) }}" 
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> View Results
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Show requirements based on selected data type
+document.getElementById('data_type').addEventListener('change', function() {
+    // Hide all requirement alerts
+    document.getElementById('problemRequirements').style.display = 'none';
+    document.getElementById('businessCaseRequirements').style.display = 'none';
+    document.getElementById('projectRequirements').style.display = 'none';
+    
+    // Show relevant requirements
+    const dataType = this.value;
+    if (dataType === 'Problem') {
+        document.getElementById('problemRequirements').style.display = 'block';
+    } else if (dataType === 'BusinessCase') {
+        document.getElementById('businessCaseRequirements').style.display = 'block';
+    } else if (dataType === 'Project') {
+        document.getElementById('projectRequirements').style.display = 'block';
+    }
+});
+
+// File validation
+document.getElementById('file').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+            alert('File size exceeds 10MB limit. Please choose a smaller file.');
+            this.value = '';
+            return;
+        }
+        
+        const allowedTypes = ['.csv', '.xlsx', '.xls'];
+        const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowedTypes.includes(fileExt)) {
+            alert('Invalid file type. Please upload a CSV or Excel file.');
+            this.value = '';
+            return;
+        }
+    }
+});
+</script>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.spin {
+    animation: spin 1s linear infinite;
+}
+</style>
+
+<script>
+function refreshJobStatus() {
+    const authToken = '{{ auth_token }}';
+    fetch(`/admin/import-data/status?auth_token=${authToken}`)
+        .then(response => response.json())
+        .then(jobs => {
+            const tbody = document.getElementById('jobsTableBody');
+            if (tbody) {
+                jobs.forEach(job => {
+                    const row = document.querySelector(`tr[data-job-id="${job.id}"]`);
+                    if (row) {
+                        // Update status
+                        const statusCell = row.querySelector('.job-status');
+                        let statusBadge = '';
+                        if (job.status === 'Complete') {
+                            statusBadge = '<span class="badge bg-success">Complete</span>';
+                        } else if (job.status === 'Failed') {
+                            statusBadge = '<span class="badge bg-danger">Failed</span>';
+                        } else if (job.status === 'Importing') {
+                            statusBadge = '<span class="badge bg-warning"><i class="bi bi-arrow-repeat spin"></i> Importing</span>';
+                        } else {
+                            statusBadge = `<span class="badge bg-secondary">${job.status}</span>`;
+                        }
+                        statusCell.innerHTML = statusBadge;
+                        
+                        // Update record counts
+                        const recordsCell = row.querySelector('.job-records');
+                        recordsCell.innerHTML = `
+                            <small>
+                                Success: <span class="success-count">${job.rows_success || 0}</span><br>
+                                Failed: <span class="failed-count">${job.rows_failed || 0}</span>
+                            </small>
+                        `;
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error refreshing job status:', error));
+}
+
+// Auto-refresh every 5 seconds for importing jobs
+setInterval(() => {
+    const importingJobs = document.querySelectorAll('.badge.bg-warning');
+    if (importingJobs.length > 0) {
+        refreshJobStatus();
+    }
+}, 5000);
+</script>
+{% endblock %}

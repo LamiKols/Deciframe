@@ -1,0 +1,252 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Data Management - DeciFrame{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Data Export & Retention</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('data_management.export_data') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-download"></i> Export Data
+            </a>
+            <a href="{{ url_for('data_management.data_retention_page') }}" class="btn btn-sm btn-outline-warning">
+                <i class="fas fa-archive"></i> Archive Old Data
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Active Records</h5>
+                        <h3 class="mb-0">{{ stats.total_active or 0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-database fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-secondary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Archived Records</h5>
+                        <h3 class="mb-0">{{ stats.total_archived or 0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-archive fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Problems</h5>
+                        <h3 class="mb-0">{{ stats.problems or 0 }}</h3>
+                        <small>Active</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Projects</h5>
+                        <h3 class="mb-0">{{ stats.projects or 0 }}</h3>
+                        <small>Active</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-project-diagram fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Retention Policies -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Data Retention Policies</h5>
+                <a href="{{ url_for('data_management.data_retention_page') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-cog"></i> Manage
+                </a>
+            </div>
+            <div class="card-body">
+                {% if policies %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Table</th>
+                                    <th>Retention</th>
+                                    <th>Archive</th>
+                                    <th>Auto Cleanup</th>
+                                    <th>Last Cleanup</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for policy in policies %}
+                                <tr>
+                                    <td><strong>{{ policy.table_name.title() }}</strong></td>
+                                    <td><span class="badge bg-info">{{ policy.retention_months }} months</span></td>
+                                    <td>
+                                        {% if policy.archive_enabled %}
+                                            <span class="badge bg-success">Enabled</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Disabled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if policy.auto_cleanup %}
+                                            <span class="badge bg-warning">Auto</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Manual</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if policy.last_cleanup %}
+                                            <small class="text-muted">{{ policy.last_cleanup.strftime('%Y-%m-%d') }}</small>
+                                        {% else %}
+                                            <small class="text-muted">Never</small>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No retention policies configured.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('data_management.export_data') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-download"></i> Start Export
+                    </a>
+                    <a href="{{ url_for('data_management.data_retention_page') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-archive"></i> Archive Data
+                    </a>
+                    <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-outline-info">
+                        <i class="fas fa-history"></i> View Logs
+                    </a>
+                    <a href="{{ url_for('data_management.export_data') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-tasks"></i> Export Jobs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Exports</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_exports %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Table</th>
+                                    <th>Format</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for export in recent_exports %}
+                                <tr>
+                                    <td>{{ export.table_name }}</td>
+                                    <td><span class="badge bg-secondary">{{ export.format.upper() }}</span></td>
+                                    <td>
+                                        {% if export.status == 'Complete' %}
+                                            <span class="badge bg-success">{{ export.status }}</span>
+                                        {% elif export.status == 'Failed' %}
+                                            <span class="badge bg-danger">{{ export.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">{{ export.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><small class="text-muted">{{ export.created_at.strftime('%m/%d %H:%M') }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No recent exports.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Archiving</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_logs %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Table</th>
+                                    <th>Records</th>
+                                    <th>Cutoff</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in recent_logs %}
+                                <tr>
+                                    <td>{{ log.table_name }}</td>
+                                    <td><span class="badge bg-info">{{ log.row_count }}</span></td>
+                                    <td><small class="text-muted">{{ log.cutoff.strftime('%Y-%m-%d') }}</small></td>
+                                    <td><small class="text-muted">{{ log.created_at.strftime('%m/%d %H:%M') }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No recent archiving activity.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

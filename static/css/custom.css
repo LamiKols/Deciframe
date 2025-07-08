@@ -1,0 +1,900 @@
+/* DeciFrame Custom Styles - Comprehensive Text Visibility Fixes */
+
+/* Global text visibility fixes for dark theme */
+body, html {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+
+/* Ensure all text elements are visible */
+h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a, label {
+  color: var(--bs-body-color) !important;
+}
+
+/* Card and content area fixes */
+.card, .card-body, .card-header, .card-footer {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+
+/* Table fixes */
+.table, .table td, .table th {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+
+/* Navigation fixes */
+.navbar, .navbar-brand, .nav-link {
+  color: var(--bs-body-color) !important;
+}
+
+/* Form element fixes */
+.form-control, .form-select, .form-label {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-form-control-bg) !important;
+}
+
+/* Button text fixes - theme aware */
+.btn {
+  /* Let Bootstrap handle button text colors properly */
+}
+
+/* SIMPLE BUTTON FIX: Force button text visibility */
+.btn-primary {
+  color: #ffffff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for primary buttons */
+.btn-primary:hover {
+  color: #ffffff !important;
+  background-color: #0b5ed7 !important;
+  border-color: #0a58ca !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.btn-secondary {
+  color: #ffffff !important;
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for secondary buttons */
+.btn-secondary:hover {
+  color: #ffffff !important;
+  background-color: #5c636a !important;
+  border-color: #565e64 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.btn-success {
+  color: #ffffff !important;
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for success buttons */
+.btn-success:hover {
+  color: #ffffff !important;
+  background-color: #157347 !important;
+  border-color: #146c43 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.btn-danger {
+  color: #ffffff !important;
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* Enhanced hover state for danger buttons */
+.btn-danger:hover {
+  color: #ffffff !important;
+  background-color: #bb2d3b !important;
+  border-color: #b02a37 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Outline Button Fixes for Quick Actions */
+.btn-outline-primary {
+  color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  color: #ffffff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.btn-outline-secondary {
+  color: #6c757d !important;
+  border-color: #6c757d !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-secondary:hover {
+  color: #ffffff !important;
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+
+.btn-outline-success {
+  color: #198754 !important;
+  border-color: #198754 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-success:hover {
+  color: #ffffff !important;
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+}
+
+.btn-outline-danger {
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-danger:hover {
+  color: #ffffff !important;
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+.btn-outline-warning {
+  color: #fd7e14 !important;
+  border-color: #fd7e14 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-warning:hover {
+  color: #ffffff !important;
+  background-color: #fd7e14 !important;
+  border-color: #fd7e14 !important;
+}
+
+.btn-outline-info {
+  color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-info:hover {
+  color: #ffffff !important;
+  background-color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
+}
+
+/* Dark theme outline button text visibility */
+[data-bs-theme="dark"] .btn-outline-primary {
+  color: #6ea8fe !important;
+  border-color: #6ea8fe !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+  color: #adb5bd !important;
+  border-color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-success {
+  color: #75b798 !important;
+  border-color: #75b798 !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-danger {
+  color: #ea868f !important;
+  border-color: #ea868f !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-warning {
+  color: #ffda6a !important;
+  border-color: #ffda6a !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-info {
+  color: #6edff6 !important;
+  border-color: #6edff6 !important;
+}
+
+/* FINAL FIX: Maximum specificity button text visibility */
+html[data-bs-theme="dark"] .btn-outline-primary,
+html[data-bs-theme="dark"] .btn-outline-secondary,
+html[data-bs-theme="dark"] .btn-outline-success,
+html[data-bs-theme="dark"] .btn-outline-danger,
+html[data-bs-theme="dark"] .btn-outline-warning,
+html[data-bs-theme="dark"] .btn-outline-info {
+  color: #ffffff !important;
+  border-width: 2px !important;
+}
+
+html[data-bs-theme="light"] .btn-outline-primary,
+html[data-bs-theme="light"] .btn-outline-secondary,
+html[data-bs-theme="light"] .btn-outline-success,
+html[data-bs-theme="light"] .btn-outline-danger,
+html[data-bs-theme="light"] .btn-outline-warning,
+html[data-bs-theme="light"] .btn-outline-info {
+  color: #212529 !important;
+  border-width: 2px !important;
+}
+
+/* Force visibility for ALL buttons regardless of theme */
+.btn, .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info,
+.btn-outline-primary, .btn-outline-secondary, .btn-outline-success, 
+.btn-outline-danger, .btn-outline-warning, .btn-outline-info,
+input[type="submit"].btn, input[type="button"].btn {
+  font-weight: 600 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+}
+
+/* UNIVERSAL INPUT SUBMIT BUTTON STYLING WITH MAXIMUM SPECIFICITY */
+html body div.container div.card div.card-body form div input[type="submit"].btn,
+html body div.container form div input[type="submit"].btn,
+html body form input[type="submit"].btn,
+html input[type="submit"].btn {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+  border: 1px solid !important;
+  cursor: pointer !important;
+}
+
+/* MAXIMUM SPECIFICITY: Specific input submit button colors */
+html body div.container div.card div.card-body form div input[type="submit"].btn-primary,
+html body div.container form div input[type="submit"].btn-primary,
+html body form input[type="submit"].btn-primary,
+html input[type="submit"].btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+html body div.container div.card div.card-body form div input[type="submit"].btn-success,
+html body div.container form div input[type="submit"].btn-success,
+html body form input[type="submit"].btn-success,
+html input[type="submit"].btn-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+
+html body div.container div.card div.card-body form div input[type="submit"].btn-secondary,
+html body div.container form div input[type="submit"].btn-secondary,
+html body form input[type="submit"].btn-secondary,
+html input[type="submit"].btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+/* MAXIMUM SPECIFICITY: Force all button types to have consistent styling */
+html .btn-success,
+html body .btn-success,
+html body div .btn-success,
+html body .container .btn-success,
+html body .card .btn-success,
+html input[type="submit"].btn-success,
+html body input[type="submit"].btn-success,
+html body div input[type="submit"].btn-success,
+html body .container input[type="submit"].btn-success,
+html body .card input[type="submit"].btn-success {
+  color: #ffffff !important;
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+}
+
+html .btn-primary,
+html body .btn-primary,
+html body div .btn-primary,
+html body .container .btn-primary,
+html body .card .btn-primary,
+html input[type="submit"].btn-primary,
+html body input[type="submit"].btn-primary,
+html body div input[type="submit"].btn-primary,
+html body .container input[type="submit"].btn-primary,
+html body .card input[type="submit"].btn-primary {
+  color: #ffffff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+}
+
+.btn-outline-primary, .btn-outline-secondary, .btn-outline-success, .btn-outline-info, .btn-outline-warning, .btn-outline-danger {
+  color: var(--bs-body-color) !important;
+}
+
+.btn-outline-primary:hover, .btn-outline-secondary:hover, .btn-outline-success:hover, 
+.btn-outline-info:hover, .btn-outline-warning:hover, .btn-outline-danger:hover {
+  color: #fff !important;
+}
+
+/* Badge fixes */
+.badge {
+  color: #fff !important;
+}
+
+/* Alert fixes */
+.alert {
+  color: var(--bs-body-color) !important;
+}
+
+.alert-info, .alert-primary, .alert-secondary, .alert-success, .alert-warning {
+  color: #212529 !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dropdown menu fixes */
+.dropdown-menu {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+  border: 1px solid var(--bs-border-color) !important;
+}
+
+.dropdown-item {
+  color: var(--bs-body-color) !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: var(--bs-secondary-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+/* Modal fixes */
+.modal-content {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+.modal-header, .modal-body, .modal-footer {
+  color: var(--bs-body-color) !important;
+}
+
+/* List and sidebar fixes */
+.list-group-item {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-body-bg) !important;
+}
+
+/* Ensure dark text on light-colored backgrounds */
+.bg-info, .bg-primary, .bg-secondary, .bg-success, .bg-warning {
+  color: #212529 !important;
+}
+
+/* Ensure light text on dark-colored backgrounds */
+.bg-dark, .modal-content.bg-dark {
+  color: #f8f9fa !important;
+}
+
+/* Fix readonly form elements */
+textarea[readonly], input[readonly] {
+  color: #212529 !important;
+  background-color: #f8f9fa !important;
+  opacity: 1 !important;
+}
+
+.form-control[readonly] {
+  background-color: #e9ecef !important;
+  color: #212529 !important;
+  opacity: 1 !important;
+}
+
+/* Specific fixes for various components */
+.text-muted {
+  color: var(--bs-secondary-color) !important;
+}
+
+.navbar-toggler {
+  border-color: var(--bs-border-color) !important;
+}
+
+/* Remove problematic universal color inheritance that breaks text visibility */
+
+/* Toast Notification Styling */
+.toast {
+  min-width: 280px;
+  font-size: 0.95rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border-radius: 0.375rem;
+}
+
+.toast-body {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+}
+
+.toast .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* Toast color variations */
+.toast.bg-success {
+  background-color: #198754 !important;
+}
+
+.toast.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.toast.bg-warning {
+  background-color: #fd7e14 !important;
+}
+
+.toast.bg-info {
+  background-color: #0dcaf0 !important;
+}
+
+/* =================================
+   STANDARDIZED BUTTON STYLING
+   ================================= */
+
+/* Base button styling */
+.btn {
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  font-size: 0.95rem !important;
+  border: none !important;
+  transition: background-color 0.2s ease, transform 0.1s ease !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+  line-height: 1.5 !important;
+  min-height: 38px !important;
+  min-width: 80px !important;
+  box-sizing: border-box !important;
+}
+
+/* Primary button styling */
+.btn-primary {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-primary:focus {
+  outline: 3px solid rgba(13, 110, 253, 0.25) !important;
+  background-color: #0b5ed7 !important;
+  color: #fff !important;
+}
+
+.btn-primary:active {
+  background-color: #0a58ca !important;
+  transform: translateY(0) !important;
+}
+
+/* Secondary button styling */
+.btn-secondary {
+  background-color: #6c757d !important;
+  color: #fff !important;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-secondary:focus {
+  outline: 3px solid rgba(108, 117, 125, 0.25) !important;
+  background-color: #5a6268 !important;
+  color: #fff !important;
+}
+
+/* Success button styling */
+.btn-success {
+  background-color: #198754 !important;
+  color: #fff !important;
+}
+
+.btn-success:hover {
+  background-color: #157347 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-success:focus {
+  outline: 3px solid rgba(25, 135, 84, 0.25) !important;
+  background-color: #157347 !important;
+  color: #fff !important;
+}
+
+/* Danger button styling */
+.btn-danger {
+  background-color: #dc3545 !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background-color: #bb2d3b !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-danger:focus {
+  outline: 3px solid rgba(220, 53, 69, 0.25) !important;
+  background-color: #bb2d3b !important;
+  color: #fff !important;
+}
+
+/* Warning button styling */
+.btn-warning {
+  background-color: #fd7e14 !important;
+  color: #fff !important;
+}
+
+.btn-warning:hover {
+  background-color: #e86100 !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Info button styling */
+.btn-info {
+  background-color: #0dcaf0 !important;
+  color: #000 !important;
+}
+
+.btn-info:hover {
+  background-color: #3dd5f3 !important;
+  color: #000 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Outline button variants */
+.btn-outline-primary {
+  background-color: transparent !important;
+  border: 2px solid #0d6efd !important;
+  color: #0d6efd !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  border-color: #0d6efd !important;
+}
+
+.btn-outline-secondary {
+  background-color: transparent !important;
+  border: 2px solid #6c757d !important;
+  color: #6c757d !important;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d !important;
+  color: #fff !important;
+  border-color: #6c757d !important;
+}
+
+/* Small button variant */
+.btn-sm {
+  padding: 6px 12px !important;
+  font-size: 0.875rem !important;
+}
+
+/* Large button variant */
+.btn-lg {
+  padding: 12px 24px !important;
+  font-size: 1.1rem !important;
+}
+
+/* =================================
+   STANDARDIZED FORM STYLING
+   ================================= */
+
+/* Form inputs */
+input[type="text"]:not(.navbar-right input),
+input[type="email"]:not(.navbar-right input),
+input[type="password"]:not(.navbar-right input),
+input[type="number"]:not(.navbar-right input),
+input[type="tel"]:not(.navbar-right input),
+input[type="url"]:not(.navbar-right input),
+input[type="search"]:not(.navbar-right input),
+input[type="date"]:not(.navbar-right input),
+input[type="datetime-local"]:not(.navbar-right input),
+input[type="time"]:not(.navbar-right input),
+select:not(.navbar-right select),
+textarea:not(.navbar-right textarea),
+.form-control:not(.navbar-right .form-control),
+.form-select:not(.navbar-right .form-select) {
+  padding: 10px 14px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--bs-border-color, #ced4da) !important;
+  font-size: 0.95rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 1rem !important;
+  background-color: var(--bs-body-bg, #fff) !important;
+  color: var(--bs-body-color, #212529) !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Form input focus states */
+input[type="text"]:not(.navbar-right input):focus,
+input[type="email"]:not(.navbar-right input):focus,
+input[type="password"]:not(.navbar-right input):focus,
+input[type="number"]:not(.navbar-right input):focus,
+input[type="tel"]:not(.navbar-right input):focus,
+input[type="url"]:not(.navbar-right input):focus,
+input[type="search"]:not(.navbar-right input):focus,
+input[type="date"]:not(.navbar-right input):focus,
+input[type="datetime-local"]:not(.navbar-right input):focus,
+input[type="time"]:not(.navbar-right input):focus,
+select:not(.navbar-right select):focus,
+textarea:not(.navbar-right textarea):focus,
+.form-control:not(.navbar-right .form-control):focus,
+.form-select:not(.navbar-right .form-select):focus {
+  outline: none !important;
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Form labels */
+label,
+.form-label {
+  display: block !important;
+  margin-bottom: 0.4rem !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  color: var(--bs-body-color, #333) !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Required field indicator */
+label.required::after,
+.form-label.required::after {
+  content: " *" !important;
+  color: #dc3545 !important;
+}
+
+/* Textarea specific styling */
+textarea,
+.form-control[rows] {
+  min-height: 80px !important;
+  resize: vertical !important;
+}
+
+/* Select styling */
+select,
+.form-select {
+  cursor: pointer !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 6.5 6.5L14 6'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 16px 12px !important;
+  appearance: none !important;
+}
+
+/* Checkbox and radio styling */
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto !important;
+  margin-right: 8px !important;
+  margin-bottom: 0 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Form group spacing */
+.form-group,
+.mb-3 {
+  margin-bottom: 1.5rem !important;
+}
+
+/* Error states */
+.is-invalid,
+input.error,
+select.error,
+textarea.error {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25) !important;
+}
+
+.invalid-feedback,
+.error-message {
+  display: block !important;
+  color: #dc3545 !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.25rem !important;
+}
+
+/* Success states */
+.is-valid,
+input.valid,
+select.valid,
+textarea.valid {
+  border-color: #198754 !important;
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.25) !important;
+}
+
+.valid-feedback,
+.success-message {
+  display: block !important;
+  color: #198754 !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.25rem !important;
+}
+
+/* Disabled form elements */
+input:disabled,
+select:disabled,
+textarea:disabled,
+.form-control:disabled,
+.form-select:disabled {
+  background-color: var(--bs-secondary-bg, #e9ecef) !important;
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+}
+
+/* =================================
+   FORM LAYOUT IMPROVEMENTS
+   ================================= */
+
+/* Form container styling */
+.form-container {
+  max-width: 600px !important;
+  margin: 0 auto !important;
+  padding: 2rem !important;
+}
+
+/* Form row styling for inline forms */
+.form-row {
+  display: flex !important;
+  gap: 1rem !important;
+  flex-wrap: wrap !important;
+}
+
+.form-row .form-group {
+  flex: 1 !important;
+  min-width: 200px !important;
+}
+
+/* Button group styling */
+.btn-group,
+.form-actions {
+  display: flex !important;
+  gap: 0.75rem !important;
+  margin-top: 1.5rem !important;
+  flex-wrap: wrap !important;
+}
+
+/* Card form styling */
+.card .card-body form {
+  margin: 0 !important;
+}
+
+.card .card-body .form-group:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* =================================
+   NUCLEAR OPTION: FORCE ALL SUBMIT BUTTONS
+   ================================= */
+
+/* FINAL OVERRIDE: Force all submit buttons to have proper styling */
+input[type="submit"] {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  cursor: pointer !important;
+  border: 1px solid !important;
+  min-height: 38px !important;
+  text-decoration: none !important;
+}
+
+input[type="submit"].btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+input[type="submit"].btn-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+}
+
+input[type="submit"].btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+
+/* Target specific Create Business Case button */
+input[type="submit"][value*="Create Business Case"] {
+  color: #ffffff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+}
+
+/* COMPREHENSIVE BUTTON TEXT VISIBILITY FIX */
+.btn, button, input[type="submit"], input[type="button"], a.btn {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+  border: 1px solid !important;
+}
+
+/* Ensure all primary buttons have white text */
+.btn-primary, 
+button.btn-primary, 
+input[type="submit"].btn-primary, 
+input[type="button"].btn-primary, 
+a.btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+/* Ensure all secondary buttons have white text */
+.btn-secondary, 
+button.btn-secondary, 
+input[type="submit"].btn-secondary, 
+input[type="button"].btn-secondary, 
+a.btn-secondary {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+/* Ensure all success buttons have white text */
+.btn-success, 
+button.btn-success, 
+input[type="submit"].btn-success, 
+input[type="button"].btn-success, 
+a.btn-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
