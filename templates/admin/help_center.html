@@ -82,6 +82,58 @@ html[data-bs-theme="dark"] .btn-sm,
 .table .btn i {
     font-size: 12px !important;
 }
+
+/* NUCLEAR BUTTON FIX - Force visibility for Help Center action buttons */
+.table .btn-outline-primary,
+.table .btn-outline-danger,
+.table .btn-sm,
+.btn-outline-primary,
+.btn-outline-danger,
+table .btn,
+tbody .btn,
+tr .btn,
+td .btn {
+    background-color: transparent !important;
+    color: #0d6efd !important;
+    -webkit-text-fill-color: #0d6efd !important;
+    border: 2px solid #0d6efd !important;
+    font-weight: 600 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    text-decoration: none !important;
+}
+
+.table .btn-outline-danger,
+.btn-outline-danger,
+td .btn-outline-danger {
+    color: #dc3545 !important;
+    -webkit-text-fill-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+/* Force icon colors */
+.table .btn i,
+.btn-outline-primary i,
+.btn-outline-danger i {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+/* Hover states */
+.table .btn:hover,
+.btn-outline-primary:hover {
+    background-color: #0d6efd !important;
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+}
+
+.table .btn-outline-danger:hover,
+.btn-outline-danger:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+}
 </style>
 {% endblock %}
 
