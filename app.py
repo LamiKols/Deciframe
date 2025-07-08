@@ -339,12 +339,16 @@ def create_app():
         """Inject first user admin access context for unrestricted admin setup"""
         unrestricted_admin = False
         if current_user.is_authenticated:
-            # Check if current user is the first and only user in their organization
-            from models import User
-            org_users = User.query.filter_by(organization_id=current_user.organization_id).count()
-            if org_users == 1 and current_user.role == RoleEnum.Admin:
-                unrestricted_admin = True
-                print(f"🔧 First User Admin: Granting unrestricted access to {current_user.email}")
+            try:
+                # Check if current user is the first and only user in their organization
+                from models import User
+                org_users = User.query.filter_by(organization_id=current_user.organization_id).count()
+                if org_users == 1 and current_user.role.value == 'Admin':
+                    unrestricted_admin = True
+                    print(f"🔧 First User Admin: Granting unrestricted access to {current_user.email}")
+            except Exception as e:
+                print(f"🔧 First User Admin Debug: Error: {e}")
+                unrestricted_admin = False
         
         return dict(unrestricted_admin=unrestricted_admin)
 
