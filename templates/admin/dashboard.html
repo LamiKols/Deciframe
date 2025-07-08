@@ -188,7 +188,7 @@
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Business Cases</h6>
                                     <h3 class="text-warning mb-2">{{ pending_metrics.cases_submitted }}</h3>
-                                    <a href="{{ url_for('review.review_business_cases') }}" class="btn btn-outline-warning btn-sm">
+                                    <a href="{{ '#' }}" class="btn btn-outline-warning btn-sm">
                                         <i class="fas fa-eye me-1"></i>Review
                                     </a>
                                 </div>
@@ -199,7 +199,7 @@
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Projects</h6>
                                     <h3 class="text-info mb-2">{{ pending_metrics.projects_submitted }}</h3>
-                                    <a href="{{ url_for('review.review_projects') }}" class="btn btn-outline-info btn-sm">
+                                    <a href="{{ '#' }}" class="btn btn-outline-info btn-sm">
                                         <i class="fas fa-eye me-1"></i>Review
                                     </a>
                                 </div>
@@ -210,7 +210,7 @@
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Epics</h6>
                                     <h3 class="text-success mb-2">{{ pending_metrics.epics_submitted }}</h3>
-                                    <a href="{{ url_for('review.review_epics') }}" class="btn btn-outline-success btn-sm">
+                                    <a href="{{ '#' }}" class="btn btn-outline-success btn-sm">
                                         <i class="fas fa-eye me-1"></i>Review
                                     </a>
                                 </div>
@@ -218,7 +218,7 @@
                         </div>
                     </div>
                     <div class="text-center mt-3">
-                        <a href="{{ url_for('review.review_summary') }}" class="btn btn-primary">
+                        <a href="{{ '#' }}" class="btn btn-primary">
                             <i class="fas fa-tachometer-alt me-2"></i>
                             View Review Dashboard
                         </a>
@@ -439,7 +439,7 @@
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <a href="{{ url_for('monitoring.dashboard') }}" class="btn btn-outline-info w-100 h-100 d-flex flex-column justify-content-center">
+                            <a href="{{ '#' }}" class="btn btn-outline-info w-100 h-100 d-flex flex-column justify-content-center">
                                 <i class="fas fa-heartbeat fa-2x mb-2"></i>
                                 <span>System Health</span>
                                 <small class="text-muted">Monitor status</small>
@@ -460,7 +460,7 @@
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <a href="{{ url_for('notifications_config.notification_settings') }}" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column justify-content-center">
+                            <a href="{{ url_for('admin_organization_settings') }}" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column justify-content-center">
                                 <i class="fas fa-bell fa-2x mb-2"></i>
                                 <span>Notifications</span>
                                 <small class="text-muted">Event configuration</small>
@@ -525,17 +525,8 @@
 <!-- Dashboard Refresh JavaScript -->
 <script>
 function refreshDashboard() {
-    // fetch('{{ url_for("admin.quick_stats") }}') // Disabled - route not available
-        .then(response => response.json())
-        .then(data => {
-            // Update stats if needed
-            console.log('Dashboard stats updated:', data);
-            // Reload the page for full refresh
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error refreshing dashboard:', error);
-        });
+    // Simple page reload for dashboard refresh
+    window.location.reload();
 }
 
 // Auto-refresh every 5 minutes
