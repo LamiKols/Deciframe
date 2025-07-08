@@ -1149,21 +1149,42 @@ class HelpCategory(db.Model):
     
     # Relationships
     organization = db.relationship('Organization', foreign_keys=[organization_id])
+# Help Article Role Enum
+class HelpArticleRoleEnum(enum.Enum):
+    admin = "admin"
+    user = "user"  
+    both = "both"
+
 class HelpArticle(db.Model):
     __tablename__ = 'help_articles'
     id = db.Column(db.Integer, primary_key=True)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('help_categories.id'), nullable=False)
+    
+    # Enhanced fields per requirements
+    module_name = db.Column(db.String(100), nullable=True)  # e.g., "Business Cases", "Admin Dashboard"
     title = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(200), unique=True, nullable=False)
     content = db.Column(db.Text, nullable=False)  # Store Markdown or HTML
+    role = db.Column(db.Enum(HelpArticleRoleEnum), nullable=False, default=HelpArticleRoleEnum.both)
+    tags = db.Column(db.String(500), nullable=True)  # Comma-separated tags
+    faq = db.Column(db.JSON, nullable=True)  # JSON for Q&A pairs: [{"question": "...", "answer": "..."}]
+    
+    # Feedback and analytics
+    view_count = db.Column(db.Integer, default=0)
+    helpful_count = db.Column(db.Integer, default=0)
+    not_helpful_count = db.Column(db.Integer, default=0)
+    
+    # Existing fields
     sort_order = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     
+    # Relationships
     category = db.relationship('HelpCategory', backref='articles')
     author = db.relationship('User', backref='help_articles')
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     
     def generate_slug(self):
         """Auto-generate slug from title"""
@@ -1181,6 +1202,52 @@ class HelpArticle(db.Model):
         
         return slug
     
+    def to_dict(self):
+        """Convert article to dictionary for API responses"""
+        return {
+            'id': self.id,
+            'module_name': self.module_name,
+            'title': self.title,
+            'slug': self.slug,
+            'content': self.content,
+            'role': self.role.value if self.role else 'both',
+            'tags': self.tags.split(',') if self.tags else [],
+            'faq': self.faq or [],
+            'view_count': self.view_count,
+            'helpful_count': self.helpful_count,
+            'not_helpful_count': self.not_helpful_count,
+            'category': {
+                'id': self.category.id,
+                'name': self.category.name
+            } if self.category else None,
+            'author': self.author.email if self.author else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def increment_view_count(self):
+        """Increment view count for analytics"""
+        self.view_count = (self.view_count or 0) + 1
+        db.session.commit()
+    
+    def record_feedback(self, helpful=True):
+        """Record user feedback"""
+        if helpful:
+            self.helpful_count = (self.helpful_count or 0) + 1
+        else:
+            self.not_helpful_count = (self.not_helpful_count or 0) + 1
+        db.session.commit()
+    
+    @property
+    def tag_list(self):
+        """Get tags as a list"""
+        return self.tags.split(',') if self.tags else []
+    
+    @tag_list.setter
+    def tag_list(self, tags):
+        """Set tags from a list"""
+        self.tags = ','.join(tags) if tags else None
+
     def __repr__(self):
         return f'<HelpArticle {self.title}>'
 
