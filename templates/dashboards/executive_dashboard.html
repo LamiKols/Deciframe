@@ -80,7 +80,7 @@
       <tr>
         <td><a href="{{ url_for('projects.view_project', id=proj.id) }}">{{ proj.title }}</a></td>
         <td>{{ proj.owner.name if proj.owner else 'Unassigned' }}</td>
-        <td>{{ proj.status }}</td>
+        <td>{{ proj.status.value if proj.status else 'Unknown' }}</td>
         <td>{{ format_currency(proj.budget|int if proj.budget else 0) }}</td>
       </tr>
       {% else %}
