@@ -394,6 +394,7 @@ def approve_case(id):
             project_manager_id=user.id,
             department_id=project_dept_id,
             created_by=user.id,
+            organization_id=user.organization_id,
             status=StatusEnum.Open,
             priority=PriorityEnum.Medium
         )
