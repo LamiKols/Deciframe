@@ -472,7 +472,8 @@ def init_admin_routes(app):
                     description=description,
                     definition=json.loads(template_content),
                     is_active=is_active,
-                    created_by=current_user.id
+                    created_by=current_user.id,
+                    organization_id=current_user.organization_id
                 )
                 db.session.add(new_workflow)
                 db.session.commit()
@@ -484,10 +485,82 @@ def init_admin_routes(app):
             
             return redirect(url_for('admin_workflows'))
         
-        workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
-        library_workflows = WorkflowLibrary.query.filter_by(organization_id=current_user.organization_id).all()
-        log_action("Viewed workflow templates")
-        return render_template('admin/workflows.html', workflows=workflows, library_workflows=library_workflows)
+        try:
+            workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
+            
+            # If no workflows exist, create some sample ones
+            if not workflows:
+                print(f"🔧 No workflows found for org {current_user.organization_id}, creating samples...")
+                sample_workflows = [
+                    {
+                        'name': 'Problem Escalation',
+                        'description': 'Automatically escalate high-priority problems to management',
+                        'definition': {
+                            'triggers': ['problem_created', 'problem_updated'],
+                            'conditions': [{'field': 'priority', 'operator': 'equals', 'value': 'High'}],
+                            'actions': [
+                                {'type': 'notification', 'target': 'manager', 'message': 'High priority problem requires attention'},
+                                {'type': 'email', 'recipients': ['manager@company.com'], 'subject': 'Priority Problem Alert'}
+                            ]
+                        },
+                        'is_active': True
+                    },
+                    {
+                        'name': 'Business Case Review',
+                        'description': 'Route new business cases to appropriate business analysts',
+                        'definition': {
+                            'triggers': ['business_case_created'],
+                            'conditions': [{'field': 'value', 'operator': 'greater_than', 'value': 10000}],
+                            'actions': [
+                                {'type': 'assign', 'target': 'business_analyst', 'role': 'BA'},
+                                {'type': 'notification', 'target': 'creator', 'message': 'Business case assigned for review'}
+                            ]
+                        },
+                        'is_active': True
+                    },
+                    {
+                        'name': 'Project Milestone Alert',
+                        'description': 'Send alerts when project milestones are approaching',
+                        'definition': {
+                            'triggers': ['milestone_due_soon'],
+                            'conditions': [{'field': 'days_until_due', 'operator': 'less_than', 'value': 3}],
+                            'actions': [
+                                {'type': 'notification', 'target': 'project_manager', 'message': 'Project milestone due in 3 days'},
+                                {'type': 'email', 'recipients': ['pm@company.com'], 'subject': 'Milestone Alert'}
+                            ]
+                        },
+                        'is_active': True
+                    }
+                ]
+                
+                for sample in sample_workflows:
+                    workflow = WorkflowTemplate(
+                        name=sample['name'],
+                        description=sample['description'],
+                        definition=sample['definition'],
+                        is_active=sample['is_active'],
+                        created_by=current_user.id,
+                        organization_id=current_user.organization_id
+                    )
+                    db.session.add(workflow)
+                
+                db.session.commit()
+                workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
+                print(f"🔧 Created {len(workflows)} sample workflows")
+            
+            # Get library workflows
+            try:
+                library_workflows = WorkflowLibrary.query.all()  # Show all library workflows
+            except:
+                library_workflows = []
+            
+            log_action("Viewed workflow templates")
+            return render_template('admin/workflows.html', workflows=workflows, library_workflows=library_workflows)
+            
+        except Exception as e:
+            print(f"🔧 Workflow Error: {str(e)}")
+            flash(f'Error loading workflows: {str(e)}', 'error')
+            return redirect(url_for('admin_dashboard'))
     
     @app.route('/admin/workflows/<int:workflow_id>/toggle', methods=['POST'])
     @login_required
