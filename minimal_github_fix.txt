@@ -1,0 +1,29 @@
+CRITICAL GITHUB UPLOAD REQUIRED FOR DEPLOYMENT FIX
+
+The deployment is failing because the auth module fix hasn't been uploaded to GitHub yet.
+
+REQUIRED FILE CHANGE:
+File: auth/__init__.py
+Current content causing error:
+```
+from flask import Blueprint
+
+bp = Blueprint('auth', __name__, template_folder='templates')
+
+from auth import routes
+```
+
+MUST BE CHANGED TO:
+```
+from flask import Blueprint
+
+bp = Blueprint('auth', __name__, template_folder='templates')
+
+from . import routes
+```
+
+CRITICAL: Change line 5 from "from auth import routes" to "from . import routes"
+
+This single line change will resolve the "ModuleNotFoundError: No module named 'auth'" error and allow deployment to succeed.
+
+The issue is a circular import where the auth module tries to import from itself, creating an infinite loop during import resolution on the deployment server.

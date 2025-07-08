@@ -1,0 +1,38 @@
+from flask import Flask, request, session, current_app
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_login import LoginManager, current_user
+from sqlalchemy.orm import DeclarativeBase
+from config import Config
+import os
+import logging
+import json
+import secrets
+import uuid
+from datetime import datetime
+from sqlalchemy import text
+
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+from prometheus_flask_exporter import PrometheusMetrics
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+
+class Base(DeclarativeBase):
+    pass
+
+# Initialize Flask extensions
+db = SQLAlchemy(model_class=Base)
+migrate = Migrate()
+login_manager = LoginManager()
+
+def generate_csrf_token():
+    """Generate a CSRF token for forms"""
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = secrets.token_hex(16)
+    return session['_csrf_token']

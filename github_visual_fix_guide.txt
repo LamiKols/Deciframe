@@ -1,0 +1,36 @@
+VISUAL GUIDE: WHERE TO ADD THE BLANK LINE
+
+CURRENT GITHUB STRUCTURE (INCORRECT):
+```
+line 32: class Base(DeclarativeBase):
+line 33:     pass
+line 34:     db = SQLAlchemy(model_class=Base)  ← REMOVE 4 SPACES HERE
+line 35: migrate = Migrate()
+```
+
+CORRECTED STRUCTURE NEEDED:
+```
+line 32: class Base(DeclarativeBase):
+line 33:     pass
+line 34:                                        ← ADD BLANK LINE HERE
+line 35: db = SQLAlchemy(model_class=Base)      ← MOVE THIS TO NO INDENTATION
+line 36: migrate = Migrate()
+```
+
+STEP-BY-STEP VISUAL FIX:
+
+1. In GitHub editor, find these lines:
+   class Base(DeclarativeBase):
+       pass
+       db = SQLAlchemy(model_class=Base)
+
+2. Change them to look like this:
+   class Base(DeclarativeBase):
+       pass
+   
+   db = SQLAlchemy(model_class=Base)
+
+WHAT TO DO:
+- Remove the 4 spaces before "db = SQLAlchemy"
+- Add an empty line between "pass" and "db = SQLAlchemy"
+- The db line should start at column 1 (no indentation)
