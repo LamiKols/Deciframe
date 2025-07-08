@@ -10,12 +10,12 @@
             <h5 style="color: white; margin-bottom: 10px;">Current System Status</h5>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
                 <div style="background: #28a745; color: white; padding: 10px; border-radius: 3px; text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold;">4</div>
+                    <div style="font-size: 24px; font-weight: bold;">{{ workflows|selectattr('is_active')|list|length }}</div>
                     <div style="font-size: 12px;">Active Workflows</div>
                 </div>
                 <div style="background: #6c757d; color: white; padding: 10px; border-radius: 3px; text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold;">4</div>
-                    <div style="font-size: 12px;">Available Templates</div>
+                    <div style="font-size: 24px; font-weight: bold;">{{ workflows|length }}</div>
+                    <div style="font-size: 12px;">Total Workflows</div>
                 </div>
                 <div style="background: #fd7e14; color: white; padding: 10px; border-radius: 3px; text-align: center;">
                     <div style="font-size: 24px; font-weight: bold;">0</div>
