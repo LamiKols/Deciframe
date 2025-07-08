@@ -5,6 +5,29 @@
     <div style="background: #343a40; padding: 20px; border-radius: 5px;">
         <h4 style="color: white; margin-bottom: 15px;">Workflow Management</h4>
         
+        <!-- Current Status Summary -->
+        <div style="background: #2c3034; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h5 style="color: white; margin-bottom: 10px;">Current System Status</h5>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                <div style="background: #28a745; color: white; padding: 10px; border-radius: 3px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold;">4</div>
+                    <div style="font-size: 12px;">Active Workflows</div>
+                </div>
+                <div style="background: #6c757d; color: white; padding: 10px; border-radius: 3px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold;">4</div>
+                    <div style="font-size: 12px;">Available Templates</div>
+                </div>
+                <div style="background: #fd7e14; color: white; padding: 10px; border-radius: 3px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold;">0</div>
+                    <div style="font-size: 12px;">Triage Rules</div>
+                </div>
+                <div style="background: #20c997; color: white; padding: 10px; border-radius: 3px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold;">30min</div>
+                    <div style="font-size: 12px;">Auto-Schedule</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Add New Workflow Button -->
         <div style="margin-bottom: 20px;">
             <button type="button" style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;"
@@ -38,41 +61,50 @@
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
                 
-                <!-- Problem-to-Business Case Workflow -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545;">
+                <!-- Problem-to-Business Case Workflow - ACTIVE -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545; position: relative;">
+                    <div style="position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                        ✓ ACTIVE
+                    </div>
                     <h6 style="color: white; margin-bottom: 8px;">Problem-to-Business Case Workflow</h6>
                     <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Complete workflow from problem identification to business case creation with triage rules</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Problems</span>
-                        <button onclick="importTemplate('Problem-to-Business Case Workflow')" 
-                               style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            Import
+                        <button onclick="alert('This workflow is already active in your system')" 
+                               style="background: #6c757d; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
+                            Active
                         </button>
                     </div>
                 </div>
 
-                <!-- Business Case Review & Approval -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
+                <!-- Business Case Review & Approval - ACTIVE -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd; position: relative;">
+                    <div style="position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                        ✓ ACTIVE
+                    </div>
                     <h6 style="color: white; margin-bottom: 8px;">Business Case Review & Approval</h6>
                     <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Multi-stage business case review process with BA assignment and ROI validation</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="background: #0d6efd; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Business</span>
-                        <button onclick="importTemplate('Business Case Review & Approval')" 
-                               style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            Import
+                        <button onclick="alert('This workflow is already active in your system')" 
+                               style="background: #6c757d; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
+                            Active
                         </button>
                     </div>
                 </div>
 
-                <!-- Epic & Story Management -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
+                <!-- Epic & Story Management - ACTIVE -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd; position: relative;">
+                    <div style="position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                        ✓ ACTIVE
+                    </div>
                     <h6 style="color: white; margin-bottom: 8px;">Epic & Story Management</h6>
                     <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">AI-powered epic creation and user story breakdown with requirements generation</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="background: #0d6efd; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Business</span>
-                        <button onclick="importTemplate('Epic & Story Management')" 
-                               style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            Import
+                        <button onclick="alert('This workflow is already active in your system')" 
+                               style="background: #6c757d; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
+                            Active
                         </button>
                     </div>
                 </div>
@@ -129,15 +161,18 @@
                     </div>
                 </div>
 
-                <!-- Notification & Alert Management -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #20c997;">
+                <!-- Notification & Alert Management - ACTIVE -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #20c997; position: relative;">
+                    <div style="position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: bold;">
+                        ✓ ACTIVE
+                    </div>
                     <h6 style="color: white; margin-bottom: 8px;">Notification & Alert Management</h6>
                     <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Automated notification system with email integration and workflow triggers</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="background: #20c997; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Notifications</span>
-                        <button onclick="importTemplate('Notification & Alert Management')" 
-                               style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            Import
+                        <button onclick="alert('This workflow is already active in your system')" 
+                               style="background: #6c757d; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
+                            Active
                         </button>
                     </div>
                 </div>
