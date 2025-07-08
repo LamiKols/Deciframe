@@ -907,13 +907,94 @@ function showErrorMessage(message) {
     `;
     document.body.appendChild(alertDiv);
     
-    // Auto-dismiss after 5 seconds
+    // Auto-dismiss after 3 seconds
     setTimeout(() => {
         if (alertDiv.parentNode) {
             alertDiv.parentNode.removeChild(alertDiv);
         }
-    }, 5000);
+    }, 3000);
 }
+
+// Essential workflow management functions
+function toggleWorkflow(workflowId, isActive) {
+    fetch(`/admin/workflows/${workflowId}/toggle`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            showErrorMessage('Failed to toggle workflow status');
+        }
+    })
+    .catch(error => {
+        console.error('Toggle failed:', error);
+        showErrorMessage('Failed to toggle workflow status');
+    });
+}
+
+function deleteWorkflow(workflowId, workflowName) {
+    if (confirm(`Are you sure you want to delete the workflow "${workflowName}"? This action cannot be undone.`)) {
+        fetch(`/admin/workflows/${workflowId}/delete`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessMessage(`Workflow "${workflowName}" deleted successfully`);
+                location.reload();
+            } else {
+                showErrorMessage('Failed to delete workflow');
+            }
+        })
+        .catch(error => {
+            console.error('Delete failed:', error);
+            showErrorMessage('Failed to delete workflow');
+        });
+    }
+}
+
+function refreshLibrary() {
+    location.reload();
+}
+
+function importFromLibrary(libraryId) {
+    fetch(`/admin/workflows/library/${libraryId}/import`, {
+        method: 'POST',
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessMessage(`Workflow imported successfully!`);
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showErrorMessage('Failed to import workflow');
+        }
+    })
+    .catch(error => {
+        console.error('Import failed:', error);
+        showErrorMessage('Failed to import workflow');
+    });
+}
+
+function initializeEditModal(workflowId) {
+    // Initialize edit modal with workflow data
+    console.log('Initializing edit modal for workflow:', workflowId);
+}
+
+
 
 // Tab and search functionality
 function updateActionButtons(activeTab) {
