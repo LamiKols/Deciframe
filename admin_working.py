@@ -2439,7 +2439,7 @@ def init_admin_routes(app):
     def admin_help_center():
         """Help Center management dashboard"""
         categories = HelpCategory.query.filter_by(organization_id=current_user.organization_id).order_by(HelpCategory.sort_order, HelpCategory.name).all()
-        articles = HelpArticle.query.filter_by(organization_id=current_user.organization_id).join(HelpCategory).options(db.joinedload(HelpArticle.created_by_user)).order_by(HelpCategory.sort_order, HelpArticle.sort_order, HelpArticle.title).all()
+        articles = HelpArticle.query.filter_by(organization_id=current_user.organization_id).join(HelpCategory).order_by(HelpCategory.sort_order, HelpArticle.sort_order, HelpArticle.title).all()
         
         # Add article count to categories
         for category in categories:

@@ -1183,7 +1183,7 @@ class HelpArticle(db.Model):
     
     # Relationships
     category = db.relationship('HelpCategory', backref='articles')
-    author = db.relationship('User', backref='help_articles')
+    created_by_user = db.relationship('User', foreign_keys=[created_by], backref='help_articles')
     organization = db.relationship('Organization', foreign_keys=[organization_id])
     
     def generate_slug(self):
