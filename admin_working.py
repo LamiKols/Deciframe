@@ -507,19 +507,30 @@ def init_admin_routes(app):
     def admin_workflows_fixed():
         """Fixed workflow templates management that bypasses transaction issues"""
         try:
+            # Clear any existing transaction errors
+            db.session.rollback()
+            
             # Get workflows for current organization
             workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
             
             # Get library workflows
             library_workflows = WorkflowLibrary.query.all()
             
-            print(f"🔧 Loaded {len(workflows)} workflows and {len(library_workflows)} library workflows")
+            print(f"🔧 Loaded {len(workflows)} workflows for org {current_user.organization_id}")
+            print(f"🔧 Loaded {len(library_workflows)} library workflows")
+            print(f"🔧 User: {current_user.email}, Org: {current_user.organization_id}")
+            
+            # Debug: print workflow details
+            for wf in workflows:
+                print(f"🔧 Workflow: {wf.name} (Active: {wf.is_active})")
             
             return render_template('admin/workflows_fixed.html', 
                                  workflows=workflows, 
                                  library_workflows=library_workflows)
         except Exception as e:
             print(f"🔧 Error loading workflows: {str(e)}")
+            import traceback
+            traceback.print_exc()
             # Return empty lists if there's an error
             return render_template('admin/workflows_fixed.html', workflows=[], library_workflows=[])
 
