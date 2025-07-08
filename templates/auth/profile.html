@@ -25,7 +25,7 @@
                         <div class="col profile-info">
                             <h5 class="mb-1" style="color: var(--bs-body-color) !important;">{{ current_user.name }}</h5>
                             <p class="mb-1" style="color: var(--bs-body-color) !important;">{{ current_user.role.value if current_user.role else 'No Role' }}</p>
-                            <p class="mb-1" style="color: var(--bs-body-color) !important;">{{ current_user.department.name if current_user.department else 'No Department' }}</p>
+                            <p class="mb-1" style="color: var(--bs-body-color) !important;">{{ current_user.org_unit.name if current_user.org_unit else 'No Department' }}</p>
                             <small style="color: var(--bs-body-color) !important;">
                                 <i class="bi bi-calendar3 me-1"></i>
                                 Member since {{ current_user.created_at.strftime('%B %Y') if current_user.created_at else 'Unknown' }}
@@ -77,11 +77,11 @@
                         </div>
                         
                         <div class="col-md-6 mb-3">
-                            {{ form.department_id.label(class="form-label") }}
-                            {{ form.department_id(class="form-select" + (" is-invalid" if form.department_id.errors else "")) }}
-                            {% if form.department_id.errors %}
+                            {{ form.org_unit_id.label(class="form-label") }}
+                            {{ form.org_unit_id(class="form-select" + (" is-invalid" if form.org_unit_id.errors else "")) }}
+                            {% if form.org_unit_id.errors %}
                                 <div class="invalid-feedback">
-                                    {% for error in form.department_id.errors %}
+                                    {% for error in form.org_unit_id.errors %}
                                         <div>{{ error }}</div>
                                     {% endfor %}
                                 </div>

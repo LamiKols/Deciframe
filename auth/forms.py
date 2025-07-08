@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
-from models import User, RoleEnum, Department
+from models import User, RoleEnum, Department, OrgUnit
 from flask_login import current_user
 from utils.email_validation import validate_business_email, is_new_organization_domain, extract_domain
 import pytz
@@ -166,7 +166,7 @@ class ProfileForm(FlaskForm):
                           (RoleEnum.CEO.value, RoleEnum.CEO.value)
                           # Admin role excluded from profile changes for security
                       ])
-    department_id = SelectField('Department', validators=[DataRequired()], coerce=int)
+    org_unit_id = SelectField('Department', validators=[DataRequired()], coerce=int)
     reports_to = SelectField('Reports To', coerce=int, validators=[])
     timezone = SelectField('Timezone', validators=[], choices=[])
     theme = SelectField('Theme Preference', validators=[], 
@@ -184,25 +184,20 @@ class ProfileForm(FlaskForm):
         try:
             if current_user.is_authenticated and hasattr(current_user, 'organization_id') and current_user.organization_id:
                 from app import db
-                from models import User, Department
+                from models import User, Department, OrgUnit
                 org_id = current_user.organization_id
-                # Get departments used by users in the same organization
-                dept_ids_in_org = db.session.query(User.dept_id).filter(
-                    User.organization_id == org_id,
-                    User.dept_id.isnot(None)
-                ).distinct().all()
-                dept_ids = [dept_id[0] for dept_id in dept_ids_in_org]
-                departments = Department.query.filter(Department.id.in_(dept_ids)).all() if dept_ids else []
-                self.department_id.choices = [(0, 'Select Department')] + [(d.id, d.name) for d in departments]
+                # Get organizational units from the same organization
+                org_units = OrgUnit.query.filter_by(organization_id=org_id).all()
+                self.org_unit_id.choices = [(0, 'Select Department')] + [(d.id, d.name) for d in org_units]
                 self.reports_to.choices = [(0, 'No Manager')] + [(u.id, u.name) for u in User.query.filter_by(organization_id=org_id).all()]
             else:
                 # For unauthenticated users or users without org, show empty lists
-                self.department_id.choices = [(0, 'Select Department')]
+                self.org_unit_id.choices = [(0, 'Select Department')]
                 self.reports_to.choices = [(0, 'No Manager')]
         except Exception as e:
             # Fallback in case of any database errors
             print(f"ProfileForm initialization error: {e}")
-            self.department_id.choices = [(0, 'Select Department')]
+            self.org_unit_id.choices = [(0, 'Select Department')]
             self.reports_to.choices = [(0, 'No Manager')]
         
         # Populate timezone choices

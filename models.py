@@ -126,7 +126,7 @@ class User(UserMixin, db.Model):
     # Multi-tenant organization assignment
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     
-    dept_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    org_unit_id = db.Column(db.Integer, db.ForeignKey('org_units.id'), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     department_status = db.Column(db.String(20), default='assigned')  # assigned, pending, requested
     
@@ -151,7 +151,7 @@ class User(UserMixin, db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    department = db.relationship('Department', backref='users')
+    org_unit = db.relationship('OrgUnit', foreign_keys=[org_unit_id], backref='users')
     
     def set_password(self, password):
         """Set password hash"""
@@ -176,16 +176,16 @@ class User(UserMixin, db.Model):
     @property
     def can_create_content(self):
         """Check if user can create problems, business cases, projects"""
-        return self.dept_id is not None and self.department_status == 'assigned'
+        return self.org_unit_id is not None and self.department_status == 'assigned'
     
     def set_pending_department(self):
         """Set user to pending department status"""
         self.department_status = 'pending'
-        self.dept_id = None
+        self.org_unit_id = None
     
-    def assign_department(self, dept_id):
-        """Assign department and activate user"""
-        self.dept_id = dept_id
+    def assign_department(self, org_unit_id):
+        """Assign organizational unit and activate user"""
+        self.org_unit_id = org_unit_id
         self.department_status = 'assigned'
     
     def get_effective_timezone(self):
