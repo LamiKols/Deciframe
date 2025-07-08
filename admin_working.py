@@ -175,9 +175,9 @@ def init_admin_routes(app):
         
         # Department scoping for non-Admin users (Directors can only manage their department hierarchy)
         if current_user.role.value != 'Admin':
-            if current_user.dept_id:
-                allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
-                query = query.filter(User.dept_id.in_(allowed_dept_ids))
+            if current_user.org_unit_id:
+                allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
+                query = query.filter(User.org_unit_id.in_(allowed_dept_ids))
         
         if search:
             query = query.filter(db.or_(
@@ -195,17 +195,17 @@ def init_admin_routes(app):
         
         # Also scope departments dropdown for non-Admin users
         # Note: Department model doesn't have organization_id, so we filter by users in the organization
-        if current_user.role.value != 'Admin' and current_user.dept_id:
-            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
-            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
+        if current_user.role.value != 'Admin' and current_user.org_unit_id:
+            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
+            departments = OrgUnit.query.filter(OrgUnit.id.in_(allowed_dept_ids)).all()
         else:
             # Get all departments, but only those used by users in this organization
-            dept_ids_in_org = db.session.query(User.dept_id).filter(
+            dept_ids_in_org = db.session.query(User.org_unit_id).filter(
                 User.organization_id == current_user.organization_id,
-                User.dept_id.isnot(None)
+                User.org_unit_id.isnot(None)
             ).distinct().all()
             dept_ids = [dept_id[0] for dept_id in dept_ids_in_org]
-            departments = Department.query.filter(Department.id.in_(dept_ids)).all() if dept_ids else []
+            departments = OrgUnit.query.filter(OrgUnit.id.in_(dept_ids)).all() if dept_ids else []
         
         return render_template('admin/users.html', 
                              users=users, 
@@ -246,13 +246,13 @@ def init_admin_routes(app):
                     
                     # Department access validation for non-Admin users
                     if current_user.role.value != 'Admin':
-                        if current_user.dept_id:
-                            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
+                        if current_user.org_unit_id:
+                            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
                             if dept_id not in allowed_dept_ids:
                                 flash('You can only create users in your department hierarchy', 'error')
                                 return redirect(url_for('admin_create_user'))
                     
-                    user.dept_id = dept_id
+                    user.org_unit_id = dept_id
                     
                 db.session.add(user)
                 db.session.commit()
@@ -261,11 +261,11 @@ def init_admin_routes(app):
                 return redirect(url_for('admin_users'))
         
         # Scope departments for non-Admin users
-        if current_user.role.value != 'Admin' and current_user.dept_id:
-            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
-            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
+        if current_user.role.value != 'Admin' and current_user.org_unit_id:
+            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
+            departments = OrgUnit.query.filter(OrgUnit.id.in_(allowed_dept_ids)).all()
         else:
-            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
+            departments = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
         roles = list(RoleEnum)
         return render_template('admin/user_form.html', 
                              departments=departments, 
@@ -280,9 +280,9 @@ def init_admin_routes(app):
         
         # Department access validation for non-Admin users
         if current_user.role.value != 'Admin':
-            if current_user.dept_id and user.dept_id:
-                allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
-                if user.dept_id not in allowed_dept_ids:
+            if current_user.org_unit_id and user.org_unit_id:
+                allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
+                if user.org_unit_id not in allowed_dept_ids:
                     flash('You can only edit users in your department hierarchy', 'error')
                     return redirect(url_for('admin_users'))
         
@@ -298,15 +298,15 @@ def init_admin_routes(app):
                 
                 # Department access validation for non-Admin users
                 if current_user.role.value != 'Admin':
-                    if current_user.dept_id:
-                        allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
+                    if current_user.org_unit_id:
+                        allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
                         if dept_id not in allowed_dept_ids:
                             flash('You can only assign users to departments in your hierarchy', 'error')
                             return redirect(url_for('admin_edit_user', id=id))
                 
-                user.dept_id = dept_id
+                user.org_unit_id = dept_id
             else:
-                user.dept_id = None
+                user.org_unit_id = None
             
             db.session.commit()
             log_action('UPDATE_USER', f'Updated user {user.email}')
@@ -314,11 +314,11 @@ def init_admin_routes(app):
             return redirect(url_for('admin_users'))
         
         # Scope departments for non-Admin users
-        if current_user.role.value != 'Admin' and current_user.dept_id:
-            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
-            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
+        if current_user.role.value != 'Admin' and current_user.org_unit_id:
+            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
+            departments = OrgUnit.query.filter(OrgUnit.id.in_(allowed_dept_ids)).all()
         else:
-            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
+            departments = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
         roles = list(RoleEnum)
         
         # Create proper form with user data
@@ -332,7 +332,7 @@ def init_admin_routes(app):
             form.name.data = user.name
             form.email.data = user.email
             form.role.data = user.role.name if user.role else ''
-            form.department.data = user.dept_id
+            form.department.data = user.org_unit_id
             form.is_active.data = user.is_active
         
         return render_template('admin/user_form.html', 
