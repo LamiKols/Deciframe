@@ -38,130 +38,104 @@
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
                 
-                <!-- Employee Onboarding -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Employee Onboarding</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Complete new employee onboarding process with IT setup, training, and documentation</p>
+                <!-- Problem-to-Business Case Workflow -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545;">
+                    <h6 style="color: white; margin-bottom: 8px;">Problem-to-Business Case Workflow</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Complete workflow from problem identification to business case creation with triage rules</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">HR</span>
-                        <button onclick="importTemplate('Employee Onboarding')" 
+                        <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Problems</span>
+                        <button onclick="importTemplate('Problem-to-Business Case Workflow')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>
                     </div>
                 </div>
 
-                <!-- IT Support Escalation -->
+                <!-- Business Case Review & Approval -->
                 <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">IT Support Escalation</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Multi-level IT support ticket escalation workflow</p>
+                    <h6 style="color: white; margin-bottom: 8px;">Business Case Review & Approval</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Multi-stage business case review process with BA assignment and ROI validation</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">IT</span>
-                        <button onclick="importTemplate('IT Support Escalation')" 
+                        <span style="background: #0d6efd; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Business</span>
+                        <button onclick="importTemplate('Business Case Review & Approval')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>
                     </div>
                 </div>
 
-                <!-- Purchase Request Approval -->
+                <!-- Epic & Story Management -->
                 <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Purchase Request Approval</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Complete purchase request approval process with budget checks</p>
+                    <h6 style="color: white; margin-bottom: 8px;">Epic & Story Management</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">AI-powered epic creation and user story breakdown with requirements generation</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Finance</span>
-                        <button onclick="importTemplate('Purchase Request Approval')" 
+                        <span style="background: #0d6efd; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Business</span>
+                        <button onclick="importTemplate('Epic & Story Management')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>
                     </div>
                 </div>
 
-                <!-- Quality Assurance Review -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Quality Assurance Review</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Comprehensive quality assurance workflow for deliverables</p>
+                <!-- Business Case to Project Conversion -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #28a745;">
+                    <h6 style="color: white; margin-bottom: 8px;">Business Case to Project Conversion</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Automated conversion from approved business cases to project management with milestone creation</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Quality</span>
-                        <button onclick="importTemplate('Quality Assurance Review')" 
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Projects</span>
+                        <button onclick="importTemplate('Business Case to Project Conversion')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>
                     </div>
                 </div>
 
-                <!-- Customer Issue Resolution -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Customer Issue Resolution</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Customer service issue resolution with escalation paths</p>
+                <!-- Project Review & Milestone Tracking -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #28a745;">
+                    <h6 style="color: white; margin-bottom: 8px;">Project Review & Milestone Tracking</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Project milestone monitoring with automated notifications and success prediction</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Customer Service</span>
-                        <button onclick="importTemplate('Customer Issue Resolution')" 
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Projects</span>
+                        <button onclick="importTemplate('Project Review & Milestone Tracking')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>
                     </div>
                 </div>
 
-                <!-- Marketing Campaign Launch -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Marketing Campaign Launch</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Complete marketing campaign launch workflow</p>
+                <!-- Solution Recommendation Process -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #6f42c1;">
+                    <h6 style="color: white; margin-bottom: 8px;">Solution Recommendation Process</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">AI-powered solution recommendation engine with implementation workflow</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Marketing</span>
-                        <button onclick="importTemplate('Marketing Campaign Launch')" 
+                        <span style="background: #6f42c1; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Solutions</span>
+                        <button onclick="importTemplate('Solution Recommendation Process')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>
                     </div>
                 </div>
 
-                <!-- Security Incident Response -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Security Incident Response</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Comprehensive security incident response workflow</p>
+                <!-- Department Escalation Workflow -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #fd7e14;">
+                    <h6 style="color: white; margin-bottom: 8px;">Department Escalation Workflow</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Hierarchical department escalation with role-based routing and approval chains</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Security</span>
-                        <button onclick="importTemplate('Security Incident Response')" 
+                        <span style="background: #fd7e14; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Departments</span>
+                        <button onclick="importTemplate('Department Escalation Workflow')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>
                     </div>
                 </div>
 
-                <!-- Contract Review Process -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Contract Review Process</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Legal contract review and approval workflow</p>
+                <!-- Notification & Alert Management -->
+                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #20c997;">
+                    <h6 style="color: white; margin-bottom: 8px;">Notification & Alert Management</h6>
+                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Automated notification system with email integration and workflow triggers</p>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Legal</span>
-                        <button onclick="importTemplate('Contract Review Process')" 
-                               style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            Import
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Document Review Workflow -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Document Review Workflow</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Multi-stage document review and approval process</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Operations</span>
-                        <button onclick="importTemplate('Document Review Workflow')" 
-                               style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            Import
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Change Management Process -->
-                <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 8px;">Change Management Process</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">Comprehensive change management workflow for system updates</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Operations</span>
-                        <button onclick="importTemplate('Change Management Process')" 
+                        <span style="background: #20c997; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">Notifications</span>
+                        <button onclick="importTemplate('Notification & Alert Management')" 
                                style="background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
                             Import
                         </button>

@@ -648,72 +648,89 @@ def init_admin_routes(app):
         """Simple template import that creates a workflow from predefined templates"""
         template_name = request.form.get('template_name')
         
-        # Template definitions mapping
+        # DeciFrame-specific workflow template definitions
         template_definitions = {
-            'Employee Onboarding': {
-                'description': 'Complete new employee onboarding process with IT setup, training, and documentation',
+            'Problem-to-Business Case Workflow': {
+                'description': 'Complete workflow from problem identification to business case creation with triage rules',
                 'definition': {"steps": [
-                    {"id": "step1", "name": "Create IT Account", "type": "task", "assignee": "IT_admin", "duration": "1 day"},
-                    {"id": "step2", "name": "Equipment Setup", "type": "task", "assignee": "IT_admin", "duration": "2 hours"},
-                    {"id": "step3", "name": "HR Documentation", "type": "approval", "assignee": "HR_manager", "duration": "1 day"},
-                    {"id": "step4", "name": "Department Introduction", "type": "notification", "assignee": "department_manager", "duration": "30 minutes"},
-                    {"id": "step5", "name": "Training Schedule", "type": "task", "assignee": "training_coordinator", "duration": "3 days"}
+                    {"id": "step1", "name": "Problem Submission", "type": "task", "assignee": "Staff", "duration": "30 minutes", "module": "problems"},
+                    {"id": "step2", "name": "Auto-Classification", "type": "automated", "assignee": "AI_System", "duration": "immediate", "module": "ai"},
+                    {"id": "step3", "name": "Triage Review", "type": "approval", "assignee": "Manager", "duration": "2 days", "module": "problems"},
+                    {"id": "step4", "name": "Business Case Creation", "type": "task", "assignee": "BA", "duration": "3 days", "module": "business"},
+                    {"id": "step5", "name": "Initial ROI Analysis", "type": "task", "assignee": "BA", "duration": "1 day", "module": "business"}
                 ]}
             },
-            'IT Support Escalation': {
-                'description': 'Multi-level IT support ticket escalation workflow',
+            'Business Case Review & Approval': {
+                'description': 'Multi-stage business case review process with BA assignment and ROI validation',
                 'definition': {"steps": [
-                    {"id": "step1", "name": "Level 1 Support", "type": "task", "assignee": "support_agent", "duration": "2 hours"},
-                    {"id": "step2", "name": "Level 2 Escalation", "type": "conditional", "condition": "unresolved", "assignee": "senior_support", "duration": "4 hours"},
-                    {"id": "step3", "name": "Management Review", "type": "approval", "assignee": "IT_manager", "duration": "1 day"},
-                    {"id": "step4", "name": "External Vendor", "type": "task", "assignee": "vendor_coordinator", "duration": "3 days"}
+                    {"id": "step1", "name": "BA Assignment", "type": "assignment", "assignee": "Manager", "duration": "1 day", "module": "business"},
+                    {"id": "step2", "name": "Light Case Analysis", "type": "task", "assignee": "BA", "duration": "2 days", "module": "business"},
+                    {"id": "step3", "name": "Full Case Development", "type": "conditional", "condition": "ROI > $25k", "assignee": "BA", "duration": "5 days", "module": "business"},
+                    {"id": "step4", "name": "Director Review", "type": "approval", "assignee": "Director", "duration": "3 days", "module": "business"},
+                    {"id": "step5", "name": "CEO Approval", "type": "conditional", "condition": "budget > $100k", "assignee": "CEO", "duration": "2 days", "module": "business"}
                 ]}
             },
-            'Purchase Request Approval': {
-                'description': 'Complete purchase request approval process with budget checks',
+            'Epic & Story Management': {
+                'description': 'AI-powered epic creation and user story breakdown with requirements generation',
                 'definition': {"steps": [
-                    {"id": "step1", "name": "Budget Verification", "type": "task", "assignee": "finance_analyst", "duration": "1 day"},
-                    {"id": "step2", "name": "Department Approval", "type": "approval", "assignee": "department_manager", "duration": "2 days"},
-                    {"id": "step3", "name": "Finance Director Review", "type": "approval", "assignee": "finance_director", "duration": "1 day"},
-                    {"id": "step4", "name": "Procurement Processing", "type": "task", "assignee": "procurement_team", "duration": "3 days"}
+                    {"id": "step1", "name": "Epic Creation", "type": "task", "assignee": "BA", "duration": "2 days", "module": "business"},
+                    {"id": "step2", "name": "AI Story Generation", "type": "automated", "assignee": "AI_System", "duration": "30 minutes", "module": "ai"},
+                    {"id": "step3", "name": "Story Refinement", "type": "task", "assignee": "BA", "duration": "1 day", "module": "business"},
+                    {"id": "step4", "name": "Epic Sync Review", "type": "approval", "assignee": "PM", "duration": "1 day", "module": "business"},
+                    {"id": "step5", "name": "Requirements Export", "type": "automated", "assignee": "System", "duration": "immediate", "module": "business"}
                 ]}
             },
-            'Quality Assurance Review': {
-                'description': 'Comprehensive quality assurance workflow for deliverables',
+            'Business Case to Project Conversion': {
+                'description': 'Automated conversion from approved business cases to project management with milestone creation',
                 'definition': {"steps": [
-                    {"id": "step1", "name": "Initial QA Review", "type": "task", "assignee": "qa_analyst", "duration": "1 day"},
-                    {"id": "step2", "name": "Compliance Check", "type": "task", "assignee": "compliance_officer", "duration": "2 days"},
-                    {"id": "step3", "name": "Final QA Approval", "type": "approval", "assignee": "qa_manager", "duration": "1 day"},
-                    {"id": "step4", "name": "Stakeholder Notification", "type": "notification", "assignee": "stakeholder", "duration": "immediate"}
+                    {"id": "step1", "name": "Project Creation", "type": "automated", "assignee": "System", "duration": "immediate", "module": "projects"},
+                    {"id": "step2", "name": "PM Assignment", "type": "assignment", "assignee": "Director", "duration": "1 day", "module": "projects"},
+                    {"id": "step3", "name": "Milestone Planning", "type": "task", "assignee": "PM", "duration": "2 days", "module": "projects"},
+                    {"id": "step4", "name": "Resource Allocation", "type": "task", "assignee": "PM", "duration": "1 day", "module": "projects"},
+                    {"id": "step5", "name": "Project Kickoff", "type": "notification", "assignee": "PM", "duration": "1 day", "module": "projects"}
                 ]}
             },
-            'Customer Issue Resolution': {
-                'description': 'Customer service issue resolution with escalation paths',
+            'Project Review & Milestone Tracking': {
+                'description': 'Project milestone monitoring with automated notifications and success prediction',
                 'definition': {"steps": [
-                    {"id": "step1", "name": "Initial Response", "type": "task", "assignee": "customer_service", "duration": "2 hours"},
-                    {"id": "step2", "name": "Investigation", "type": "task", "assignee": "support_specialist", "duration": "1 day"},
-                    {"id": "step3", "name": "Solution Implementation", "type": "task", "assignee": "technical_team", "duration": "2 days"},
-                    {"id": "step4", "name": "Customer Feedback", "type": "task", "assignee": "customer_service", "duration": "1 day"},
-                    {"id": "step5", "name": "Case Closure", "type": "approval", "assignee": "service_manager", "duration": "1 day"}
+                    {"id": "step1", "name": "Milestone Check", "type": "automated", "assignee": "System", "duration": "daily", "module": "projects"},
+                    {"id": "step2", "name": "Success Prediction", "type": "automated", "assignee": "ML_System", "duration": "immediate", "module": "predict"},
+                    {"id": "step3", "name": "Risk Assessment", "type": "task", "assignee": "PM", "duration": "1 day", "module": "projects"},
+                    {"id": "step4", "name": "Stakeholder Updates", "type": "notification", "assignee": "PM", "duration": "immediate", "module": "notifications"},
+                    {"id": "step5", "name": "Course Correction", "type": "conditional", "condition": "risk_high", "assignee": "PM", "duration": "2 days", "module": "projects"}
+                ]}
+            },
+            'Solution Recommendation Process': {
+                'description': 'AI-powered solution recommendation engine with implementation workflow',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Problem Analysis", "type": "task", "assignee": "BA", "duration": "1 day", "module": "solutions"},
+                    {"id": "step2", "name": "AI Recommendation", "type": "automated", "assignee": "AI_System", "duration": "immediate", "module": "solutions"},
+                    {"id": "step3", "name": "Solution Evaluation", "type": "task", "assignee": "BA", "duration": "2 days", "module": "solutions"},
+                    {"id": "step4", "name": "Implementation Planning", "type": "task", "assignee": "PM", "duration": "3 days", "module": "solutions"},
+                    {"id": "step5", "name": "Solution Handoff", "type": "approval", "assignee": "Director", "duration": "1 day", "module": "solutions"}
+                ]}
+            },
+            'Department Escalation Workflow': {
+                'description': 'Hierarchical department escalation with role-based routing and approval chains',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Initial Assignment", "type": "automated", "assignee": "System", "duration": "immediate", "module": "dept"},
+                    {"id": "step2", "name": "Department Review", "type": "task", "assignee": "Manager", "duration": "2 days", "module": "dept"},
+                    {"id": "step3", "name": "Escalation Check", "type": "conditional", "condition": "unresolved", "assignee": "System", "duration": "immediate", "module": "dept"},
+                    {"id": "step4", "name": "Senior Management", "type": "approval", "assignee": "Director", "duration": "1 day", "module": "dept"},
+                    {"id": "step5", "name": "Executive Review", "type": "conditional", "condition": "critical", "assignee": "CEO", "duration": "immediate", "module": "dept"}
+                ]}
+            },
+            'Notification & Alert Management': {
+                'description': 'Automated notification system with email integration and workflow triggers',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Event Detection", "type": "automated", "assignee": "System", "duration": "immediate", "module": "notifications"},
+                    {"id": "step2", "name": "Rule Evaluation", "type": "automated", "assignee": "System", "duration": "immediate", "module": "notifications"},
+                    {"id": "step3", "name": "Notification Routing", "type": "automated", "assignee": "System", "duration": "immediate", "module": "notifications"},
+                    {"id": "step4", "name": "Email Delivery", "type": "automated", "assignee": "SendGrid", "duration": "immediate", "module": "notifications"},
+                    {"id": "step5", "name": "Delivery Tracking", "type": "automated", "assignee": "System", "duration": "immediate", "module": "notifications"}
                 ]}
             }
         }
-        
-        # Add remaining templates with basic definitions
-        remaining_templates = [
-            'Marketing Campaign Launch', 'Security Incident Response', 
-            'Contract Review Process', 'Document Review Workflow', 'Change Management Process'
-        ]
-        
-        for template in remaining_templates:
-            template_definitions[template] = {
-                'description': f'{template} workflow template',
-                'definition': {"steps": [
-                    {"id": "step1", "name": "Initial Step", "type": "task", "assignee": "team_lead", "duration": "1 day"},
-                    {"id": "step2", "name": "Review Step", "type": "approval", "assignee": "manager", "duration": "1 day"},
-                    {"id": "step3", "name": "Final Step", "type": "task", "assignee": "executor", "duration": "1 day"}
-                ]}
-            }
         
         if template_name in template_definitions:
             try:
