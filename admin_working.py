@@ -282,6 +282,13 @@ def init_admin_routes(app):
         else:
             departments = Department.query.all()
         roles = list(RoleEnum)
+        
+        # Create a mock form object for template compatibility
+        class MockForm:
+            def hidden_tag(self):
+                return ''
+        
+        form = MockForm()
         return render_template('admin/user_form.html', 
                              form=form,
                              user=user, 
