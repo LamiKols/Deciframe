@@ -10,7 +10,7 @@
                 <h2 class="text-light">Workflow Management</h2>
                 <div id="actionButtons">
                     <!-- Library Actions -->
-                    <div id="import-actions">
+                    <div id="import-actions" style="display: none;">
                         <div class="d-flex align-items-center">
                             <small class="text-muted me-3">Browse and import proven workflow patterns</small>
                             <button type="button" class="btn btn-outline-info" onclick="refreshLibrary()">
@@ -20,7 +20,7 @@
                     </div>
                     
                     <!-- My Workflows Actions -->
-                    <div id="workflow-actions" style="display: none;">
+                    <div id="workflow-actions">
                         <div class="d-flex align-items-center">
                             <small class="text-muted me-3">Manage your workflow templates</small>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkflowModal">
@@ -34,18 +34,18 @@
             <!-- Tab Navigation -->
             <ul class="nav nav-tabs nav-fill mb-4" id="workflowTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" 
+                    <button class="nav-link" 
                             id="library-tab" data-bs-toggle="tab" data-bs-target="#library-pane" 
                             type="button" role="tab" onclick="updateActionButtons('library')"
-                            style="background-color: var(--bs-primary); color: white; border: 1px solid var(--bs-primary);">
+                            style="background-color: transparent; color: var(--bs-body-color); border: 1px solid var(--bs-border-color);">
                         <i class="fas fa-book me-2"></i>Library
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" 
+                    <button class="nav-link active" 
                             id="my-workflows-tab" data-bs-toggle="tab" data-bs-target="#my-workflows-pane" 
                             type="button" role="tab" onclick="updateActionButtons('my-workflows')"
-                            style="background-color: transparent; color: var(--bs-body-color); border: 1px solid var(--bs-border-color);">
+                            style="background-color: var(--bs-primary); color: white; border: 1px solid var(--bs-primary);">
                         <i class="fas fa-cogs me-2"></i>My Workflows
                     </button>
                 </li>
@@ -54,7 +54,7 @@
             <!-- Tab Content -->
             <div class="tab-content" id="workflowTabContent">
                 <!-- Library Tab -->
-                <div class="tab-pane fade show active" id="library-pane" role="tabpanel">
+                <div class="tab-pane fade" id="library-pane" role="tabpanel">
                     <div class="card bg-dark border-secondary">
                         <div class="card-header border-secondary">
                             <h5 class="text-light mb-0">Workflow Template Library</h5>
@@ -112,7 +112,7 @@
                 </div>
 
                 <!-- My Workflows Tab -->
-                <div class="tab-pane fade" id="my-workflows-pane" role="tabpanel">
+                <div class="tab-pane fade show active" id="my-workflows-pane" role="tabpanel">
                     <div class="card bg-dark border-secondary">
                         <div class="card-header border-secondary">
                             <h5 class="text-light mb-0">My Workflow Templates</h5>
@@ -998,28 +998,15 @@ function initializeEditModal(workflowId) {
 
 // Tab and search functionality
 function updateActionButtons(activeTab) {
-    const actionButtonsDiv = document.getElementById('actionButtons');
+    const importActions = document.getElementById('import-actions');
+    const workflowActions = document.getElementById('workflow-actions');
     
     if (activeTab === 'library') {
-        actionButtonsDiv.innerHTML = `
-            <div class="d-flex align-items-center">
-                <small class="text-muted me-3">Browse and import proven workflow patterns</small>
-                <button type="button" class="btn btn-outline-info" onclick="refreshLibrary()">
-                    <i class="fas fa-sync me-1"></i>Refresh
-                </button>
-            </div>
-        `;
+        if (importActions) importActions.style.display = 'block';
+        if (workflowActions) workflowActions.style.display = 'none';
     } else if (activeTab === 'my-workflows') {
-        actionButtonsDiv.innerHTML = `
-            <div>
-                <button type="button" class="btn btn-info me-2" onclick="switchToLibraryTab()">
-                    <i class="fas fa-download me-1"></i>Import from Library
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkflowModal">
-                    <i class="fas fa-plus me-1"></i>Create New Workflow
-                </button>
-            </div>
-        `;
+        if (importActions) importActions.style.display = 'none';
+        if (workflowActions) workflowActions.style.display = 'block';
     }
 }
 
