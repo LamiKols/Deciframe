@@ -121,7 +121,7 @@ def new_project():
             business_case_id=form.business_case_id.data if form.business_case_id.data > 0 else None,
             project_manager_id=form.project_manager_id.data,
             department_id=department_id,
-
+            organization_id=user.organization_id,  # Add organization_id for multi-tenant security
             created_by=user.id
         )
         

@@ -143,6 +143,7 @@ def create():
             status=StatusEnum[form.status.data],
             reported_by=user.id,
             created_by=user.id,
+            organization_id=user.organization_id,  # Add organization_id for multi-tenant security
             issue_type=issue_type,
             code=get_next_problem_code(),  # Generate code before insert
             ai_confidence=ai_confidence
