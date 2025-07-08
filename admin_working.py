@@ -795,6 +795,9 @@ def init_admin_routes(app):
         
         if request.method == 'POST':
             try:
+                # Update workflow active status
+                workflow.is_active = 'workflow_active' in request.form
+                
                 # Get or create configuration
                 config = WorkflowConfiguration.get_or_create_for_workflow(
                     current_user.organization_id,

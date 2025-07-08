@@ -143,6 +143,32 @@ html body .container-fluid .card .card-body .form-check:hover .form-check-input,
             <form method="POST" action="{{ url_for('configure_workflow', workflow_id=workflow.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
+                <!-- Workflow Status -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-power"></i> Workflow Status
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="workflow_active" 
+                                   name="workflow_active" {% if workflow.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="workflow_active">
+                                <strong>{% if workflow.is_active %}Active{% else %}Inactive{% endif %}</strong>
+                                - This workflow is {% if workflow.is_active %}currently processing requests{% else %}currently disabled{% endif %}
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            {% if workflow.is_active %}
+                                This workflow is active and will process business cases, problems, and projects according to its configuration.
+                            {% else %}
+                                This workflow is inactive and will not process any requests. Activate it to enable automated processing.
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                
                 <!-- Business Case Configuration -->
                 <div class="card mb-4">
                     <div class="card-header">
