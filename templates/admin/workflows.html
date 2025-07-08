@@ -1384,8 +1384,8 @@ function saveWorkflow(workflowId) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Set initial action buttons
-    updateActionButtons('library');
+    // Set initial action buttons to match active tab (My Workflows)
+    updateActionButtons('my-workflows');
     
     // Add tab change listeners
     const libraryTab = document.getElementById('library-tab');
