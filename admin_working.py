@@ -5,6 +5,7 @@ Working Admin Routes Implementation
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings
+from werkzeug.security import generate_password_hash
 from datetime import datetime
 from utils.date import format_datetime
 import os
@@ -283,12 +284,50 @@ def init_admin_routes(app):
             departments = Department.query.all()
         roles = list(RoleEnum)
         
-        # Create a mock form object for template compatibility
-        class MockForm:
-            def hidden_tag(self):
-                return ''
+        # Create a comprehensive mock form object for template compatibility
+        class MockFormField:
+            def __init__(self, data=None, label_text=""):
+                self.data = data
+                self._label_text = label_text
+            
+            def __call__(self, **kwargs):
+                field_type = kwargs.get('type', 'text')
+                field_class = kwargs.get('class', '')
+                value = self.data or ''
+                if field_type == 'checkbox':
+                    checked = 'checked' if self.data else ''
+                    return f'<input type="checkbox" class="{field_class}" {checked}>'
+                elif field_type == 'password':
+                    return f'<input type="password" class="{field_class}" value="">'
+                elif field_type == 'select':
+                    return f'<select class="{field_class}"><option value="">{value}</option></select>'
+                else:
+                    return f'<input type="text" class="{field_class}" value="{value}">'
+            
+            def label(self, **kwargs):
+                return f'<label class="{kwargs.get("class", "")}">{self._label_text}</label>'
         
-        form = MockForm()
+        class MockForm:
+            def __init__(self, user_data=None):
+                if user_data:
+                    self.name = MockFormField(user_data.name, "Full Name")
+                    self.email = MockFormField(user_data.email, "Email")
+                    self.role = MockFormField(user_data.role.value if user_data.role else '', "Role")
+                    self.department = MockFormField(user_data.dept_id, "Department")
+                    self.is_active = MockFormField(user_data.is_active, "Active")
+                else:
+                    self.name = MockFormField('', "Full Name")
+                    self.email = MockFormField('', "Email")
+                    self.role = MockFormField('', "Role")
+                    self.department = MockFormField('', "Department")
+                    self.is_active = MockFormField(True, "Active")
+                self.password = MockFormField('', "Password")
+                self.submit = MockFormField('Update User', "")
+            
+            def hidden_tag(self):
+                return '<input type="hidden" name="csrf_token" value="mock-token">'
+        
+        form = MockForm(user)
         return render_template('admin/user_form.html', 
                              form=form,
                              user=user, 
