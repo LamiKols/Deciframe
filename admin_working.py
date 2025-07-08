@@ -573,6 +573,50 @@ def init_admin_routes(app):
             flash(f'Error loading workflows: {str(e)}', 'error')
             return redirect(url_for('admin_dashboard'))
     
+    @app.route('/admin/workflows/import/<int:library_id>', methods=['POST'])
+    @login_required
+    @admin_required
+    def import_workflow_from_library(library_id):
+        """Import workflow from library and create customizable template"""
+        try:
+            # Get the library workflow
+            library_workflow = WorkflowLibrary.query.get_or_404(library_id)
+            
+            # Create a new workflow template based on the library workflow
+            imported_name = f"{library_workflow.name} (Imported)"
+            
+            # Check if this name already exists for this organization
+            counter = 1
+            base_name = imported_name
+            while WorkflowTemplate.query.filter_by(
+                name=imported_name, 
+                organization_id=current_user.organization_id
+            ).first():
+                counter += 1
+                imported_name = f"{base_name} ({counter})"
+            
+            new_workflow = WorkflowTemplate(
+                name=imported_name,
+                description=f"Imported from library: {library_workflow.description}",
+                definition=library_workflow.definition,  # Copy the JSON definition
+                organization_id=current_user.organization_id,
+                created_by=current_user.id,
+                is_active=True
+            )
+            
+            db.session.add(new_workflow)
+            db.session.commit()
+            
+            flash(f'Successfully imported workflow: {imported_name}', 'success')
+            print(f"🔧 Imported workflow '{imported_name}' from library for org {current_user.organization_id}")
+            
+        except Exception as e:
+            print(f"🔧 Error importing workflow: {str(e)}")
+            db.session.rollback()
+            flash(f'Error importing workflow: {str(e)}', 'error')
+        
+        return redirect(url_for('admin_workflows'))
+
     @app.route('/admin/workflows/<int:workflow_id>/toggle', methods=['POST'])
     @login_required
     @admin_required
@@ -641,33 +685,7 @@ def init_admin_routes(app):
             db.session.rollback()
             return jsonify({'success': False, 'error': f'Failed to delete workflow: {str(e)}'}), 500
 
-    @app.route('/admin/workflows/import/<int:library_id>', methods=['POST'])
-    @login_required
-    @admin_required
-    def import_workflow_from_library(library_id):
-        """Import workflow from library and return edit modal data"""
-        from models import WorkflowLibrary, WorkflowTemplate
-        
-        library_workflow = WorkflowLibrary.query.filter_by(id=library_id, organization_id=current_user.organization_id).first_or_404()
-        
-        # Get current user for created_by field
-        current_user = current_user
-        
-        # Create new workflow template from library
-        new_workflow = WorkflowTemplate(
-            name=f"My - {library_workflow.name}",
-            description=library_workflow.description,
-            definition=library_workflow.definition,
-            is_active=False,  # Start as inactive for user review
-            created_by=current_user.id if current_user else None
-        )
-        
-        db.session.add(new_workflow)
-        db.session.commit()
-        
-        log_action(f"Imported workflow from library: {library_workflow.name}")
-        
-        return redirect(url_for('admin_workflows'))
+
 
     # Bulk Data Import Routes - Add URL name for template reference
     @app.route('/admin/import-data', methods=['GET', 'POST'], endpoint='admin_import_data')
