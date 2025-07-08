@@ -71,11 +71,19 @@ def init_admin_routes(app):
             'total_pending': pending_epics + pending_cases + pending_projects
         }
         
+        # Create pending_metrics for template compatibility
+        pending_metrics = {
+            'pending_epics': pending_epics,
+            'pending_cases': pending_cases,
+            'pending_projects': pending_projects,
+            'total_pending': pending_epics + pending_cases + pending_projects
+        }
+        
         try:
             recent_logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(5).all()
         except:
             recent_logs = []
-        return render_template('admin/dashboard.html', stats=stats, recent_activity=recent_logs)
+        return render_template('admin/dashboard.html', stats=stats, pending_metrics=pending_metrics, recent_activity=recent_logs)
     
     @app.route('/admin/settings', methods=['GET', 'POST'])
     @login_required
