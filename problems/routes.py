@@ -26,7 +26,7 @@ def index():
     # Determine allowed departments
     if user.role.value == 'Admin':
         # Admin users can see problems from ALL departments regardless of their assigned department
-        allowed = [d.id for d in Department.query.with_entities(Department.id).all()]
+        allowed = [d.id for d in Department.query.filter_by(organization_id=current_user.organization_id).with_entities(Department.id).all()]
     else:
         # Non-admin users are restricted to their department hierarchy
         own = user.department  # may be None for users without dept assignment
@@ -34,8 +34,8 @@ def index():
             allowed = own.get_descendant_ids(include_self=True)
         else:
             # For users without department assignment (unassigned users)
-            # Show all departments to prevent access issues
-            allowed = [d.id for d in Department.query.with_entities(Department.id).all()]
+            # Show all departments in their organization
+            allowed = [d.id for d in Department.query.filter_by(organization_id=current_user.organization_id).with_entities(Department.id).all()]
     
     # Add extra departments if user has any
     if hasattr(user, 'extra_departments') and user.extra_departments:
@@ -48,7 +48,17 @@ def index():
         allowed = [sel]
     
     # Build query with department filtering
-    query = Problem.query.filter_by(organization_id=current_user.organization_id).filter(Problem.department_id.in_(allowed))
+    # Include problems with no department (NULL department_id) for admin users or when user has no department
+    base_query = Problem.query.filter_by(organization_id=current_user.organization_id)
+    
+    if user.role.value == 'Admin' or not user.dept_id:
+        # Admin users or users without department can see all problems including unassigned ones
+        query = base_query.filter(
+            (Problem.department_id.in_(allowed)) | (Problem.department_id.is_(None))
+        )
+    else:
+        # Regular users with department assignment see only their department's problems
+        query = base_query.filter(Problem.department_id.in_(allowed))
     
     # Text search on title and description
     if q:
@@ -74,8 +84,11 @@ def index():
     problems_list = pagination.items
     
     # Get departments for filter dropdown
-    # Get departments for filter dropdown (only user's allowed departments)
-    departments = Department.query.filter(Department.id.in_(allowed)).order_by(Department.name).all()
+    # Get departments for filter dropdown (only user's allowed departments within their organization)
+    if allowed:
+        departments = Department.query.filter(Department.id.in_(allowed)).filter_by(organization_id=current_user.organization_id).order_by(Department.name).all()
+    else:
+        departments = []
     
     return render_template('problems.html', 
                          problems=problems_list, 
