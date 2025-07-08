@@ -48,6 +48,12 @@ DeciFrame is a modular Flask application providing comprehensive problem and bus
 - **URGENT ACTION REQUIRED**: Complete auth/templates/ directory must be committed to GitHub
 - Template files confirmed present locally but missing from repository deployment
 
+⚠️ **GIT MERGE CONFLICT ENCOUNTERED - July 8, 2025**
+- **PUSH REJECTED**: Remote repository contains changes not in local copy
+- Error: "Updates were rejected because the remote contains work that you do not have locally"
+- **RESOLUTION REQUIRED**: Pull remote changes first, then push auth template fixes
+- Steps: git pull origin main → resolve conflicts → commit auth templates → git push origin main
+
 ### Core Business Modules Preparation - FULLY READY FOR UPLOAD ✅
 ✓ **Auth Module Fix Confirmed - July 7, 2025**
 - Git integration confirmed working: repository properly connected to https://github.com/LamiKols/Deciframe.git
