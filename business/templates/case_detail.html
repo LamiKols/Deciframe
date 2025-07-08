@@ -298,7 +298,7 @@
                                 <i class="fas fa-edit"></i> Edit Business Case
                             </a>
                             {% if user.role.value in ['Manager', 'Director', 'CEO', 'Admin'] and business_case.status.value != 'Approved' %}
-                                <form method="POST" action="{{ url_for('business.approve_case', id=business_case.id) }}" class="d-inline w-100 mb-2">
+                                <form method="POST" action="{{ url_for('business.approve_case', id=business_case.id) }}" class="mb-2">
                                     <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
                                     <button type="submit" class="btn btn-success w-100" onclick="return confirm('Approve this business case? This action will trigger project workflows.')">
                                         <i class="fas fa-check"></i> Approve Business Case
@@ -306,7 +306,7 @@
                                 </form>
                             {% endif %}
                             {% if business_case.case_depth.value == 'Light' and not business_case.full_case_requested %}
-                                <form method="POST" action="{{ url_for('business.request_full_case', id=business_case.id) }}" class="d-inline w-100 mb-2">
+                                <form method="POST" action="{{ url_for('business.request_full_case', id=business_case.id) }}" class="mb-2">
                                     <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
                                     <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Request full case elaboration? This will notify the assigned Business Analyst to complete additional sections.')">
                                         <i class="fas fa-file-plus"></i> Request Full Case
