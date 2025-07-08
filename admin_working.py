@@ -52,9 +52,9 @@ def init_admin_routes(app):
         
         # Calculate pending review counts
         try:
-            pending_epics = Epic.query.filter_by(status='Submitted').count()
-            pending_cases = BusinessCase.query.filter_by(status='Submitted').count()
-            pending_projects = Project.query.filter_by(status='Submitted').count()
+            pending_epics = Epic.query.filter_by(status='Submitted', organization_id=current_user.organization_id).count()
+            pending_cases = BusinessCase.query.filter_by(status='Submitted', organization_id=current_user.organization_id).count()
+            pending_projects = Project.query.filter_by(status='Submitted', organization_id=current_user.organization_id).count()
         except:
             pending_epics = 0
             pending_cases = 0
@@ -265,7 +265,7 @@ def init_admin_routes(app):
             allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
             departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
         else:
-            departments = Department.query.all()
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
         roles = list(RoleEnum)
         return render_template('admin/user_form.html', 
                              departments=departments, 
@@ -318,7 +318,7 @@ def init_admin_routes(app):
             allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
             departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
         else:
-            departments = Department.query.all()
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
         roles = list(RoleEnum)
         
         # Create proper form with user data
@@ -484,8 +484,8 @@ def init_admin_routes(app):
             
             return redirect(url_for('admin_workflows'))
         
-        workflows = WorkflowTemplate.query.all()
-        library_workflows = WorkflowLibrary.query.all()
+        workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
+        library_workflows = WorkflowLibrary.query.filter_by(organization_id=current_user.organization_id).all()
         log_action("Viewed workflow templates")
         return render_template('admin/workflows.html', workflows=workflows, library_workflows=library_workflows)
     
@@ -494,7 +494,7 @@ def init_admin_routes(app):
     @admin_required
     def toggle_workflow(workflow_id):
         """Toggle workflow template active status"""
-        workflow = WorkflowTemplate.query.get_or_404(workflow_id)
+        workflow = WorkflowTemplate.query.filter_by(id=workflow_id, organization_id=current_user.organization_id).first_or_404()
         workflow.is_active = not workflow.is_active
         db.session.commit()
         
@@ -508,7 +508,7 @@ def init_admin_routes(app):
     @admin_required
     def edit_workflow(workflow_id):
         """Edit existing workflow template"""
-        workflow = WorkflowTemplate.query.get_or_404(workflow_id)
+        workflow = WorkflowTemplate.query.filter_by(id=workflow_id, organization_id=current_user.organization_id).first_or_404()
         
         workflow.name = request.form.get('name')
         workflow.description = request.form.get('description')
@@ -530,7 +530,7 @@ def init_admin_routes(app):
     @admin_required
     def delete_workflow(workflow_id):
         """Delete workflow template"""
-        workflow = WorkflowTemplate.query.get_or_404(workflow_id)
+        workflow = WorkflowTemplate.query.filter_by(id=workflow_id, organization_id=current_user.organization_id).first_or_404()
         workflow_name = workflow.name
         
         db.session.delete(workflow)
@@ -546,7 +546,7 @@ def init_admin_routes(app):
         """Import workflow from library and return edit modal data"""
         from models import WorkflowLibrary, WorkflowTemplate
         
-        library_workflow = WorkflowLibrary.query.get_or_404(library_id)
+        library_workflow = WorkflowLibrary.query.filter_by(id=library_id, organization_id=current_user.organization_id).first_or_404()
         
         # Get current user for created_by field
         current_user = current_user
@@ -957,7 +957,7 @@ def init_admin_routes(app):
                             if current_user.dept_id:
                                 data['dept_id'] = current_user.dept_id
                             else:
-                                first_dept = Department.query.first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['dept_id'] = first_dept.id
                         
@@ -1018,7 +1018,7 @@ def init_admin_routes(app):
                             if current_user.dept_id:
                                 data['dept_id'] = current_user.dept_id
                             else:
-                                first_dept = Department.query.first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['dept_id'] = first_dept.id
                         
@@ -1078,7 +1078,7 @@ def init_admin_routes(app):
                                 data['department_id'] = current_user.dept_id
                             else:
                                 # Use first available department as fallback
-                                first_dept = Department.query.first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['department_id'] = first_dept.id
                                 else:
@@ -1134,7 +1134,7 @@ def init_admin_routes(app):
                             if current_user.dept_id:
                                 data['dept_id'] = current_user.dept_id
                             else:
-                                first_dept = Department.query.first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['dept_id'] = first_dept.id
                         
@@ -1169,7 +1169,7 @@ def init_admin_routes(app):
                                 data['department_id'] = current_user.dept_id
                             else:
                                 # Use first available department as fallback
-                                first_dept = Department.query.first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['department_id'] = first_dept.id
                                 # If no departments exist, leave as None (nullable field)
@@ -1278,7 +1278,7 @@ def init_admin_routes(app):
     @admin_required
     def import_from_library(library_id):
         """Import workflow from library and return edit modal data"""
-        library_workflow = WorkflowLibrary.query.get_or_404(library_id)
+        library_workflow = WorkflowLibrary.query.filter_by(id=library_id, organization_id=current_user.organization_id).first_or_404()
         
         # Create new workflow template from library
         new_workflow = WorkflowTemplate(
@@ -1322,13 +1322,13 @@ def init_admin_routes(app):
                                      libraries=libraries, 
                                      error="Please select a workflow to import.")
             
-            lib = WorkflowLibrary.query.get_or_404(lib_id)
+            lib = WorkflowLibrary.query.filter_by(id=lib_id, organization_id=current_user.organization_id).first_or_404()
             
             # Use custom name if provided, otherwise default naming
             workflow_name = custom_name if custom_name else f"My - {lib.name}"
             
             # Check for duplicate names
-            existing = WorkflowTemplate.query.filter_by(name=workflow_name).first()
+            existing = WorkflowTemplate.query.filter_by(name=workflow_name, organization_id=current_user.organization_id).first()
             if existing:
                 return render_template('admin/import_workflow.html', 
                                      libraries=libraries, 
@@ -2076,7 +2076,7 @@ def init_admin_routes(app):
                 return redirect(url_for('admin_create_help_category'))
             
             # Check for duplicate name
-            existing = HelpCategory.query.filter_by(name=name).first()
+            existing = HelpCategory.query.filter_by(name=name, organization_id=current_user.organization_id).first()
             if existing:
                 flash('Category name already exists', 'error')
                 return redirect(url_for('admin_create_help_category'))
@@ -2105,7 +2105,7 @@ def init_admin_routes(app):
     @admin_required
     def admin_edit_help_category(id):
         """Edit help category"""
-        category = HelpCategory.query.get_or_404(id)
+        category = HelpCategory.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
         
         if request.method == 'POST':
             name = request.form.get('name', '').strip()
@@ -2141,7 +2141,7 @@ def init_admin_routes(app):
     @admin_required
     def admin_delete_help_category(id):
         """Delete help category"""
-        category = HelpCategory.query.get_or_404(id)
+        category = HelpCategory.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
         
         # Check if category has articles
         if category.articles:
@@ -2217,7 +2217,7 @@ def init_admin_routes(app):
     @admin_required
     def admin_edit_help_article(id):
         """Edit help article"""
-        article = HelpArticle.query.get_or_404(id)
+        article = HelpArticle.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
         categories = HelpCategory.query.order_by(HelpCategory.sort_order, HelpCategory.name).all()
         
         if request.method == 'POST':
@@ -2342,7 +2342,7 @@ def init_admin_routes(app):
     @admin_required
     def admin_delete_help_article(id):
         """Delete help article"""
-        article = HelpArticle.query.get_or_404(id)
+        article = HelpArticle.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
         
         try:
             article_title = article.title
@@ -2454,7 +2454,7 @@ def init_admin_routes(app):
         from models import TriageRule
         
         try:
-            rule = TriageRule.query.get_or_404(rule_id)
+            rule = TriageRule.query.filter_by(id=rule_id, organization_id=current_user.organization_id).first_or_404()
             rule.active = not rule.active
             db.session.commit()
             
@@ -2476,7 +2476,7 @@ def init_admin_routes(app):
         from models import TriageRule
         
         try:
-            rule = TriageRule.query.get_or_404(rule_id)
+            rule = TriageRule.query.filter_by(id=rule_id, organization_id=current_user.organization_id).first_or_404()
             rule_name = rule.name
             db.session.delete(rule)
             db.session.commit()
@@ -2499,7 +2499,7 @@ def init_admin_routes(app):
         from services.triage_engine import test_rule
         
         try:
-            rule = TriageRule.query.get_or_404(rule_id)
+            rule = TriageRule.query.filter_by(id=rule_id, organization_id=current_user.organization_id).first_or_404()
             count, results = test_rule(rule)
             
             if isinstance(results, str):

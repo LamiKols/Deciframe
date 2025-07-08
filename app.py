@@ -594,6 +594,18 @@ def create_app():
     
     logging.info("✓ Application initialized successfully")
     
+    
+    @app.errorhandler(403)
+    def forbidden(error):
+        """Handle 403 Forbidden errors"""
+        from flask_login import current_user
+        
+        # Log security violation
+        if current_user.is_authenticated:
+            print(f"🚨 Security Alert: User {current_user.email} attempted unauthorized access")
+        
+        return render_template('errors/403.html'), 403
+    
     return app
 
 # Create app instance

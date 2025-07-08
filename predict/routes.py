@@ -401,7 +401,7 @@ def submit_feedback():
         # Find the original prediction if it exists
         existing_feedback = PredictionFeedback.query.filter_by(
             prediction_type=prediction_type,
-            entity_id=int(entity_id)
+            entity_id=int(entity_id, organization_id=current_user.organization_id)
         ).order_by(PredictionFeedback.feedback_date.desc()).first()
         
         if existing_feedback:

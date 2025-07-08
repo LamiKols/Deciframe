@@ -21,7 +21,7 @@ def compute_department_kpis(dept_id):
     open_problems = Problem.query.count()
     
     # Get ALL pending cases (organization-wide totals for KPI cards)
-    pending_cases = BusinessCase.query.filter_by(status=StatusEnum.Open).count()
+    pending_cases = BusinessCase.query.filter_by(status=StatusEnum.Open, organization_id=current_user.organization_id).count()
     
     # Get ALL active projects (organization-wide totals for KPI cards)
     active_projects = Project.query.filter(
@@ -58,19 +58,19 @@ def dashboard_home():
     
     # Show personal dashboard with user-specific data regardless of role
     # Get user's personal statistics
-    my_problems = Problem.query.filter_by(reported_by=current_user.id).count()
-    my_cases = BusinessCase.query.filter_by(created_by=current_user.id).count()
-    my_projects = Project.query.filter_by(created_by=current_user.id).count()
+    my_problems = Problem.query.filter_by(reported_by=current_user.id, organization_id=current_user.organization_id).count()
+    my_cases = BusinessCase.query.filter_by(created_by=current_user.id, organization_id=current_user.organization_id).count()
+    my_projects = Project.query.filter_by(created_by=current_user.id, organization_id=current_user.organization_id).count()
     
     # Get recent items for this user
-    recent_problems = Problem.query.filter_by(reported_by=current_user.id)\
+    recent_problems = Problem.query.filter_by(reported_by=current_user.id, organization_id=current_user.organization_id)\
         .order_by(desc(Problem.created_at)).limit(5).all()
-    recent_cases = BusinessCase.query.filter_by(created_by=current_user.id)\
+    recent_cases = BusinessCase.query.filter_by(created_by=current_user.id, organization_id=current_user.organization_id)\
         .order_by(desc(BusinessCase.created_at)).limit(5).all()
     
     # Get tasks based on role
     if role in ['director', 'ceo', 'admin']:
-        pending_approvals = BusinessCase.query.filter_by(status=StatusEnum.Open).count()
+        pending_approvals = BusinessCase.query.filter_by(status=StatusEnum.Open, organization_id=current_user.organization_id).count()
     else:
         pending_approvals = 0
     
@@ -87,11 +87,11 @@ def dashboard_home():
 @login_required
 def staff_dashboard():
     """Staff dashboard - shows user's own problems and cases"""
-    problems = Problem.query.filter_by(reported_by=current_user.id)\
+    problems = Problem.query.filter_by(reported_by=current_user.id, organization_id=current_user.organization_id)\
         .order_by(desc(Problem.created_at)).limit(10).all()
     
     # Cases where user is creator
-    cases = BusinessCase.query.filter_by(created_by=current_user.id)\
+    cases = BusinessCase.query.filter_by(created_by=current_user.id, organization_id=current_user.organization_id)\
         .order_by(desc(BusinessCase.created_at)).limit(10).all()
     
     return render_template('dashboards/staff.html', 
@@ -106,11 +106,11 @@ def manager_dashboard():
     dept_id = current_user.dept_id
     
     # Department problems by priority
-    problems = Problem.query.filter_by(department_id=dept_id)\
+    problems = Problem.query.filter_by(department_id=dept_id, organization_id=current_user.organization_id)\
         .order_by(desc(Problem.priority)).limit(10).all()
     
     # Pending cases in department
-    cases = BusinessCase.query.filter_by(dept_id=dept_id, status=StatusEnum.Open)\
+    cases = BusinessCase.query.filter_by(dept_id=dept_id, status=StatusEnum.Open, organization_id=current_user.organization_id)\
         .order_by(desc(BusinessCase.created_at)).all()
     
     # Department KPIs
@@ -127,14 +127,14 @@ def manager_dashboard():
 def ba_dashboard():
     """Business Analyst dashboard - shows assigned cases and requirements"""
     # Cases assigned to this BA
-    assigned_cases = BusinessCase.query.filter_by(assigned_ba=current_user.id)\
+    assigned_cases = BusinessCase.query.filter_by(assigned_ba=current_user.id, organization_id=current_user.organization_id)\
         .order_by(desc(BusinessCase.created_at)).all()
     
     # Cases without epics (pending requirements)
     needs_requirements = [case for case in assigned_cases if not case.epics]
     
     # Recent cases across all departments for awareness
-    recent_cases = BusinessCase.query.filter_by(status=StatusEnum.Open)\
+    recent_cases = BusinessCase.query.filter_by(status=StatusEnum.Open, organization_id=current_user.organization_id)\
         .order_by(desc(BusinessCase.created_at)).limit(5).all()
     
     # Calculate statistics for BA dashboard
@@ -166,7 +166,7 @@ def ba_dashboard():
 def pm_dashboard():
     """Project Manager dashboard - shows active projects and milestones"""
     # Projects managed by this PM
-    projects = Project.query.filter_by(project_manager_id=current_user.id)\
+    projects = Project.query.filter_by(project_manager_id=current_user.id, organization_id=current_user.organization_id)\
         .order_by(desc(Project.created_at)).all()
     
     # Upcoming milestones using helper function
@@ -200,7 +200,7 @@ def director_dashboard():
     kpis = compute_department_kpis(dept_id)
     
     # Cases awaiting approval in department
-    cases = BusinessCase.query.filter_by(dept_id=dept_id, status=StatusEnum.Open)\
+    cases = BusinessCase.query.filter_by(dept_id=dept_id, status=StatusEnum.Open, organization_id=current_user.organization_id)\
         .order_by(desc(BusinessCase.created_at)).all()
     
     # High priority problems across department
@@ -208,7 +208,7 @@ def director_dashboard():
         department_id=dept_id, 
         priority=PriorityEnum.High,
         status=StatusEnum.Open
-    ).order_by(desc(Problem.created_at)).all()
+    , organization_id=current_user.organization_id).order_by(desc(Problem.created_at)).all()
     
     # Portfolio metrics for department projects
     portfolio = {
@@ -284,9 +284,9 @@ def exec_dashboard():
         
         # Try to count department-related items, fallback to 0 if no relationship
         try:
-            dept_problems = Problem.query.filter_by(department_id=dept.id).count() if hasattr(Problem, 'department_id') else 0
-            dept_cases = BusinessCase.query.filter_by(department_id=dept.id).count() if hasattr(BusinessCase, 'department_id') else 0
-            dept_projects = Project.query.filter_by(department_id=dept.id).count() if hasattr(Project, 'department_id') else 0
+            dept_problems = Problem.query.filter_by(department_id=dept.id, organization_id=current_user.organization_id).count() if hasattr(Problem, 'department_id') else 0
+            dept_cases = BusinessCase.query.filter_by(department_id=dept.id, organization_id=current_user.organization_id).count() if hasattr(BusinessCase, 'department_id') else 0
+            dept_projects = Project.query.filter_by(department_id=dept.id, organization_id=current_user.organization_id).count() if hasattr(Project, 'department_id') else 0
         except:
             pass  # Default to 0 counts
         
@@ -343,23 +343,23 @@ def executive_dashboard():
         if current_user.role.value == "Director":
             dept_id = current_user.dept_id
             if dept_id:
-                cases = BusinessCase.query.filter_by(dept_id=dept_id)
-                projects = Project.query.filter_by(dept_id=dept_id)
-                departments = Department.query.filter_by(id=dept_id).all()
+                cases = BusinessCase.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
+                projects = Project.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
+                departments = Department.query.filter_by(id=dept_id, organization_id=current_user.organization_id).all()
             else:
                 # Fallback if no department assigned
                 cases = BusinessCase.query
                 projects = Project.query
-                departments = Department.query.all()
+                departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
         else:
             cases = BusinessCase.query
             projects = Project.query
-            departments = Department.query.all()
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
 
         case_stats = []
         for dept in departments:
             try:
-                dept_cases = BusinessCase.query.filter_by(dept_id=dept.id)
+                dept_cases = BusinessCase.query.filter_by(dept_id=dept.id, organization_id=current_user.organization_id)
                 total_count = dept_cases.count()
                 approved_count = dept_cases.filter_by(status="Approved").count()
                 rejected_count = dept_cases.filter_by(status="Rejected").count()
@@ -379,8 +379,8 @@ def executive_dashboard():
     except Exception as e:
         # Fallback to empty data if database queries fail
         print(f"Database error in executive dashboard: {str(e)}")
-        cases = BusinessCase.query.filter_by(id=-1)  # Empty query
-        projects = Project.query.filter_by(id=-1)  # Empty query
+        cases = BusinessCase.query.filter_by(id=-1, organization_id=current_user.organization_id)  # Empty query
+        projects = Project.query.filter_by(id=-1, organization_id=current_user.organization_id)  # Empty query
         case_stats = []
 
     # Calculate metrics with error handling
@@ -395,7 +395,7 @@ def executive_dashboard():
         project_count = 0
         
     try:
-        problem_count = Problem.query.filter_by(status="Open").count()
+        problem_count = Problem.query.filter_by(status="Open", organization_id=current_user.organization_id).count()
     except:
         problem_count = 0
         
@@ -442,17 +442,17 @@ def export_exec_dashboard():
     # Fetch metrics (reusing logic from executive_dashboard)
     if current_user.role.value == "Director":
         dept_id = current_user.dept_id
-        cases = BusinessCase.query.filter_by(dept_id=dept_id)
-        projects = Project.query.filter_by(dept_id=dept_id)
-        departments = Department.query.filter_by(id=dept_id).all()
+        cases = BusinessCase.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
+        projects = Project.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
+        departments = Department.query.filter_by(id=dept_id, organization_id=current_user.organization_id).all()
     else:
         cases = BusinessCase.query
         projects = Project.query
-        departments = Department.query.all()
+        departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
 
     case_stats = []
     for dept in departments:
-        dept_cases = BusinessCase.query.filter_by(dept_id=dept.id)
+        dept_cases = BusinessCase.query.filter_by(dept_id=dept.id, organization_id=current_user.organization_id)
         case_stats.append({
             "name": dept.name,
             "total": dept_cases.count(),
@@ -465,7 +465,7 @@ def export_exec_dashboard():
     html = render_template("dashboards/executive_dashboard_pdf.html",
         case_count=cases.count(),
         project_count=projects.count(),
-        problem_count=Problem.query.filter_by(status="Open").count(),
+        problem_count=Problem.query.filter_by(status="Open", organization_id=current_user.organization_id).count(),
         total_budget=sum([p.budget or 0 for p in projects]),
         case_stats=case_stats,
         projects=projects.all(),

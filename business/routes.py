@@ -14,7 +14,7 @@ business_bp = Blueprint('business', __name__, template_folder='templates')
 def sync_epics_to_project(business_case_id, project_id):
     """Auto-link all epics in a business case to the project when case is approved"""
     try:
-        epics = Epic.query.filter_by(case_id=business_case_id, project_id=None).all()
+        epics = Epic.query.filter_by(case_id=business_case_id, project_id=None, organization_id=current_user.organization_id).all()
         linked_count = 0
         
         for epic in epics:
@@ -40,7 +40,7 @@ def new_case():
     
     form = BusinessCaseForm()
     # Populate problem choices including the specific problem if solution context exists
-    problems = Problem.query.all()  # Include all problems, not just open ones
+    problems = Problem.query.filter_by(organization_id=current_user.organization_id).all()  # Include all problems, not just open ones
     form.problem.choices = [(p.id, f"{p.code} – {p.title}") for p in problems]
     
 
@@ -262,15 +262,15 @@ def view_case(id):
     business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Load associated epics and stories
-    epics = Epic.query.filter_by(case_id=id).all()
+    epics = Epic.query.filter_by(case_id=id, organization_id=current_user.organization_id).all()
     for epic in epics:
-        epic.stories = Story.query.filter_by(epic_id=epic.id).all()
+        epic.stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
     
     # Check for linked project from business case approval
     linked_project = None
     if business_case.status == StatusEnum.Resolved:
         from models import Project
-        linked_project = Project.query.filter_by(business_case_id=id).first()
+        linked_project = Project.query.filter_by(business_case_id=id, organization_id=current_user.organization_id).first()
     
     # Check if user can assign BAs (Manager, Director, CEO, Admin)
     can_assign = user.role.value in ['Manager', 'Director', 'CEO', 'Admin']
@@ -376,7 +376,7 @@ def approve_case(id):
         project.code = f"PRJ{project.id:04d}"
         
         # 2) Link existing Epics & Stories to project
-        epics = Epic.query.filter_by(case_id=business_case.id).all()
+        epics = Epic.query.filter_by(case_id=business_case.id, organization_id=current_user.organization_id).all()
         for epic in epics:
             epic.project_id = project.id
             
@@ -449,7 +449,7 @@ def edit_case(id):
     """Edit an existing business case"""
     business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     form = BusinessCaseForm(obj=business_case)
-    form.problem.choices = [(p.id, f"{p.code} – {p.title}") for p in Problem.query.filter_by(status=StatusEnum.Open).all()]
+    form.problem.choices = [(p.id, f"{p.code} – {p.title}") for p in Problem.query.filter_by(status=StatusEnum.Open, organization_id=current_user.organization_id).all()]
     
     if request.method == 'GET':
         form.problem.data = business_case.problem_id
@@ -546,9 +546,9 @@ def requirements(id):
     
     case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     # Eager load epics and stories for display
-    case.epics = Epic.query.filter_by(case_id=id).all()
+    case.epics = Epic.query.filter_by(case_id=id, organization_id=current_user.organization_id).all()
     for epic in case.epics:
-        epic.stories = Story.query.filter_by(epic_id=epic.id).all()
+        epic.stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
     
     # Check if user can edit (BA only)
     can_edit = user.role == RoleEnum.BA
@@ -621,29 +621,29 @@ def save_requirements():
 def get_case_epics(case_id):
     """API endpoint to get epics and stories for a business case"""
     try:
-        business_case = BusinessCase.query.get_or_404(case_id)
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
         
         # Refresh database connection to avoid SSL issues
         db.session.commit()
         
         # Get epics for this case with retry logic
         try:
-            epics = Epic.query.filter_by(case_id=case_id).all()
+            epics = Epic.query.filter_by(case_id=case_id, organization_id=current_user.organization_id).all()
         except Exception as db_error:
             # Database connection issue, try to recover
             db.session.rollback()
             db.session.close()
-            epics = Epic.query.filter_by(case_id=case_id).all()
+            epics = Epic.query.filter_by(case_id=case_id, organization_id=current_user.organization_id).all()
         
         epics_data = []
         for epic in epics:
             # Get stories for this epic with retry logic
             try:
-                stories = Story.query.filter_by(epic_id=epic.id).all()
+                stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
             except Exception as db_error:
                 db.session.rollback()
                 db.session.close()
-                stories = Story.query.filter_by(epic_id=epic.id).all()
+                stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
             
             stories_data = []
             for story in stories:
@@ -696,7 +696,7 @@ def create_epic():
             return jsonify({'success': False, 'error': 'Case ID and title are required'}), 400
         
         # Verify business case exists and user has access
-        business_case = BusinessCase.query.get_or_404(case_id)
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
         
         epic = Epic(
             title=title,
@@ -745,7 +745,7 @@ def update_epic(epic_id):
         return jsonify({'success': False, 'error': 'Only BAs can update epics'}), 403
     
     try:
-        epic = Epic.query.get_or_404(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
         
         title = request.form.get('title')
         description = request.form.get('description', '')
@@ -780,10 +780,10 @@ def delete_epic(epic_id):
         return jsonify({'success': False, 'error': 'Only BAs can delete epics'}), 403
     
     try:
-        epic = Epic.query.get_or_404(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
         
         # Delete all stories in this epic first
-        Story.query.filter_by(epic_id=epic_id).delete()
+        Story.query.filter_by(epic_id=epic_id, organization_id=current_user.organization_id).delete()
         
         # Delete the epic
         db.session.delete(epic)
@@ -815,7 +815,7 @@ def create_story():
             return jsonify({'success': False, 'error': 'Epic ID and title are required'}), 400
         
         # Verify epic exists and check if it's editable
-        epic = Epic.query.get_or_404(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
         
         if epic.status == 'Approved':
             return jsonify({'success': False, 'error': 'Cannot add stories - Epic is already approved'}), 403
@@ -857,7 +857,7 @@ def update_story(story_id):
         return jsonify({'success': False, 'error': 'Only BAs can update stories'}), 403
     
     try:
-        story = Story.query.get_or_404(story_id)
+        story = Story.query.filter_by(id=story_id, organization_id=current_user.organization_id).first_or_404()
         
         title = request.form.get('title')
         description = request.form.get('description', '')
@@ -901,7 +901,7 @@ def delete_story(story_id):
         return jsonify({'success': False, 'error': 'Only BAs can delete stories'}), 403
     
     try:
-        story = Story.query.get_or_404(story_id)
+        story = Story.query.filter_by(id=story_id, organization_id=current_user.organization_id).first_or_404()
         db.session.delete(story)
         db.session.commit()
         
@@ -923,9 +923,9 @@ def refine_stories_page(id):
         return redirect(url_for('business.view_case', id=id))
     
     # Load epics and stories directly for template
-    epics = Epic.query.filter_by(case_id=id).all()
+    epics = Epic.query.filter_by(case_id=id, organization_id=current_user.organization_id).all()
     for epic in epics:
-        epic.stories = Story.query.filter_by(epic_id=epic.id).all()
+        epic.stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
     
     return render_template('refine_stories_simple.html', business_case=business_case, user=user, epics=epics)
 
@@ -1063,7 +1063,7 @@ def get_stories():
     
     try:
         # Verify epic exists and user has access
-        epic = Epic.query.get(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first()
         if not epic:
             logging.error(f"❌ Epic {epic_id} not found")
             return jsonify({'error': f'Epic {epic_id} not found'}), 404
@@ -1074,7 +1074,7 @@ def get_stories():
             return jsonify({'error': f'Business case not found'}), 404
         
         # Get stories for this epic
-        stories = Story.query.filter_by(epic_id=epic_id).all()
+        stories = Story.query.filter_by(epic_id=epic_id, organization_id=current_user.organization_id).all()
         logging.info(f"✅ Found {len(stories)} stories for epic {epic_id}")
         
         result = []
@@ -1121,7 +1121,7 @@ def get_stories_v2():
     
     try:
         # Verify epic exists and user has access
-        epic = Epic.query.get(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first()
         if not epic:
             logging.error(f"❌ Epic {epic_id} not found")
             return jsonify({'error': f'Epic {epic_id} not found'}), 404
@@ -1132,7 +1132,7 @@ def get_stories_v2():
             return jsonify({'error': f'Business case not found'}), 404
         
         # Build query with filters
-        query = Story.query.filter_by(epic_id=epic_id)
+        query = Story.query.filter_by(epic_id=epic_id, organization_id=current_user.organization_id)
         
         if stakeholder:
             # Add stakeholder filter if the field exists on Story model
@@ -1198,7 +1198,7 @@ def get_stories_v2():
 def submit_epic(epic_id):
     """Submit epic for review"""
     try:
-        epic = Epic.query.get_or_404(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
         
         # Debug logging
         print(f"🔍 Submit Epic - User: {current_user.email}, Role: {current_user.role.value}")
@@ -1234,7 +1234,7 @@ def submit_epic(epic_id):
 def review_epic(epic_id):
     """Approve or reject epic with comments"""
     try:
-        epic = Epic.query.get_or_404(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
         
         # Check if user has permission to review epics (Manager, Director, Admin)
         if current_user.role not in [RoleEnum.Admin, RoleEnum.Manager, RoleEnum.Director]:
@@ -1288,7 +1288,7 @@ def review_epic(epic_id):
 def reset_epic(epic_id):
     """Reset epic back to draft status for re-editing"""
     try:
-        epic = Epic.query.get_or_404(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
         
         # Check if user has permission (epic creator, manager, director, admin)
         if (epic.creator_id != current_user.id and 
@@ -1328,7 +1328,7 @@ def reset_epic(epic_id):
 def add_epic_comment(epic_id):
     """Add comment to epic"""
     try:
-        epic = Epic.query.get_or_404(epic_id)
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
         message = request.form.get('message', '').strip()
         
         if not message:
@@ -1373,7 +1373,7 @@ def get_epic_comments(epic_id):
 def submit_all_draft_epics(case_id):
     """Submit all draft epics in a business case for review"""
     try:
-        business_case = BusinessCase.query.get_or_404(case_id)
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
         
         # Check if user has permission to submit epics
         if current_user.role.value not in ['Admin', 'Manager', 'Director', 'BA']:
@@ -1381,7 +1381,7 @@ def submit_all_draft_epics(case_id):
             return redirect(url_for('business.refine_stories_page', id=case_id))
         
         # Get all draft epics for this business case
-        draft_epics = Epic.query.filter_by(case_id=case_id, status='Draft').all()
+        draft_epics = Epic.query.filter_by(case_id=case_id, status='Draft', organization_id=current_user.organization_id).all()
         
         if not draft_epics:
             flash('No draft epics found to submit', 'warning')
@@ -1422,8 +1422,8 @@ def link_case_to_project(case_id, project_id):
             flash('You do not have permission to link business cases to projects', 'error')
             return redirect(url_for('business.view_case', id=case_id))
         
-        business_case = BusinessCase.query.get_or_404(case_id)
-        project = Project.query.get_or_404(project_id)
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
+        project = Project.query.filter_by(id=project_id, organization_id=current_user.organization_id).first_or_404()
         
         # Link business case to project
         business_case.project_id = project_id
@@ -1455,8 +1455,8 @@ def test_auto_link_epics():
         case_id = 26
         project_id = 15
         
-        business_case = BusinessCase.query.get(case_id)
-        project = Project.query.get(project_id)
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first()
+        project = Project.query.filter_by(id=project_id, organization_id=current_user.organization_id).first()
         
         if not business_case or not project:
             return jsonify({
@@ -1466,7 +1466,7 @@ def test_auto_link_epics():
             })
         
         # Show current state before linking
-        epics_before = Epic.query.filter_by(case_id=case_id).all()
+        epics_before = Epic.query.filter_by(case_id=case_id, organization_id=current_user.organization_id).all()
         unlinked_epics_before = [e for e in epics_before if e.project_id is None]
         
         print(f"🧪 BEFORE AUTO-LINK TEST:")
@@ -1484,7 +1484,7 @@ def test_auto_link_epics():
         linked_count = sync_epics_to_project(case_id, project_id)
         
         # Show state after linking
-        epics_after = Epic.query.filter_by(case_id=case_id).all()
+        epics_after = Epic.query.filter_by(case_id=case_id, organization_id=current_user.organization_id).all()
         linked_epics_after = [e for e in epics_after if e.project_id == project_id]
         
         print(f"🎯 AFTER AUTO-LINK TEST:")

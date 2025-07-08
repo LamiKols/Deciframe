@@ -35,7 +35,7 @@ def index():
     per_page = 20
     
     # Build query
-    query = Notification.query.filter_by(user_id=current_user.id)
+    query = Notification.query.filter_by(user_id=current_user.id, organization_id=current_user.organization_id)
     
     if show_unread_only:
         query = query.filter_by(read_flag=False)
@@ -49,7 +49,7 @@ def index():
     unread_count = Notification.query.filter_by(
         user_id=current_user.id, 
         read_flag=False
-    ).count()
+    , organization_id=current_user.organization_id).count()
     
     return render_template('notifications/index.html',
                          notifications=notifications,
@@ -105,7 +105,7 @@ def api_unread_count():
     unread_count = Notification.query.filter_by(
         user_id=current_user.id, 
         read_flag=False
-    ).count()
+    , organization_id=current_user.organization_id).count()
     
     return jsonify({'unread_count': unread_count})
 
@@ -150,7 +150,7 @@ def admin_index():
         flash('Access denied. Admin privileges required.', 'error')
         return redirect(url_for('notifications.index'))
     
-    templates = NotificationTemplate.query.all()
+    templates = NotificationTemplate.query.filter_by(organization_id=current_user.organization_id).all()
     
     return render_template('notifications/admin.html',
                          templates=templates,
@@ -168,7 +168,7 @@ def admin_edit_template(template_id):
         flash('Access denied. Admin privileges required.', 'error')
         return redirect(url_for('notifications.index'))
     
-    template = NotificationTemplate.query.get_or_404(template_id)
+    template = NotificationTemplate.query.filter_by(id=template_id, organization_id=current_user.organization_id).first_or_404()
     
     if request.method == 'POST':
         template.subject = request.form['subject']
@@ -199,7 +199,7 @@ def admin_test_template(template_id):
     if current_user.role.value not in ['Admin', 'Director', 'CEO']:
         return jsonify({'success': False, 'error': 'Access denied'})
     
-    template = NotificationTemplate.query.get_or_404(template_id)
+    template = NotificationTemplate.query.filter_by(id=template_id, organization_id=current_user.organization_id).first_or_404()
     
     # Create test context data
     test_context = {

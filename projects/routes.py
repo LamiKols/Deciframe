@@ -192,12 +192,12 @@ def view_project(id):
     upcoming_milestones = [m for m in milestones if today <= m.due_date <= upcoming_date and not m.completed]
     
     # Get epics linked to this project
-    project_epics = Epic.query.filter_by(project_id=id).all()
+    project_epics = Epic.query.filter_by(project_id=id, organization_id=current_user.organization_id).all()
     
     # Get all epics from linked business case for sync status comparison
     business_case_epics = []
     if project.business_case:
-        business_case_epics = Epic.query.filter_by(case_id=project.business_case.id).all()
+        business_case_epics = Epic.query.filter_by(case_id=project.business_case.id, organization_id=current_user.organization_id).all()
     
     project_stats = {
         'total_milestones': total_milestones,
@@ -528,7 +528,7 @@ def project_backlog(id):
     
     # Get all epics linked to this project
     from models import Epic, Story
-    epics = Epic.query.filter_by(project_id=id).all()
+    epics = Epic.query.filter_by(project_id=id, organization_id=current_user.organization_id).all()
     
     # Calculate summary statistics
     total_stories = 0
@@ -536,7 +536,7 @@ def project_backlog(id):
     estimated_stories = 0
     
     for epic in epics:
-        epic_stories = Story.query.filter_by(epic_id=epic.id).all()
+        epic_stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
         epic.stories = epic_stories  # Add stories to epic for template access
         total_stories += len(epic_stories)
         
@@ -563,7 +563,7 @@ def dashboard():
     # Overall project statistics
     total_projects = Project.query.count()
     active_projects = Project.query.filter(Project.status.in_([StatusEnum.Open, StatusEnum.InProgress])).count()
-    completed_projects = Project.query.filter_by(status=StatusEnum.Resolved).count()
+    completed_projects = Project.query.filter_by(status=StatusEnum.Resolved, organization_id=current_user.organization_id).count()
     
     # Projects by status
     status_stats = {}
@@ -577,7 +577,7 @@ def dashboard():
     
     for status_name, status_enum in db_status_mapping.items():
         try:
-            status_stats[status_name] = Project.query.filter_by(status=status_enum).count()
+            status_stats[status_name] = Project.query.filter_by(status=status_enum, organization_id=current_user.organization_id).count()
         except Exception as e:
             # Fallback for enum compatibility issues
             status_stats[status_name] = 0

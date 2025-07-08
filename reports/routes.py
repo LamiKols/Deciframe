@@ -88,7 +88,7 @@ def create_template():
 @admin_required
 def edit_template(template_id):
     """Edit an existing report template"""
-    template = ReportTemplate.query.get_or_404(template_id)
+    template = ReportTemplate.query.filter_by(id=template_id, organization_id=current_user.organization_id).first_or_404()
     
     if request.method == 'POST':
         try:
@@ -119,7 +119,7 @@ def edit_template(template_id):
 def delete_template(template_id):
     """Delete a report template"""
     try:
-        template = ReportTemplate.query.get_or_404(template_id)
+        template = ReportTemplate.query.filter_by(id=template_id, organization_id=current_user.organization_id).first_or_404()
         name = template.name
         
         db.session.delete(template)
@@ -181,7 +181,7 @@ def list_runs():
 @admin_required
 def run_details(run_id):
     """Show details of a specific report run"""
-    run = ReportRun.query.get_or_404(run_id)
+    run = ReportRun.query.filter_by(id=run_id, organization_id=current_user.organization_id).first_or_404()
     return render_template('admin/report_run_details.html', run=run)
 
 @reports_bp.route('/api/templates')
@@ -189,7 +189,7 @@ def run_details(run_id):
 @admin_required
 def api_templates():
     """API endpoint for report templates"""
-    templates = ReportTemplate.query.all()
+    templates = ReportTemplate.query.filter_by(organization_id=current_user.organization_id).all()
     return jsonify([{
         'id': t.id,
         'name': t.name,

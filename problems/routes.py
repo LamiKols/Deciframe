@@ -189,7 +189,7 @@ def view(id):
     problem = Problem.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Get related business cases
-    related_cases = BusinessCase.query.filter_by(problem_id=problem.id).all()
+    related_cases = BusinessCase.query.filter_by(problem_id=problem.id, organization_id=current_user.organization_id).all()
     
     return render_template('problem_detail.html', problem=problem, user=user, related_cases=related_cases)
 

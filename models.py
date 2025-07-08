@@ -241,6 +241,7 @@ class Department(db.Model):
     __tablename__ = 'departments'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text)
     level = db.Column(db.Integer, default=1)  # Hierarchy level (1-5)
@@ -399,12 +400,14 @@ class BusinessCaseComment(db.Model):
     __tablename__ = 'business_case_comments'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     case_id = db.Column(db.Integer, db.ForeignKey('business_cases.id'), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     case = db.relationship('BusinessCase', backref='comments')
     author = db.relationship('User')
     
@@ -468,6 +471,7 @@ class ProjectMilestone(db.Model):
     __tablename__ = 'project_milestones'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
@@ -479,6 +483,7 @@ class ProjectMilestone(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     project = db.relationship('Project', backref='milestones')
     owner = db.relationship('User')
 
@@ -486,12 +491,14 @@ class ProjectComment(db.Model):
     __tablename__ = 'project_comments'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     project = db.relationship('Project', backref='comments')
     author = db.relationship('User')
     
@@ -516,6 +523,7 @@ class NotificationTemplate(db.Model):
     __tablename__ = 'notification_templates'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     event = db.Column(db.Enum(NotificationEventEnum), nullable=False, unique=True)
     subject = db.Column(db.String(200), nullable=False)
     body = db.Column(db.Text, nullable=False)
@@ -527,10 +535,14 @@ class NotificationTemplate(db.Model):
     def __repr__(self):
         return f'<NotificationTemplate {self.event.value}>'
 
+    
+    # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
 class Notification(db.Model):
     __tablename__ = 'notifications'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     message = db.Column(db.Text, nullable=False)
     link = db.Column(db.String(200), nullable=True)
@@ -541,6 +553,7 @@ class Notification(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     user = db.relationship('User', backref='notifications')
     
     def mark_as_read(self):
@@ -571,6 +584,7 @@ class ReportTemplate(db.Model):
     __tablename__ = 'report_templates'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
     frequency = db.Column(db.Enum(ReportFrequencyEnum), nullable=False)
@@ -593,6 +607,7 @@ class RequirementsBackup(db.Model):
     __tablename__ = 'requirements_backups'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     case_id = db.Column(db.Integer, db.ForeignKey('business_cases.id'), nullable=False)
     answers_json = db.Column(db.Text, nullable=False)  # JSON-encoded 8 answers
     epics_json = db.Column(db.Text, nullable=False)    # JSON-encoded generated epics
@@ -600,6 +615,7 @@ class RequirementsBackup(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     business_case = db.relationship('BusinessCase', backref='requirements_backups')
     creator = db.relationship('User', foreign_keys=[created_by])
     
@@ -610,6 +626,7 @@ class ReportRun(db.Model):
     __tablename__ = 'report_runs'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     template_id = db.Column(db.Integer, db.ForeignKey('report_templates.id'), nullable=False)
     run_date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(50), default='Success')
@@ -627,6 +644,7 @@ class Epic(db.Model):
     __tablename__ = 'epics'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     case_id = db.Column(db.Integer, db.ForeignKey('business_cases.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=True)  # Set when case approved
     title = db.Column(db.String(200), nullable=False)
@@ -646,6 +664,7 @@ class Epic(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     business_case = db.relationship('BusinessCase', backref='epics')
     creator = db.relationship('User', foreign_keys=[creator_id])
     submitter = db.relationship('User', foreign_keys=[submitted_by])
@@ -682,6 +701,7 @@ class EpicComment(db.Model):
     __tablename__ = 'epic_comments'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     epic_id = db.Column(db.Integer, db.ForeignKey('epics.id', ondelete='CASCADE'), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -693,6 +713,7 @@ class EpicComment(db.Model):
     timestamp = db.Column(db.DateTime, nullable=True)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     epic = db.relationship('Epic', backref=db.backref('epic_comments', cascade='all, delete-orphan'))
     author_user = db.relationship('User', foreign_keys=[author_id])
     
@@ -714,12 +735,14 @@ class EpicSyncLog(db.Model):
     __tablename__ = 'epic_sync_logs'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     epic_id = db.Column(db.Integer, db.ForeignKey('epics.id', ondelete='CASCADE'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=True)
     action = db.Column(db.String(50), nullable=False)  # 'synced', 'unsynced', 'rollback'
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     epic = db.relationship('Epic', backref=db.backref('sync_logs', cascade='all, delete-orphan'))
     project = db.relationship('Project', backref='epic_sync_logs')
     
@@ -740,6 +763,7 @@ class Story(db.Model):
     __tablename__ = 'stories'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     epic_id = db.Column(db.Integer, db.ForeignKey('epics.id', ondelete='CASCADE'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=True)
     title = db.Column(db.String(200), nullable=False)
@@ -751,6 +775,7 @@ class Story(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     epic = db.relationship('Epic', backref=db.backref('stories', cascade='all, delete-orphan'))
     
     def to_dict(self):
@@ -776,6 +801,7 @@ class Solution(db.Model):
     __tablename__ = 'solutions'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     problem_id = db.Column(db.Integer, db.ForeignKey('problems.id'), nullable=False)
     name = db.Column(db.String(200), nullable=True)  # Database field for compatibility
     title = db.Column(db.String(200), nullable=False)
@@ -790,6 +816,7 @@ class Solution(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     problem = db.relationship('Problem', backref='solutions')
     creator = db.relationship('User', foreign_keys=[created_by])
     assignee = db.relationship('User', foreign_keys=[assigned_to])
@@ -803,6 +830,7 @@ class PredictionFeedback(db.Model):
     __tablename__ = 'prediction_feedback'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     prediction_type = db.Column(db.String(50), nullable=False)  # 'success', 'cycle_time', 'anomaly'
     entity_id = db.Column(db.Integer, nullable=False)  # Project/Case ID
     predicted_value = db.Column(db.Float, nullable=True)
@@ -819,6 +847,7 @@ class AIThresholdSettings(db.Model):
     __tablename__ = 'ai_threshold_settings'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     setting_name = db.Column(db.String(100), unique=True, nullable=False)
     threshold_value = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -910,6 +939,7 @@ class RolePermission(db.Model):
 class WorkflowTemplate(db.Model):
     __tablename__ = 'workflow_templates'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     name = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.String(200), nullable=True)
     definition = db.Column(db.JSON, nullable=False)  # JSON array of steps
@@ -923,11 +953,15 @@ class WorkflowTemplate(db.Model):
 class WorkflowLibrary(db.Model):
     __tablename__ = 'workflow_library'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     name = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.String(200))
     definition = db.Column(db.JSON, nullable=False)
     category = db.Column(db.String(50))  # e.g. "Problem Management", "Case Approval"
 
+    
+    # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
 class AuditLog(db.Model):
     __tablename__ = 'audit_logs'
     id = db.Column(db.Integer, primary_key=True)
@@ -946,6 +980,7 @@ class AuditLog(db.Model):
 class Task(db.Model):
     __tablename__ = 'tasks'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
     assigned_to = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
@@ -963,6 +998,7 @@ class Task(db.Model):
 class ScheduledTask(db.Model):
     __tablename__ = 'scheduled_tasks'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     task_type = db.Column(db.String(100), nullable=False)
     scheduled_for = db.Column(db.DateTime, nullable=False)
     context_data = db.Column(db.JSON, nullable=True)
@@ -977,6 +1013,7 @@ class ScheduledTask(db.Model):
 class WorkflowExecution(db.Model):
     __tablename__ = 'workflow_executions'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     workflow_template_id = db.Column(db.Integer, db.ForeignKey('workflow_templates.id'), nullable=False)
     event_name = db.Column(db.String(100), nullable=False)
     context_data = db.Column(db.JSON, nullable=True)
@@ -1006,6 +1043,7 @@ class ImportJob(db.Model):
 class HelpCategory(db.Model):
     __tablename__ = 'help_categories'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     name = db.Column(db.String(100), unique=True, nullable=False)
     sort_order = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -1014,9 +1052,13 @@ class HelpCategory(db.Model):
     def __repr__(self):
         return f'<HelpCategory {self.name}>'
 
+    
+    # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
 class HelpArticle(db.Model):
     __tablename__ = 'help_articles'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('help_categories.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(200), unique=True, nullable=False)
@@ -1059,6 +1101,7 @@ class FrequencyEnum(enum.Enum):
 class NotificationSetting(db.Model):
     __tablename__ = 'notification_settings'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     event_name = db.Column(db.String(100), unique=True, nullable=False)
     frequency = db.Column(db.Enum(FrequencyEnum), nullable=False, default=FrequencyEnum.immediate)
     threshold_hours = db.Column(db.Integer, nullable=True)  # for escalation after X hours
@@ -1070,6 +1113,9 @@ class NotificationSetting(db.Model):
     def __repr__(self):
         return f'<NotificationSetting {self.event_name}: {self.frequency.value}>'
 
+    
+    # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
 
 # Data Export & Retention Models
 
@@ -1114,6 +1160,7 @@ class ExportJob(db.Model):
 class ArchivedProblem(db.Model):
     __tablename__ = 'archived_problems'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     original_id = db.Column(db.Integer, nullable=False)  # Reference to original problem ID
     problem_code = db.Column(db.String(20), nullable=False)
     title = db.Column(db.String(200), nullable=False)
@@ -1136,6 +1183,7 @@ class ArchivedProblem(db.Model):
 class ArchivedBusinessCase(db.Model):
     __tablename__ = 'archived_business_cases'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     original_id = db.Column(db.Integer, nullable=False)
     case_code = db.Column(db.String(20), nullable=False)
     title = db.Column(db.String(200), nullable=False)
@@ -1162,6 +1210,7 @@ class ArchivedBusinessCase(db.Model):
 class ArchivedProject(db.Model):
     __tablename__ = 'archived_projects'
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     original_id = db.Column(db.Integer, nullable=False)
     project_code = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(200), nullable=False)
@@ -1334,6 +1383,7 @@ class TriageRule(db.Model):
     __tablename__ = 'triage_rules'
     
     id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     target = db.Column(db.String(50), nullable=False)  # 'Epic', 'BusinessCase', 'Project'
     field = db.Column(db.String(50), nullable=False)   # e.g. 'estimated_cost', 'classification', 'created_at'
@@ -1346,6 +1396,7 @@ class TriageRule(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     
     # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     creator = db.relationship('User', backref='created_triage_rules')
     
     def __repr__(self):
