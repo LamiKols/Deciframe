@@ -95,10 +95,15 @@ class RegistrationForm(FlaskForm):
         # Get organization_id for filtering based on email domain
         organization_id = None
         if email_domain:
-            from models import Organization
-            organization = Organization.query.filter_by(domain=email_domain).first()
-            if organization:
-                organization_id = organization.id
+            try:
+                from models import Organization
+                organization = Organization.query.filter_by(domain=email_domain).first()
+                if organization:
+                    organization_id = organization.id
+            except Exception as e:
+                # Handle database schema issues gracefully
+                print(f"Warning: Could not check organization domain: {e}")
+                organization_id = None
         
         # Populate department choices - filter by organization if available
         if organization_id:
