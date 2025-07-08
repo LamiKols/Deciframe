@@ -80,20 +80,39 @@ def register():
             flash("You must accept the Terms of Use and Privacy Policy to create an account.", "danger")
             return render_template('auth/register.html', title='Register', form=form)
         
-        from models import RoleEnum
+        from models import RoleEnum, Organization
         
-        # Check if this is the first user in the system (auto-assign Admin role)
-        existing_users_count = User.query.count()
-        is_first_user = existing_users_count == 0
+        # Extract email domain for organization assignment
+        email_domain = form.email.data.split('@')[1].lower()
+        
+        # Find or create organization based on email domain
+        organization = Organization.query.filter_by(domain=email_domain).first()
+        if not organization:
+            # Create new organization for this domain
+            organization_name = email_domain.replace('.com', '').replace('.org', '').replace('.net', '').title()
+            organization = Organization(
+                name=f"{organization_name} Organization",
+                domain=email_domain,
+                is_active=True,
+                subscription_plan='basic'
+            )
+            db.session.add(organization)
+            db.session.flush()  # Get the organization ID before committing
+            print(f"🏢 Created new organization: {organization.name} for domain: {email_domain}")
+        
+        # Check if this is the first user in this organization (auto-assign Admin role)
+        existing_users_count = User.query.filter_by(organization_id=organization.id).count()
+        is_first_user_in_org = existing_users_count == 0
         
         user = User()
         user.name = form.name.data
         user.email = form.email.data
+        user.organization_id = organization.id
         
-        # Assign role: Admin if first user, otherwise use form selection
-        if is_first_user:
+        # Assign role: Admin if first user in organization, otherwise use form selection
+        if is_first_user_in_org:
             user.role = RoleEnum.Admin
-            print(f"🔧 First user registration - automatically assigned Admin role to {user.email}")
+            print(f"🔧 First user in organization {organization.name} - automatically assigned Admin role to {user.email}")
         else:
             user.role = RoleEnum(form.role.data)
         
@@ -114,13 +133,13 @@ def register():
             
             if user.has_pending_department:
                 flash(f'Registration successful! Welcome to DeciFrame, {user.name}!', 'success')
-                if is_first_user:
-                    flash('As the first user, you have been automatically assigned Administrator privileges to set up the organization.', 'info')
+                if is_first_user_in_org:
+                    flash('As the first user in your organization, you have been automatically assigned Administrator privileges to set up the system.', 'info')
                 flash('Your department assignment is pending. Please contact an administrator to complete your setup. You have limited access until your department is assigned.', 'warning')
             else:
                 flash(f'Registration successful! Welcome to DeciFrame, {user.name}!', 'success')
-                if is_first_user:
-                    flash('As the first user, you have been automatically assigned Administrator privileges to set up the organization.', 'info')
+                if is_first_user_in_org:
+                    flash('As the first user in your organization, you have been automatically assigned Administrator privileges to set up the system.', 'info')
             
             # Store user_id in session and login with Flask-Login
             session['user_id'] = user.id

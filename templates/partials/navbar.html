@@ -1,4 +1,4 @@
-{% if logged_in %}
+{% if current_user.is_authenticated %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
   <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">DeciFrame</a>
 
@@ -21,7 +21,7 @@
           <i class="bi bi-speedometer2"></i> Dashboard
         </a>
       </li>
-      {% if user and user.role and user.role.value in ['Director', 'CEO', 'Admin'] %}
+      {% if current_user and current_user.role and current_user.role.value in ['Director', 'CEO', 'Admin'] %}
       <li class="nav-item mx-1">
         <a class="btn btn-primary w-100 d-lg-inline-block btn-mobile-full" href="{{ url_for('dashboards.executive_dashboard') }}">
           <i class="bi bi-bar-chart"></i> Executive
@@ -57,7 +57,7 @@
 
     <!-- Right side buttons -->
     <div class="d-flex align-items-center">
-      {% if user and user.role and user.role.value in ['Manager', 'Director', 'CEO', 'PM'] %}
+      {% if current_user and current_user.role and current_user.role.value in ['Manager', 'Director', 'CEO', 'PM'] %}
       <div class="dropdown me-2">
         <button class="btn btn-primary dropdown-toggle position-relative" type="button" data-bs-toggle="dropdown">
           <i class="bi bi-clipboard"></i> Management
@@ -97,7 +97,7 @@
       </div>
       {% endif %}
 
-      {% if user and user.role and user.role.value == 'Admin' %}
+      {% if current_user and current_user.role and current_user.role.value == 'Admin' %}
       <div class="dropdown me-2">
         <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
           <i class="bi bi-gear"></i> Admin Center
@@ -122,7 +122,7 @@
 
       <div class="dropdown">
         <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          <i class="bi bi-person-circle"></i> {{ user.name }}
+          <i class="bi bi-person-circle"></i> {{ current_user.name }}
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="bi bi-person"></i> Profile</a></li>

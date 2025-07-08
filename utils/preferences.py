@@ -5,7 +5,7 @@ Provides centralized access to organization-level settings and user preferences
 
 from flask import current_app, g
 from flask_login import current_user
-from models import OrganizationSettings, User
+from models import OrganizationSettings, User, Organization
 
 
 def get_org_preferences():

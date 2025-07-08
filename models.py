@@ -87,6 +87,29 @@ class ReportTypeEnum(enum.Enum):
     Custom = "Custom"
 
 # Core Models
+class Organization(db.Model):
+    """
+    Organization model for multi-tenant support
+    Each organization has its own isolated data and settings
+    """
+    __tablename__ = 'organizations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    domain = db.Column(db.String(100), unique=True, nullable=False)  # Email domain for auto-assignment
+    is_active = db.Column(db.Boolean, default=True)
+    subscription_plan = db.Column(db.String(50), default='basic')  # basic, premium, enterprise
+    
+    # Metadata
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    users = db.relationship('User', backref='organization', lazy=True)
+    
+    def __repr__(self):
+        return f'<Organization {self.name}>'
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     
@@ -96,6 +119,10 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
     role = db.Column(db.Enum(UserRoleEnum), default=UserRoleEnum.Staff)
+    
+    # Multi-tenant organization assignment
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
+    
     dept_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     department_status = db.Column(db.String(20), default='assigned')  # assigned, pending, requested
@@ -1213,7 +1240,7 @@ class OrganizationSettings(db.Model):
     __tablename__ = 'organization_settings'
     
     id = db.Column(db.Integer, primary_key=True)
-    org_id = db.Column(db.Integer, default=1)  # Single organization for now
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     
     # Timezone and regional settings
     timezone = db.Column(db.String(100), default='UTC')  # IANA timezone (e.g. 'America/New_York')
@@ -1233,19 +1260,29 @@ class OrganizationSettings(db.Model):
     updater = db.relationship('User', backref='organization_settings_updates')
     
     @classmethod
-    def get_organization_timezone(cls):
+    def get_organization_timezone(cls, organization_id=None):
         """Get the organization's default timezone"""
-        settings = cls.query.filter_by(org_id=1).first()
+        if not organization_id and hasattr(current_user, 'organization_id'):
+            organization_id = current_user.organization_id
+        if not organization_id:
+            organization_id = 1  # Fallback for backwards compatibility
+        settings = cls.query.filter_by(organization_id=organization_id).first()
         return settings.timezone if settings else 'UTC'
     
     @classmethod
-    def get_organization_settings(cls):
+    def get_organization_settings(cls, organization_id=None):
         """Get or create organization settings"""
-        settings = cls.query.filter_by(org_id=1).first()
+        from flask_login import current_user
+        if not organization_id and hasattr(current_user, 'organization_id') and current_user.organization_id:
+            organization_id = current_user.organization_id
+        if not organization_id:
+            organization_id = 1  # Fallback for backwards compatibility
+            
+        settings = cls.query.filter_by(organization_id=organization_id).first()
         if not settings:
-            # Create default settings
+            # Create default settings for this organization
             settings = cls(
-                org_id=1,
+                organization_id=organization_id,
                 timezone='UTC',
                 currency='USD',
                 date_format='ISO',
@@ -1276,7 +1313,7 @@ class OrganizationSettings(db.Model):
         return cls.get_organization_settings()
     
     def __repr__(self):
-        return f'<OrganizationSettings org_id={self.org_id} timezone={self.timezone}>'
+        return f'<OrganizationSettings organization_id={self.organization_id} timezone={self.timezone}>'
 
 
 class TriageRule(db.Model):
