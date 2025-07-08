@@ -130,6 +130,7 @@ def new_case():
             benefit_estimate=float(form.benefit_estimate.data) if form.benefit_estimate.data else 0.0,
             created_by=user.id,
             dept_id=user.dept_id,  # Automatically assign user's department
+            organization_id=user.organization_id,  # Critical: enforce multi-tenant isolation
             case_type=ct,
             case_depth=cd,
             initiative_name=init_name,
@@ -213,7 +214,7 @@ def list_cases():
         allowed = [sel]
     
     # Build query with department filtering
-    query = BusinessCase.query.filter(BusinessCase.dept_id.in_(allowed))
+    query = BusinessCase.query.filter_by(organization_id=current_user.organization_id).filter(BusinessCase.dept_id.in_(allowed))
     
     # Text search on title and description
     if q:
@@ -258,7 +259,7 @@ def list_cases():
 def view_case(id):
     """View a specific business case with BA assignment capability"""
     user = current_user
-    business_case = BusinessCase.query.get_or_404(id)
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Load associated epics and stories
     epics = Epic.query.filter_by(case_id=id).all()
@@ -333,7 +334,7 @@ def view_case(id):
 def approve_case(id):
     """Approve a business case and create linked project"""
     user = current_user
-    business_case = BusinessCase.query.get_or_404(id)
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Check if user has approval authority (Director role required)
     if user.role.value not in ['Director', 'CEO', 'Admin']:
@@ -446,7 +447,7 @@ def approve_case(id):
 @login_required
 def edit_case(id):
     """Edit an existing business case"""
-    business_case = BusinessCase.query.get_or_404(id)
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     form = BusinessCaseForm(obj=business_case)
     form.problem.choices = [(p.id, f"{p.code} – {p.title}") for p in Problem.query.filter_by(status=StatusEnum.Open).all()]
     
@@ -499,7 +500,7 @@ def edit_case(id):
 def request_full_case(id):
     """Request full case elaboration for a Light case"""
     user = current_user
-    business_case = BusinessCase.query.get_or_404(id)
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Only allow requesting full case for Light cases
     if business_case.case_depth != CaseDepthEnum.Light:
@@ -521,7 +522,7 @@ def request_full_case(id):
 def delete_case(id):
     """Delete a business case"""
     user = current_user
-    business_case = BusinessCase.query.get_or_404(id)
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     db.session.delete(business_case)
     db.session.commit()
     flash(f'Business Case {business_case.code} deleted successfully!', 'success')
@@ -543,7 +544,7 @@ def requirements(id):
         flash('Authentication required', 'error')
         return redirect(url_for('auth.login'))
     
-    case = BusinessCase.query.get_or_404(id)
+    case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     # Eager load epics and stories for display
     case.epics = Epic.query.filter_by(case_id=id).all()
     for epic in case.epics:
@@ -914,7 +915,7 @@ def delete_story(story_id):
 def refine_stories_page(id):
     """Story refinement UI page"""
     user = current_user
-    business_case = BusinessCase.query.get_or_404(id)
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Check if user is a Business Analyst
     if user.role.value != 'BA':
@@ -933,7 +934,7 @@ def refine_stories_page(id):
 def batch_refine_stories(id):
     """Batch update multiple stories (BA only)"""
     user = current_user
-    business_case = BusinessCase.query.get_or_404(id)
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Check if user is a Business Analyst
     if user.role.value != 'BA':

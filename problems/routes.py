@@ -48,7 +48,7 @@ def index():
         allowed = [sel]
     
     # Build query with department filtering
-    query = Problem.query.filter(Problem.department_id.in_(allowed))
+    query = Problem.query.filter_by(organization_id=current_user.organization_id).filter(Problem.department_id.in_(allowed))
     
     # Text search on title and description
     if q:
@@ -186,7 +186,7 @@ def view(id):
     """View a specific problem"""
     from models import BusinessCase
     user = current_user
-    problem = Problem.query.get_or_404(id)
+    problem = Problem.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Get related business cases
     related_cases = BusinessCase.query.filter_by(problem_id=problem.id).all()
@@ -198,7 +198,7 @@ def view(id):
 def edit(id):
     """Edit an existing problem"""
     user = current_user
-    problem = Problem.query.get_or_404(id)
+    problem = Problem.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     form = ProblemForm(obj=problem)
     
     # Strict department enforcement: users can only edit problems for their own department
@@ -241,7 +241,7 @@ def edit(id):
 @login_required
 def delete(id):
     """Delete a problem"""
-    problem = Problem.query.get_or_404(id)
+    problem = Problem.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     problem_code = problem.code
     
     try:

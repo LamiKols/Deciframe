@@ -297,6 +297,7 @@ class Problem(db.Model):
     reported_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     assigned_to = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -366,6 +367,7 @@ class BusinessCase(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'), nullable=True)  # Set when approved and project created
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     dept_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     assigned_ba = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     assigned_ba_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Legacy field
     
@@ -424,6 +426,7 @@ class Project(db.Model):
     business_case_id = db.Column(db.Integer, db.ForeignKey('business_cases.id'), nullable=True)
     project_manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
