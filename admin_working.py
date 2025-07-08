@@ -559,7 +559,11 @@ def init_admin_routes(app):
             # Get library workflows
             try:
                 library_workflows = WorkflowLibrary.query.all()  # Show all library workflows
-            except:
+                print(f"🔧 Successfully loaded {len(library_workflows)} library workflows")
+                for wf in library_workflows:
+                    print(f"🔧 Library workflow: {wf.name} ({wf.category})")
+            except Exception as lib_error:
+                print(f"🔧 Error loading library workflows: {lib_error}")
                 library_workflows = []
             
             # Skip audit logging to avoid transaction issues
