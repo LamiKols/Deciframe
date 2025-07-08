@@ -556,15 +556,26 @@ def init_admin_routes(app):
                     db.session.rollback()
                     workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
             
-            # Get library workflows
+            # Get library workflows - handle transaction issues
+            library_workflows = []
             try:
+                # Ensure we have a clean transaction state
+                db.session.rollback()
                 library_workflows = WorkflowLibrary.query.all()  # Show all library workflows
                 print(f"🔧 Successfully loaded {len(library_workflows)} library workflows")
                 for wf in library_workflows:
                     print(f"🔧 Library workflow: {wf.name} ({wf.category})")
             except Exception as lib_error:
                 print(f"🔧 Error loading library workflows: {lib_error}")
-                library_workflows = []
+                # Try with a fresh session
+                try:
+                    db.session.rollback()
+                    from models import WorkflowLibrary
+                    library_workflows = db.session.query(WorkflowLibrary).all()
+                    print(f"🔧 Retry successful: loaded {len(library_workflows)} library workflows")
+                except Exception as retry_error:
+                    print(f"🔧 Retry failed: {retry_error}")
+                    library_workflows = []
             
             # Skip audit logging to avoid transaction issues
             print(f"🔧 Successfully loaded {len(workflows)} workflows for org {current_user.organization_id}")
