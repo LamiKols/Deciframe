@@ -4,7 +4,7 @@ Working Admin Routes Implementation
 
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, OrgUnit, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings
+from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, OrgUnit, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings, WorkflowConfiguration
 from werkzeug.security import generate_password_hash
 from admin.forms import UserForm
 from datetime import datetime
@@ -678,6 +678,80 @@ def init_admin_routes(app):
             db.session.rollback()
             return jsonify({'success': False, 'error': f'Failed to toggle workflow: {str(e)}'}), 500
     
+    @app.route('/admin/workflows/<int:workflow_id>/configure', methods=['GET', 'POST'])
+    @login_required
+    @admin_required
+    def configure_workflow(workflow_id):
+        """Configure workflow parameters (Tier 1 customization)"""
+        workflow = WorkflowTemplate.query.filter_by(
+            id=workflow_id, 
+            organization_id=current_user.organization_id
+        ).first_or_404()
+        
+        if request.method == 'POST':
+            try:
+                # Get or create configuration
+                config = WorkflowConfiguration.get_or_create_for_workflow(
+                    current_user.organization_id,
+                    workflow_id,
+                    current_user.id
+                )
+                
+                # Update business case configuration
+                config.full_case_threshold = float(request.form.get('full_case_threshold', 25000.0))
+                config.ba_assignment_timeout = int(request.form.get('ba_assignment_timeout', 48))
+                config.director_approval_timeout = int(request.form.get('director_approval_timeout', 72))
+                
+                # Update notification configuration
+                config.reminder_frequency = int(request.form.get('reminder_frequency', 24))
+                config.escalation_levels = int(request.form.get('escalation_levels', 3))
+                config.email_notifications = 'email_notifications' in request.form
+                config.sms_notifications = 'sms_notifications' in request.form
+                
+                # Update project configuration
+                config.milestone_reminder_days = int(request.form.get('milestone_reminder_days', 7))
+                config.overdue_escalation_days = int(request.form.get('overdue_escalation_days', 3))
+                
+                # Update problem configuration
+                config.auto_triage_enabled = 'auto_triage_enabled' in request.form
+                config.high_priority_escalation_hours = int(request.form.get('high_priority_escalation_hours', 4))
+                config.problem_resolution_sla = int(request.form.get('problem_resolution_sla', 72))
+                
+                # Update workflow steps configuration
+                config.skip_ba_assignment = 'skip_ba_assignment' in request.form
+                config.require_manager_approval = 'require_manager_approval' in request.form
+                config.enable_peer_review = 'enable_peer_review' in request.form
+                
+                # Update role configuration
+                assignee_roles = request.form.getlist('assignee_roles')
+                approval_roles = request.form.getlist('approval_roles')
+                config.set_assignee_roles(assignee_roles)
+                config.set_approval_roles(approval_roles)
+                
+                db.session.commit()
+                flash(f'Configuration updated for workflow: {workflow.name}', 'success')
+                
+                # Log configuration change
+                print(f"🔧 Workflow configuration updated for {workflow.name} by {current_user.email}")
+                
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error updating configuration: {str(e)}', 'error')
+                print(f"🔧 Error updating workflow configuration: {str(e)}")
+            
+            return redirect(url_for('admin_workflows_fixed'))
+        
+        # GET request - show configuration form
+        config = WorkflowConfiguration.get_or_create_for_workflow(
+            current_user.organization_id,
+            workflow_id,
+            current_user.id
+        )
+        
+        return render_template('admin/workflow_configuration.html', 
+                             workflow=workflow, 
+                             config=config)
+
     @app.route('/admin/workflows/<int:workflow_id>/edit', methods=['POST'])
     @login_required
     @admin_required

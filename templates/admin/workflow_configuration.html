@@ -1,0 +1,320 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Configure Workflow - {{ workflow.name }} | DeciFrame Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Configure Workflow</h2>
+                    <p class="text-muted mb-0">{{ workflow.name }}</p>
+                </div>
+                <a href="{{ url_for('admin_workflows_fixed') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Workflows
+                </a>
+            </div>
+
+            <!-- Configuration Form -->
+            <form method="POST" action="{{ url_for('configure_workflow', workflow_id=workflow.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <!-- Business Case Configuration -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-briefcase"></i> Business Case Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="full_case_threshold" class="form-label">Full Case Threshold</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="full_case_threshold" 
+                                               name="full_case_threshold" value="{{ config.full_case_threshold }}" 
+                                               min="0" step="1000">
+                                    </div>
+                                    <small class="form-text text-muted">Cases above this amount require full documentation</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ba_assignment_timeout" class="form-label">BA Assignment Timeout</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="ba_assignment_timeout" 
+                                               name="ba_assignment_timeout" value="{{ config.ba_assignment_timeout }}" 
+                                               min="1" max="168">
+                                        <span class="input-group-text">hours</span>
+                                    </div>
+                                    <small class="form-text text-muted">Time before BA assignment escalates</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="director_approval_timeout" class="form-label">Director Approval Timeout</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="director_approval_timeout" 
+                                               name="director_approval_timeout" value="{{ config.director_approval_timeout }}" 
+                                               min="1" max="168">
+                                        <span class="input-group-text">hours</span>
+                                    </div>
+                                    <small class="form-text text-muted">Time before director approval escalates</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Configuration -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-bell"></i> Notification Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="reminder_frequency" class="form-label">Reminder Frequency</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="reminder_frequency" 
+                                               name="reminder_frequency" value="{{ config.reminder_frequency }}" 
+                                               min="1" max="168">
+                                        <span class="input-group-text">hours</span>
+                                    </div>
+                                    <small class="form-text text-muted">How often to send reminders</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="escalation_levels" class="form-label">Escalation Levels</label>
+                                    <input type="number" class="form-control" id="escalation_levels" 
+                                           name="escalation_levels" value="{{ config.escalation_levels }}" 
+                                           min="1" max="5">
+                                    <small class="form-text text-muted">Number of escalation levels</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Notification Types</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="email_notifications" 
+                                               name="email_notifications" {% if config.email_notifications %}checked{% endif %}>
+                                        <label class="form-check-label" for="email_notifications">
+                                            Email Notifications
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="sms_notifications" 
+                                               name="sms_notifications" {% if config.sms_notifications %}checked{% endif %}>
+                                        <label class="form-check-label" for="sms_notifications">
+                                            SMS Notifications
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Configuration -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-kanban"></i> Project Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="milestone_reminder_days" class="form-label">Milestone Reminder</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="milestone_reminder_days" 
+                                               name="milestone_reminder_days" value="{{ config.milestone_reminder_days }}" 
+                                               min="1" max="30">
+                                        <span class="input-group-text">days before</span>
+                                    </div>
+                                    <small class="form-text text-muted">Days before milestone due date to send reminders</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="overdue_escalation_days" class="form-label">Overdue Escalation</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="overdue_escalation_days" 
+                                               name="overdue_escalation_days" value="{{ config.overdue_escalation_days }}" 
+                                               min="1" max="30">
+                                        <span class="input-group-text">days after</span>
+                                    </div>
+                                    <small class="form-text text-muted">Days after due date to escalate overdue items</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem Configuration -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> Problem Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="high_priority_escalation_hours" class="form-label">High Priority Escalation</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="high_priority_escalation_hours" 
+                                               name="high_priority_escalation_hours" value="{{ config.high_priority_escalation_hours }}" 
+                                               min="1" max="48">
+                                        <span class="input-group-text">hours</span>
+                                    </div>
+                                    <small class="form-text text-muted">Time before high priority problems escalate</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="problem_resolution_sla" class="form-label">Problem Resolution SLA</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="problem_resolution_sla" 
+                                               name="problem_resolution_sla" value="{{ config.problem_resolution_sla }}" 
+                                               min="1" max="168">
+                                        <span class="input-group-text">hours</span>
+                                    </div>
+                                    <small class="form-text text-muted">Standard resolution time for problems</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Auto-Triage</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="auto_triage_enabled" 
+                                               name="auto_triage_enabled" {% if config.auto_triage_enabled %}checked{% endif %}>
+                                        <label class="form-check-label" for="auto_triage_enabled">
+                                            Enable Auto-Triage
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Automatically assign problems based on rules</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Configuration -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-people"></i> Role Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Assignee Roles</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="assignee_roles" value="BA" 
+                                               {% if "BA" in config.get_assignee_roles() %}checked{% endif %}>
+                                        <label class="form-check-label">Business Analyst</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="assignee_roles" value="Manager" 
+                                               {% if "Manager" in config.get_assignee_roles() %}checked{% endif %}>
+                                        <label class="form-check-label">Manager</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="assignee_roles" value="Director" 
+                                               {% if "Director" in config.get_assignee_roles() %}checked{% endif %}>
+                                        <label class="form-check-label">Director</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Approval Roles</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="approval_roles" value="Manager" 
+                                               {% if "Manager" in config.get_approval_roles() %}checked{% endif %}>
+                                        <label class="form-check-label">Manager</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="approval_roles" value="Director" 
+                                               {% if "Director" in config.get_approval_roles() %}checked{% endif %}>
+                                        <label class="form-check-label">Director</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="approval_roles" value="CEO" 
+                                               {% if "CEO" in config.get_approval_roles() %}checked{% endif %}>
+                                        <label class="form-check-label">CEO</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow Steps Configuration -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-flow-chart"></i> Workflow Steps Configuration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skip_ba_assignment" 
+                                           name="skip_ba_assignment" {% if config.skip_ba_assignment %}checked{% endif %}>
+                                    <label class="form-check-label" for="skip_ba_assignment">
+                                        Skip BA Assignment
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Skip BA assignment for small cases</small>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="require_manager_approval" 
+                                           name="require_manager_approval" {% if config.require_manager_approval %}checked{% endif %}>
+                                    <label class="form-check-label" for="require_manager_approval">
+                                        Require Manager Approval
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Always require manager approval</small>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enable_peer_review" 
+                                           name="enable_peer_review" {% if config.enable_peer_review %}checked{% endif %}>
+                                    <label class="form-check-label" for="enable_peer_review">
+                                        Enable Peer Review
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Add peer review step to workflow</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end">
+                    <a href="{{ url_for('admin_workflows_fixed') }}" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Save Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

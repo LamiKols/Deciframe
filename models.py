@@ -639,6 +639,100 @@ class ReportRun(db.Model):
     def __repr__(self):
         return f'<ReportRun {self.id}: {self.template.name} at {self.run_date}>'
 
+class WorkflowConfiguration(db.Model):
+    """Tier 1 Workflow Configuration - Safe parameter customization"""
+    __tablename__ = 'workflow_configurations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
+    workflow_template_id = db.Column(db.Integer, db.ForeignKey('workflow_templates.id'), nullable=False)
+    
+    # Business Case Configuration
+    full_case_threshold = db.Column(db.Float, default=25000.0)  # Default $25k threshold
+    ba_assignment_timeout = db.Column(db.Integer, default=48)  # Hours before escalation
+    director_approval_timeout = db.Column(db.Integer, default=72)  # Hours before escalation
+    
+    # Notification Configuration
+    reminder_frequency = db.Column(db.Integer, default=24)  # Hours between reminders
+    escalation_levels = db.Column(db.Integer, default=3)  # Number of escalation levels
+    email_notifications = db.Column(db.Boolean, default=True)
+    sms_notifications = db.Column(db.Boolean, default=False)
+    
+    # Project Configuration
+    milestone_reminder_days = db.Column(db.Integer, default=7)  # Days before milestone due
+    overdue_escalation_days = db.Column(db.Integer, default=3)  # Days after due date
+    
+    # Problem Configuration
+    auto_triage_enabled = db.Column(db.Boolean, default=True)
+    high_priority_escalation_hours = db.Column(db.Integer, default=4)  # Hours for high priority
+    problem_resolution_sla = db.Column(db.Integer, default=72)  # Hours for problem resolution
+    
+    # Role Configuration - JSON field for assignee roles
+    assignee_roles = db.Column(db.Text, default='["BA", "Manager", "Director"]')  # JSON array
+    approval_roles = db.Column(db.Text, default='["Director", "CEO"]')  # JSON array
+    
+    # Workflow Steps Configuration
+    skip_ba_assignment = db.Column(db.Boolean, default=False)  # Skip BA assignment for small cases
+    require_manager_approval = db.Column(db.Boolean, default=True)  # Require manager approval
+    enable_peer_review = db.Column(db.Boolean, default=False)  # Enable peer review step
+    
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
+    workflow_template = db.relationship('WorkflowTemplate', backref='configurations')
+    creator = db.relationship('User', foreign_keys=[created_by])
+    
+    def get_assignee_roles(self):
+        """Get assignee roles as Python list"""
+        import json
+        try:
+            return json.loads(self.assignee_roles)
+        except:
+            return ["BA", "Manager", "Director"]
+    
+    def get_approval_roles(self):
+        """Get approval roles as Python list"""
+        import json
+        try:
+            return json.loads(self.approval_roles)
+        except:
+            return ["Director", "CEO"]
+    
+    def set_assignee_roles(self, roles):
+        """Set assignee roles from Python list"""
+        import json
+        self.assignee_roles = json.dumps(roles)
+    
+    def set_approval_roles(self, roles):
+        """Set approval roles from Python list"""
+        import json
+        self.approval_roles = json.dumps(roles)
+    
+    @classmethod
+    def get_or_create_for_workflow(cls, organization_id, workflow_template_id, created_by):
+        """Get existing configuration or create default one"""
+        config = cls.query.filter_by(
+            organization_id=organization_id,
+            workflow_template_id=workflow_template_id
+        ).first()
+        
+        if not config:
+            config = cls(
+                organization_id=organization_id,
+                workflow_template_id=workflow_template_id,
+                created_by=created_by
+            )
+            db.session.add(config)
+            db.session.commit()
+        
+        return config
+    
+    def __repr__(self):
+        return f'<WorkflowConfiguration {self.id}: Workflow {self.workflow_template_id}>'
+
 # Epic and Story models for AI-generated requirements
 class Epic(db.Model):
     __tablename__ = 'epics'

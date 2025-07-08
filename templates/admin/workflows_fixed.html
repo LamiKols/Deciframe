@@ -42,11 +42,25 @@
             {% if workflows %}
                 {% for workflow in workflows %}
                 <div style="background: #495057; padding: 15px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid #0d6efd;">
-                    <h6 style="color: white; margin-bottom: 5px;">{{ workflow.name }}</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">{{ workflow.description }}</p>
-                    <span style="background: {% if workflow.is_active %}#28a745{% else %}#6c757d{% endif %}; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">
-                        {% if workflow.is_active %}Active{% else %}Inactive{% endif %}
-                    </span>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <h6 style="color: white; margin-bottom: 5px;">{{ workflow.name }}</h6>
+                            <p style="color: #adb5bd; font-size: 14px; margin-bottom: 10px;">{{ workflow.description }}</p>
+                            <span style="background: {% if workflow.is_active %}#28a745{% else %}#6c757d{% endif %}; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">
+                                {% if workflow.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-left: 15px;">
+                            <a href="{{ url_for('configure_workflow', workflow_id=workflow.id) }}" 
+                               style="background: #17a2b8; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">
+                                <i class="bi bi-gear"></i> Configure
+                            </a>
+                            <button onclick="toggleWorkflow({{ workflow.id }})" 
+                                    style="background: {% if workflow.is_active %}#dc3545{% else %}#28a745{% endif %}; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                {% if workflow.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             {% else %}
