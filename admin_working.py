@@ -580,7 +580,7 @@ def init_admin_routes(app):
             # Skip audit logging to avoid transaction issues
             print(f"🔧 Successfully loaded {len(workflows)} workflows for org {current_user.organization_id}")
             
-            return render_template('admin/workflows_simple.html', workflows=workflows, library_workflows=library_workflows)
+            return render_template('admin/workflows_fixed.html', workflows=workflows, library_workflows=library_workflows)
             
         except Exception as e:
             print(f"🔧 Workflow Error: {str(e)}")
@@ -629,6 +629,121 @@ def init_admin_routes(app):
             print(f"🔧 Error importing workflow: {str(e)}")
             db.session.rollback()
             flash(f'Error importing workflow: {str(e)}', 'error')
+        
+        return redirect(url_for('admin_workflows'))
+
+    @app.route('/admin/workflows-import', methods=['POST'])
+    @login_required
+    @admin_required
+    def import_workflow_template():
+        """Simple template import that creates a workflow from predefined templates"""
+        template_name = request.form.get('template_name')
+        
+        # Template definitions mapping
+        template_definitions = {
+            'Employee Onboarding': {
+                'description': 'Complete new employee onboarding process with IT setup, training, and documentation',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Create IT Account", "type": "task", "assignee": "IT_admin", "duration": "1 day"},
+                    {"id": "step2", "name": "Equipment Setup", "type": "task", "assignee": "IT_admin", "duration": "2 hours"},
+                    {"id": "step3", "name": "HR Documentation", "type": "approval", "assignee": "HR_manager", "duration": "1 day"},
+                    {"id": "step4", "name": "Department Introduction", "type": "notification", "assignee": "department_manager", "duration": "30 minutes"},
+                    {"id": "step5", "name": "Training Schedule", "type": "task", "assignee": "training_coordinator", "duration": "3 days"}
+                ]}
+            },
+            'IT Support Escalation': {
+                'description': 'Multi-level IT support ticket escalation workflow',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Level 1 Support", "type": "task", "assignee": "support_agent", "duration": "2 hours"},
+                    {"id": "step2", "name": "Level 2 Escalation", "type": "conditional", "condition": "unresolved", "assignee": "senior_support", "duration": "4 hours"},
+                    {"id": "step3", "name": "Management Review", "type": "approval", "assignee": "IT_manager", "duration": "1 day"},
+                    {"id": "step4", "name": "External Vendor", "type": "task", "assignee": "vendor_coordinator", "duration": "3 days"}
+                ]}
+            },
+            'Purchase Request Approval': {
+                'description': 'Complete purchase request approval process with budget checks',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Budget Verification", "type": "task", "assignee": "finance_analyst", "duration": "1 day"},
+                    {"id": "step2", "name": "Department Approval", "type": "approval", "assignee": "department_manager", "duration": "2 days"},
+                    {"id": "step3", "name": "Finance Director Review", "type": "approval", "assignee": "finance_director", "duration": "1 day"},
+                    {"id": "step4", "name": "Procurement Processing", "type": "task", "assignee": "procurement_team", "duration": "3 days"}
+                ]}
+            },
+            'Quality Assurance Review': {
+                'description': 'Comprehensive quality assurance workflow for deliverables',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Initial QA Review", "type": "task", "assignee": "qa_analyst", "duration": "1 day"},
+                    {"id": "step2", "name": "Compliance Check", "type": "task", "assignee": "compliance_officer", "duration": "2 days"},
+                    {"id": "step3", "name": "Final QA Approval", "type": "approval", "assignee": "qa_manager", "duration": "1 day"},
+                    {"id": "step4", "name": "Stakeholder Notification", "type": "notification", "assignee": "stakeholder", "duration": "immediate"}
+                ]}
+            },
+            'Customer Issue Resolution': {
+                'description': 'Customer service issue resolution with escalation paths',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Initial Response", "type": "task", "assignee": "customer_service", "duration": "2 hours"},
+                    {"id": "step2", "name": "Investigation", "type": "task", "assignee": "support_specialist", "duration": "1 day"},
+                    {"id": "step3", "name": "Solution Implementation", "type": "task", "assignee": "technical_team", "duration": "2 days"},
+                    {"id": "step4", "name": "Customer Feedback", "type": "task", "assignee": "customer_service", "duration": "1 day"},
+                    {"id": "step5", "name": "Case Closure", "type": "approval", "assignee": "service_manager", "duration": "1 day"}
+                ]}
+            }
+        }
+        
+        # Add remaining templates with basic definitions
+        remaining_templates = [
+            'Marketing Campaign Launch', 'Security Incident Response', 
+            'Contract Review Process', 'Document Review Workflow', 'Change Management Process'
+        ]
+        
+        for template in remaining_templates:
+            template_definitions[template] = {
+                'description': f'{template} workflow template',
+                'definition': {"steps": [
+                    {"id": "step1", "name": "Initial Step", "type": "task", "assignee": "team_lead", "duration": "1 day"},
+                    {"id": "step2", "name": "Review Step", "type": "approval", "assignee": "manager", "duration": "1 day"},
+                    {"id": "step3", "name": "Final Step", "type": "task", "assignee": "executor", "duration": "1 day"}
+                ]}
+            }
+        
+        if template_name in template_definitions:
+            try:
+                from models import WorkflowTemplate
+                
+                template_data = template_definitions[template_name]
+                imported_name = f"{template_name} (Imported)"
+                
+                # Check for naming conflicts
+                counter = 1
+                base_name = imported_name
+                while WorkflowTemplate.query.filter_by(
+                    name=imported_name, 
+                    organization_id=current_user.organization_id
+                ).first():
+                    counter += 1
+                    imported_name = f"{base_name} ({counter})"
+                
+                new_workflow = WorkflowTemplate(
+                    name=imported_name,
+                    description=template_data['description'],
+                    definition=template_data['definition'],
+                    organization_id=current_user.organization_id,
+                    created_by=current_user.id,
+                    is_active=True
+                )
+                
+                db.session.add(new_workflow)
+                db.session.commit()
+                
+                flash(f'Successfully imported workflow: {imported_name}', 'success')
+                print(f"🔧 Imported workflow '{imported_name}' for org {current_user.organization_id}")
+                
+            except Exception as e:
+                print(f"🔧 Error importing workflow: {str(e)}")
+                db.session.rollback()
+                flash(f'Error importing workflow: {str(e)}', 'error')
+        else:
+            flash(f'Template "{template_name}" not found', 'error')
         
         return redirect(url_for('admin_workflows'))
 
