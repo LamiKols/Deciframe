@@ -286,19 +286,19 @@
                             </a>
                             {% endif %}
                             {% if epics %}
-                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-success">
+                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-success w-100 mb-2">
                                 <i class="fas fa-eye"></i> View Generated Requirements
                             </a>
                             {% else %}
-                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-info">
+                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-info w-100 mb-2">
                                 <i class="fas fa-list-check"></i> Generate Requirements
                             </a>
                             {% endif %}
-                            <a href="{{ url_for('business.edit_case', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
-                                Edit Business Case
+                            <a href="{{ url_for('business.edit_case', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-edit"></i> Edit Business Case
                             </a>
                             {% if user.role.value in ['Manager', 'Director', 'CEO', 'Admin'] and business_case.status.value != 'Approved' %}
-                                <form method="POST" action="{{ url_for('business.approve_case', id=business_case.id) }}" class="d-inline">
+                                <form method="POST" action="{{ url_for('business.approve_case', id=business_case.id) }}" class="d-inline w-100 mb-2">
                                     <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
                                     <button type="submit" class="btn btn-success w-100" onclick="return confirm('Approve this business case? This action will trigger project workflows.')">
                                         <i class="fas fa-check"></i> Approve Business Case
@@ -306,18 +306,18 @@
                                 </form>
                             {% endif %}
                             {% if business_case.case_depth.value == 'Light' and not business_case.full_case_requested %}
-                                <form method="POST" action="{{ url_for('business.request_full_case', id=business_case.id) }}" class="d-inline">
+                                <form method="POST" action="{{ url_for('business.request_full_case', id=business_case.id) }}" class="d-inline w-100 mb-2">
                                     <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
                                     <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Request full case elaboration? This will notify the assigned Business Analyst to complete additional sections.')">
-                                        Request Full Case
+                                        <i class="fas fa-file-plus"></i> Request Full Case
                                     </button>
                                 </form>
                             {% endif %}
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                Delete Business Case
+                            <button type="button" class="btn btn-danger w-100 mb-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="fas fa-trash"></i> Delete Business Case
                             </button>
-                            <a href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
-                                Back to List
+                            <a href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary w-100">
+                                <i class="fas fa-arrow-left"></i> Back to List
                             </a>
                         </div>
                     </div>
