@@ -35,6 +35,7 @@ def create_solution_api():
             title=data['title'], # Keep title for model consistency
             description=data['description'],
             status=StatusEnum.Open,
+            organization_id=user.organization_id,  # Add organization_id for multi-tenant security
             created_by=user.id
         )
         
