@@ -326,6 +326,37 @@ html[data-bs-theme="dark"] .alert-dark {
   -webkit-text-fill-color: #ffffff !important;
 }
 
+/* EMERGENCY FIX: Force success alert text to be visible in ALL contexts */
+.alert-success,
+.alert.alert-success,
+div.alert-success,
+html .alert-success,
+html div.alert-success,
+* .alert-success,
+[class*="alert-success"] {
+  background-color: #d1e7dd !important;
+  border: 1px solid #badbcc !important;
+  color: #0f5132 !important;
+  -webkit-text-fill-color: #0f5132 !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Dark theme success alerts - force white text on dark green background */
+html[data-bs-theme="dark"] .alert-success,
+html[data-bs-theme="dark"] .alert.alert-success,
+html[data-bs-theme="dark"] div.alert-success,
+[data-bs-theme="dark"] .alert-success,
+[data-bs-theme="dark"] .alert.alert-success,
+[data-bs-theme="dark"] div.alert-success {
+  background-color: #0f5132 !important;
+  border: 1px solid #2ea043 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
 /* Fix badge text visibility */
 html[data-bs-theme] .badge,
 html[data-bs-theme="dark"] .badge,
@@ -438,4 +469,31 @@ input[value*="Assign"] {
   display: flex !important;
   gap: 6px !important;
   align-items: center !important;
-}Mon Jul  7 10:35:18 AM UTC 2025: Added alert text visibility fix
+}/* July 8, 2025: Emergency success alert text visibility fix */
+/* Force success alerts to use high contrast colors for maximum visibility */
+body .alert-success,
+body div.alert-success,
+html body .alert-success,
+html body div.alert-success {
+  background-color: #d1e7dd !important;
+  border: 2px solid #0f5132 !important;
+  color: #0f5132 !important;
+  -webkit-text-fill-color: #0f5132 !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-size: 16px !important;
+}
+
+/* Dark theme: Green background with white text for success alerts */
+[data-bs-theme="dark"] body .alert-success,
+[data-bs-theme="dark"] body div.alert-success,
+html[data-bs-theme="dark"] body .alert-success,
+html[data-bs-theme="dark"] body div.alert-success {
+  background-color: #0f5132 !important;
+  border: 2px solid #2ea043 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+}
