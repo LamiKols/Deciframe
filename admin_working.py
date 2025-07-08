@@ -510,10 +510,13 @@ def init_admin_routes(app):
             # Force close and recreate database session to clear transaction errors
             db.session.close()
             
+            # Ensure essential workflows exist for this organization
+            _ensure_essential_workflows()
+            
             # Use raw SQL to bypass transaction issues  
             from sqlalchemy import text
             result = db.session.execute(
-                text("SELECT id, name, description, is_active FROM workflow_templates WHERE organization_id = :org_id"),
+                text("SELECT id, name, description, is_active FROM workflow_templates WHERE organization_id = :org_id ORDER BY name"),
                 {"org_id": current_user.organization_id}
             )
             workflow_data = result.fetchall()
@@ -532,35 +535,97 @@ def init_admin_routes(app):
                 workflow = WorkflowObj(row[0], row[1], row[2], row[3])
                 workflows.append(workflow)
             
-            # Get library workflows with raw SQL too
-            lib_result = db.session.execute(text("SELECT id, name, description FROM workflow_library"))
-            library_data = lib_result.fetchall()
-            
-            library_workflows = []
-            for row in library_data:
-                lib_workflow = type('obj', (object,), {
-                    'id': row[0],
-                    'name': row[1],
-                    'description': row[2]
-                })
-                library_workflows.append(lib_workflow)
-            
             print(f"🔧 Loaded {len(workflows)} workflows for org {current_user.organization_id}")
-            print(f"🔧 Loaded {len(library_workflows)} library workflows")
             
             # Debug: print workflow details
             for wf in workflows:
                 print(f"🔧 Workflow: {wf.name} (Active: {wf.is_active})")
             
             return render_template('admin/workflows_fixed.html', 
-                                 workflows=workflows, 
-                                 library_workflows=library_workflows)
+                                 workflows=workflows)
         except Exception as e:
             print(f"🔧 Error loading workflows: {str(e)}")
             import traceback
             traceback.print_exc()
             # Return empty lists if there's an error
-            return render_template('admin/workflows_fixed.html', workflows=[], library_workflows=[])
+            return render_template('admin/workflows_fixed.html', workflows=[])
+
+    def _ensure_essential_workflows():
+        """Ensure all essential DeciFrame workflows exist for the organization"""
+        from sqlalchemy import text
+        
+        essential_workflows = [
+            {
+                'name': 'Problem-to-Business Case Workflow',
+                'description': 'Complete workflow from problem identification to business case creation with triage rules',
+                'is_active': True
+            },
+            {
+                'name': 'Business Case Review & Approval',
+                'description': 'Multi-stage business case review process with BA assignment and ROI validation',
+                'is_active': True
+            },
+            {
+                'name': 'Project Milestone Management',
+                'description': 'Project milestone tracking with automated status updates and notifications',
+                'is_active': True
+            },
+            {
+                'name': 'Epic & Story Management',
+                'description': 'AI-powered epic creation and user story breakdown with requirements generation',
+                'is_active': True
+            },
+            {
+                'name': 'Solution Recommendation Process',
+                'description': 'AI-powered solution engine with implementation workflow integration',
+                'is_active': True
+            },
+            {
+                'name': 'Department Escalation Workflow',
+                'description': 'Hierarchical department escalation with role-based routing and approval chains',
+                'is_active': True
+            },
+            {
+                'name': 'Notification & Alert Management',
+                'description': 'Automated notification system with email integration and workflow triggers',
+                'is_active': True
+            },
+            {
+                'name': 'Business Case to Project Conversion',
+                'description': 'Automated conversion from approved business cases to project management with milestone creation',
+                'is_active': True
+            }
+        ]
+        
+        try:
+            # Check which workflows already exist
+            existing_result = db.session.execute(
+                text("SELECT name FROM workflow_templates WHERE organization_id = :org_id"),
+                {"org_id": current_user.organization_id}
+            )
+            existing_names = [row[0] for row in existing_result.fetchall()]
+            
+            # Create missing workflows
+            for workflow in essential_workflows:
+                if workflow['name'] not in existing_names:
+                    db.session.execute(
+                        text("""INSERT INTO workflow_templates (name, description, is_active, organization_id, definition) 
+                                VALUES (:name, :description, :is_active, :org_id, :definition)"""),
+                        {
+                            'name': workflow['name'],
+                            'description': workflow['description'],
+                            'is_active': workflow['is_active'],
+                            'org_id': current_user.organization_id,
+                            'definition': '{"type": "standard", "configurable": true}'
+                        }
+                    )
+                    print(f"🔧 Created essential workflow: {workflow['name']}")
+            
+            db.session.commit()
+            
+        except Exception as e:
+            print(f"🔧 Error ensuring essential workflows: {str(e)}")
+            db.session.rollback()
 
     @app.route('/admin/workflows-import', methods=['POST'])
     @login_required

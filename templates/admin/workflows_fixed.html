@@ -53,18 +53,9 @@
                         </div>
                         <div style="display: flex; gap: 8px; align-items: flex-start;">
                             <a href="/admin/workflows/{{ workflow.id }}/configure" 
-                               style="background: #ffc107; color: #000; padding: 4px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer; text-decoration: none; display: inline-block;">
+                               style="background: #ffc107; color: #000; padding: 6px 20px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; font-weight: 500;">
                                 Configure
                             </a>
-                            <form method="post" action="{{ url_for('toggle_workflow', workflow_id=workflow.id) }}" style="display: inline;">
-                                <button type="submit" style="background: {% if workflow.is_active %}#dc3545{% else %}#28a745{% endif %}; color: white; padding: 4px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                                    {% if workflow.is_active %}Deactivate{% else %}Activate{% endif %}
-                                </button>
-                            </form>
-                            <button style="background: #dc3545; color: white; padding: 4px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;"
-                                    onclick="if(confirm('Delete workflow?')) alert('Delete functionality')">
-                                Delete
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -74,118 +65,23 @@
             {% endif %}
         </div>
 
-        <!-- Workflow Library Templates -->
-        <div style="background: #2c3034; padding: 20px; border-radius: 5px;">
-            <h5 style="color: white; margin-bottom: 15px;">Workflow Library Templates</h5>
-            <p style="color: #adb5bd; margin-bottom: 15px;">Import and customize these predefined workflow templates</p>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
-                
-                <!-- Problem-to-Business Case Workflow - ACTIVE -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #dc3545; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Problem-to-Business Case Workflow</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">Complete workflow from problem identification to business case creation with triage rules</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #dc3545; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Problems</span>
-                        <button onclick="alert('This workflow is already active in your system')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            ✓ Active
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Business Case Review & Approval - ACTIVE -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #0d6efd; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Business Case Review & Approval</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">Multi-stage business case review process with BA assignment and ROI validation</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #0d6efd; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Business</span>
-                        <button onclick="alert('This workflow is already active in your system')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            ✓ Active
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Epic & Story Management - ACTIVE -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #0d6efd; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Epic & Story Management</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">AI-powered epic creation and user story breakdown with requirements generation</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #0d6efd; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Business</span>
-                        <button onclick="alert('This workflow is already active in your system')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            ✓ Active
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Business Case to Project Conversion -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Business Case to Project Conversion</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">Automated conversion from approved business cases to project management with milestone creation</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #28a745; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Projects</span>
-                        <button onclick="importTemplate('Business Case to Project Conversion')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            Import
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Project Review & Milestone Tracking -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Project Review & Milestone Tracking</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">Project milestone monitoring with automated notifications and success prediction</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #28a745; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Projects</span>
-                        <button onclick="importTemplate('Project Review & Milestone Tracking')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            Import
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Solution Recommendation Process -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #6f42c1; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Solution Recommendation Process</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">AI-powered solution recommendation engine with implementation workflow</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #6f42c1; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Solutions</span>
-                        <button onclick="importTemplate('Solution Recommendation Process')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            Import
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Department Escalation Workflow -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #fd7e14; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Department Escalation Workflow</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">Hierarchical department escalation with role-based routing and approval chains</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #fd7e14; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Departments</span>
-                        <button onclick="importTemplate('Department Escalation Workflow')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            Import
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Notification & Alert Management - ACTIVE -->
-                <div style="background: #495057; padding: 20px; border-radius: 8px; border-left: 4px solid #20c997; position: relative; min-height: 160px; display: flex; flex-direction: column;">
-                    <h6 style="color: white; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Notification & Alert Management</h6>
-                    <p style="color: #adb5bd; font-size: 14px; margin-bottom: 15px; flex-grow: 1; line-height: 1.4;">Automated notification system with email integration and workflow triggers</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                        <span style="background: #20c997; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">Notifications</span>
-                        <button onclick="alert('This workflow is already active in your system')" 
-                               style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                            ✓ Active
-                        </button>
-                    </div>
-                </div>
-
+        <!-- Configuration Information -->
+        <div style="background: #2c3034; padding: 20px; border-radius: 5px; margin-top: 20px;">
+            <h5 style="color: white; margin-bottom: 15px;">Workflow Configuration Guide</h5>
+            <p style="color: #adb5bd; margin-bottom: 15px;">
+                All essential DeciFrame workflows are pre-configured and ready for customization. 
+                Use the Configure button above to adjust parameters for each workflow.
+            </p>
+            <div style="background: #495057; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107;">
+                <p style="color: #adb5bd; margin: 0; font-size: 14px;">
+                    <strong style="color: white;">Available Configuration Options:</strong><br>
+                    • <strong>Full Case Threshold:</strong> Set monetary amounts that trigger detailed business case requirements<br>
+                    • <strong>Assignment Timeouts:</strong> Configure BA assignment and director approval time limits<br>
+                    • <strong>Notification Settings:</strong> Enable/disable email and SMS notifications for workflow events<br>
+                    • <strong>Role Parameters:</strong> Adjust role-based workflow routing and approval requirements
+                </p>
             </div>
+            
         </div>
     </div>
 </div>
