@@ -87,6 +87,19 @@ def init_admin_routes(app):
         except:
             role_distribution = {}
         
+        # Create health metrics for template
+        health_metrics = {
+            'active_notifications': 0,
+            'failed_triage_actions': 0,
+            'system_health': 'good',
+            'error_rate': 0,
+            'uptime': '99.9%'
+        }
+        
+        # Create empty alerts and triage_activity for template
+        alerts = []
+        triage_activity = []
+        
         try:
             recent_logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(5).all()
         except:
@@ -95,6 +108,9 @@ def init_admin_routes(app):
                              stats=stats, 
                              pending_metrics=pending_metrics, 
                              role_distribution=role_distribution,
+                             health_metrics=health_metrics,
+                             alerts=alerts,
+                             triage_activity=triage_activity,
                              recent_activity=recent_logs)
     
     @app.route('/admin/settings', methods=['GET', 'POST'])
