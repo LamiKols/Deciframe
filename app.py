@@ -683,6 +683,12 @@ def dropdown_demo():
     from flask import render_template
     return render_template('demo/dropdown_demo.html')
 
+@app.route('/test-workflow-buttons')
+def test_workflow_buttons():
+    """Test route for workflow button visibility"""
+    from flask import send_from_directory
+    return send_from_directory('.', 'test_workflow_buttons.html')
+
 @app.route('/thank-you')
 def thank_you():
     """Thank you page after waitlist signup"""

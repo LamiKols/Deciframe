@@ -14,7 +14,7 @@
                 <h2 class="text-light">Workflow Management</h2>
                 <div id="actionButtons">
                     <!-- Library Actions -->
-                    <div id="import-actions" style="display: none;">
+                    <div id="import-actions" style="display: none !important;">
                         <div class="d-flex align-items-center">
                             <small class="text-muted me-3">Browse and import proven workflow patterns</small>
                             <button type="button" class="btn btn-outline-info" onclick="refreshLibrary()">
@@ -23,11 +23,12 @@
                         </div>
                     </div>
                     
-                    <!-- My Workflows Actions -->
-                    <div id="workflow-actions" class="workflow-action-container">
+                    <!-- My Workflows Actions - FORCE VISIBLE -->
+                    <div id="workflow-actions" class="workflow-action-container" style="display: block !important;">
                         <div class="d-flex align-items-center gap-3">
                             <small class="text-muted">Manage your workflow templates</small>
-                            <button type="button" class="btn btn-primary workflow-add-btn" data-bs-toggle="modal" data-bs-target="#addWorkflowModal">
+                            <button type="button" class="btn btn-primary workflow-add-btn" data-bs-toggle="modal" data-bs-target="#addWorkflowModal" 
+                                    style="display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
                                 <i class="fas fa-plus me-1"></i>Add New Workflow
                             </button>
                         </div>

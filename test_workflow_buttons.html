@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Workflow Buttons</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Force visibility test styles */
+        .test-container {
+            background: #212529;
+            padding: 20px;
+            margin: 20px;
+            border: 2px solid #0d6efd;
+        }
+        .workflow-button {
+            background-color: #0d6efd !important;
+            color: white !important;
+            border: 1px solid #0d6efd !important;
+            padding: 10px 20px !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        .workflow-button:hover {
+            background-color: #0b5ed7 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="test-container">
+            <h2 class="text-light mb-4">Workflow Button Visibility Test</h2>
+            
+            <div class="mb-4">
+                <h4 class="text-info">Test 1: Basic Bootstrap Button</h4>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add New Workflow
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="text-info">Test 2: Custom Styled Button</h4>
+                <button type="button" class="workflow-button">
+                    <i class="fas fa-plus me-1"></i>Add New Workflow
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="text-info">Test 3: HTML Button</h4>
+                <button style="background: #0d6efd; color: white; border: 1px solid #0d6efd; padding: 10px 20px;">
+                    <i class="fas fa-plus"></i> Add New Workflow
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="text-info">Test 4: Link as Button</h4>
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add New Workflow
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
