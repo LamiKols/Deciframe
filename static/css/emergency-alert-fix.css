@@ -1,0 +1,204 @@
+/* 
+   EMERGENCY ALERT TEXT VISIBILITY FIX - July 8, 2025
+   NUCLEAR-LEVEL CSS to force ALL alert text to be visible
+   This CSS uses the highest possible specificity
+*/
+
+/* EMERGENCY SUCCESS ALERT VISIBILITY - LIGHT THEME */
+html body div.alert.alert-success,
+html body .alert.alert-success,
+html body div[class*="alert-success"],
+html body *[class*="alert-success"],
+body div.alert.alert-success,
+body .alert.alert-success,
+body div[class*="alert-success"],
+body *[class*="alert-success"],
+.alert.alert-success,
+div.alert.alert-success,
+[class*="alert-success"] {
+  background-color: #d1e7dd !important;
+  border: 3px solid #0f5132 !important;
+  color: #0f5132 !important;
+  -webkit-text-fill-color: #0f5132 !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  text-decoration: none !important;
+  line-height: 1.5 !important;
+  padding: 12px 20px !important;
+  margin: 10px 0 !important;
+  border-radius: 8px !important;
+}
+
+/* EMERGENCY SUCCESS ALERT VISIBILITY - DARK THEME */
+html[data-bs-theme="dark"] body div.alert.alert-success,
+html[data-bs-theme="dark"] body .alert.alert-success,
+html[data-bs-theme="dark"] body div[class*="alert-success"],
+html[data-bs-theme="dark"] body *[class*="alert-success"],
+[data-bs-theme="dark"] body div.alert.alert-success,
+[data-bs-theme="dark"] body .alert.alert-success,
+[data-bs-theme="dark"] body div[class*="alert-success"],
+[data-bs-theme="dark"] body *[class*="alert-success"],
+[data-bs-theme="dark"] .alert.alert-success,
+[data-bs-theme="dark"] div.alert.alert-success,
+[data-bs-theme="dark"] [class*="alert-success"] {
+  background-color: #0f5132 !important;
+  border: 3px solid #2ea043 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  text-decoration: none !important;
+  line-height: 1.5 !important;
+  padding: 12px 20px !important;
+  margin: 10px 0 !important;
+  border-radius: 8px !important;
+}
+
+/* FORCE ALL OTHER ALERT TYPES TO BE VISIBLE TOO */
+html body div.alert,
+html body .alert,
+body div.alert,
+body .alert,
+.alert {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  text-shadow: none !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  padding: 12px 20px !important;
+  margin: 10px 0 !important;
+  border-radius: 8px !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+}
+
+/* DANGER ALERTS */
+html body div.alert.alert-danger,
+html body .alert.alert-danger,
+body div.alert.alert-danger,
+body .alert.alert-danger,
+.alert.alert-danger {
+  background-color: #f8d7da !important;
+  border-color: #dc3545 !important;
+  color: #721c24 !important;
+  -webkit-text-fill-color: #721c24 !important;
+}
+
+[data-bs-theme="dark"] html body div.alert.alert-danger,
+[data-bs-theme="dark"] html body .alert.alert-danger,
+[data-bs-theme="dark"] body div.alert.alert-danger,
+[data-bs-theme="dark"] body .alert.alert-danger,
+[data-bs-theme="dark"] .alert.alert-danger {
+  background-color: #721c24 !important;
+  border-color: #dc3545 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* WARNING ALERTS */
+html body div.alert.alert-warning,
+html body .alert.alert-warning,
+body div.alert.alert-warning,
+body .alert.alert-warning,
+.alert.alert-warning {
+  background-color: #fff3cd !important;
+  border-color: #ffc107 !important;
+  color: #664d03 !important;
+  -webkit-text-fill-color: #664d03 !important;
+}
+
+[data-bs-theme="dark"] html body div.alert.alert-warning,
+[data-bs-theme="dark"] html body .alert.alert-warning,
+[data-bs-theme="dark"] body div.alert.alert-warning,
+[data-bs-theme="dark"] body .alert.alert-warning,
+[data-bs-theme="dark"] .alert.alert-warning {
+  background-color: #664d03 !important;
+  border-color: #ffc107 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* INFO ALERTS */
+html body div.alert.alert-info,
+html body .alert.alert-info,
+body div.alert.alert-info,
+body .alert.alert-info,
+.alert.alert-info {
+  background-color: #d1ecf1 !important;
+  border-color: #0dcaf0 !important;
+  color: #0c5460 !important;
+  -webkit-text-fill-color: #0c5460 !important;
+}
+
+[data-bs-theme="dark"] html body div.alert.alert-info,
+[data-bs-theme="dark"] html body .alert.alert-info,
+[data-bs-theme="dark"] body div.alert.alert-info,
+[data-bs-theme="dark"] body .alert.alert-info,
+[data-bs-theme="dark"] .alert.alert-info {
+  background-color: #0c5460 !important;
+  border-color: #0dcaf0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* PRIMARY ALERTS */
+html body div.alert.alert-primary,
+html body .alert.alert-primary,
+body div.alert.alert-primary,
+body .alert.alert-primary,
+.alert.alert-primary {
+  background-color: #cce7ff !important;
+  border-color: #0d6efd !important;
+  color: #004085 !important;
+  -webkit-text-fill-color: #004085 !important;
+}
+
+[data-bs-theme="dark"] html body div.alert.alert-primary,
+[data-bs-theme="dark"] html body .alert.alert-primary,
+[data-bs-theme="dark"] body div.alert.alert-primary,
+[data-bs-theme="dark"] body .alert.alert-primary,
+[data-bs-theme="dark"] .alert.alert-primary {
+  background-color: #004085 !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* FORCE ALERT ICONS TO BE VISIBLE */
+html body div.alert i,
+html body .alert i,
+body div.alert i,
+body .alert i,
+.alert i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+  text-shadow: none !important;
+}
+
+/* FORCE CLOSE BUTTONS TO BE VISIBLE */
+html body div.alert .btn-close,
+html body .alert .btn-close,
+body div.alert .btn-close,
+body .alert .btn-close,
+.alert .btn-close {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  background-color: transparent !important;
+  border: none !important;
+  font-size: 18px !important;
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
