@@ -155,6 +155,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const orgAlert = document.getElementById('org-setup-alert');
     const orgNameField = document.querySelector('input[name="organization_name"]');
     
+    // Debug: Check if elements exist
+    console.log('Elements found:', {
+        emailInput: !!emailInput,
+        orgFields: !!orgFields, 
+        orgAlert: !!orgAlert,
+        orgNameField: !!orgNameField
+    });
+    
+    // Safety check
+    if (!emailInput) {
+        console.error('Email input not found');
+        return;
+    }
+    
     // Personal email domains to check against
     const personalDomains = [
         'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
@@ -164,8 +178,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkEmailDomain() {
         const email = emailInput.value.trim();
         if (!email.includes('@')) {
-            orgFields.classList.add('d-none');
-            orgAlert.classList.add('d-none');
+            if (orgFields) orgFields.classList.add('d-none');
+            if (orgAlert) orgAlert.classList.add('d-none');
             if (orgNameField) orgNameField.removeAttribute('required');
             return;
         }
@@ -174,8 +188,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Check if it's a personal email domain
         if (personalDomains.includes(domain)) {
-            orgFields.classList.add('d-none');
-            orgAlert.classList.add('d-none');
+            if (orgFields) orgFields.classList.add('d-none');
+            if (orgAlert) orgAlert.classList.add('d-none');
             if (orgNameField) orgNameField.removeAttribute('required');
             return;
         }
@@ -194,12 +208,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.is_new_domain) {
-                orgFields.classList.remove('d-none');
-                orgAlert.classList.remove('d-none');
+                if (orgFields) orgFields.classList.remove('d-none');
+                if (orgAlert) orgAlert.classList.remove('d-none');
                 if (orgNameField) orgNameField.setAttribute('required', 'required');
             } else {
-                orgFields.classList.add('d-none');
-                orgAlert.classList.add('d-none');
+                if (orgFields) orgFields.classList.add('d-none');
+                if (orgAlert) orgAlert.classList.add('d-none');
                 if (orgNameField) orgNameField.removeAttribute('required');
             }
         })
@@ -207,8 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Domain check failed, showing org fields as fallback');
             // On error, show org fields as fallback for safety
             if (!personalDomains.includes(domain)) {
-                orgFields.classList.remove('d-none');
-                orgAlert.classList.remove('d-none');
+                if (orgFields) orgFields.classList.remove('d-none');
+                if (orgAlert) orgAlert.classList.remove('d-none');
                 if (orgNameField) orgNameField.setAttribute('required', 'required');
             }
         });
