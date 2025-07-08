@@ -334,6 +334,20 @@ def create_app():
             'org_settings': OrgSettings(currency, date_format, timezone, theme)
         }
     
+    @app.context_processor 
+    def inject_first_user_admin():
+        """Inject first user admin access context for unrestricted admin setup"""
+        unrestricted_admin = False
+        if current_user.is_authenticated:
+            # Check if current user is the first and only user in their organization
+            from models import User
+            org_users = User.query.filter_by(organization_id=current_user.organization_id).count()
+            if org_users == 1 and current_user.role == RoleEnum.Admin:
+                unrestricted_admin = True
+                print(f"🔧 First User Admin: Granting unrestricted access to {current_user.email}")
+        
+        return dict(unrestricted_admin=unrestricted_admin)
+
     @app.context_processor
     def inject_pending_counts():
         """Inject pending review counts for navigation badges"""

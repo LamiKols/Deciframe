@@ -97,10 +97,10 @@
       </div>
       {% endif %}
 
-      {% if current_user and current_user.role and current_user.role.value == 'Admin' %}
+      {% if (current_user and current_user.role and current_user.role.value == 'Admin') or unrestricted_admin %}
       <div class="dropdown me-2">
         <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          <i class="bi bi-gear"></i> Admin Center
+          <i class="bi bi-gear"></i> Admin Center{% if unrestricted_admin %} <small>(First User)</small>{% endif %}
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="/admin/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>

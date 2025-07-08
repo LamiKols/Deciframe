@@ -12,6 +12,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def is_first_user_in_org(user):
+    """Check if the current user is the first and only user in their organization"""
+    if not user or not user.organization_id:
+        return False
+    org_users = User.query.filter_by(organization_id=user.organization_id).count()
+    return org_users == 1 and user.role == RoleEnum.Admin
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     """User login route"""
