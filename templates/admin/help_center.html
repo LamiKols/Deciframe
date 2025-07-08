@@ -2,6 +2,89 @@
 
 {% block title %}Help Center Management - DeciFrame{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button-text-fix.css') }}?v={{ range(1000, 9999) | random }}">
+<style>
+/* Help Center Button Text Visibility Fix - July 8, 2025 */
+html[data-bs-theme="dark"] .btn,
+html[data-bs-theme="dark"] .btn-outline-primary,
+html[data-bs-theme="dark"] .btn-outline-secondary,
+html[data-bs-theme="dark"] .btn-outline-danger,
+html[data-bs-theme="dark"] .btn-outline-success,
+html[data-bs-theme="dark"] .btn-outline-info,
+html[data-bs-theme="dark"] .btn-outline-warning,
+html[data-bs-theme="dark"] .btn-primary,
+html[data-bs-theme="dark"] .btn-secondary,
+html[data-bs-theme="dark"] .btn-success,
+html[data-bs-theme="dark"] .btn-danger,
+html[data-bs-theme="dark"] .btn-info,
+html[data-bs-theme="dark"] .btn-warning,
+.btn,
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-danger,
+.btn-outline-success,
+.btn-outline-info,
+.btn-outline-warning,
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-info,
+.btn-warning {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    font-weight: 600 !important;
+    border-width: 2px !important;
+    text-shadow: none !important;
+    background-clip: padding-box !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure icon visibility */
+html[data-bs-theme="dark"] .btn i,
+.btn i {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+}
+
+/* Small button specific fixes */
+html[data-bs-theme="dark"] .btn-sm,
+.btn-sm {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    font-weight: 600 !important;
+    min-width: 40px !important;
+    padding: 4px 8px !important;
+}
+
+/* Force outline button text colors for Help Center */
+.btn-outline-primary {
+    color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    -webkit-text-fill-color: #0d6efd !important;
+}
+
+.btn-outline-danger {
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    -webkit-text-fill-color: #dc3545 !important;
+}
+
+/* Help Center specific button fixes */
+.table .btn {
+    min-width: 30px !important;
+    padding: 2px 6px !important;
+    font-size: 12px !important;
+}
+
+.table .btn i {
+    font-size: 12px !important;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid mt-4">
     <div class="row">
