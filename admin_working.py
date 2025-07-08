@@ -79,11 +79,23 @@ def init_admin_routes(app):
             'total_pending': pending_epics + pending_cases + pending_projects
         }
         
+        # Calculate role distribution
+        try:
+            from sqlalchemy import func
+            role_counts = db.session.query(User.role, func.count(User.role)).group_by(User.role).all()
+            role_distribution = {role.value: count for role, count in role_counts}
+        except:
+            role_distribution = {}
+        
         try:
             recent_logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(5).all()
         except:
             recent_logs = []
-        return render_template('admin/dashboard.html', stats=stats, pending_metrics=pending_metrics, recent_activity=recent_logs)
+        return render_template('admin/dashboard.html', 
+                             stats=stats, 
+                             pending_metrics=pending_metrics, 
+                             role_distribution=role_distribution,
+                             recent_activity=recent_logs)
     
     @app.route('/admin/settings', methods=['GET', 'POST'])
     @login_required
