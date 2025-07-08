@@ -46,7 +46,7 @@ def login():
         
         flash('Invalid email or password', 'danger')
     
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('auth/login.html', title='Sign In', form=form)
 
 @bp.route('/logout')
 def logout():
@@ -78,7 +78,7 @@ def register():
         # Check Terms of Use and Privacy Policy acceptance
         if 'agree_terms' not in request.form:
             flash("You must accept the Terms of Use and Privacy Policy to create an account.", "danger")
-            return render_template('register.html', title='Register', form=form)
+            return render_template('auth/register.html', title='Register', form=form)
         
         from models import RoleEnum
         
@@ -139,7 +139,7 @@ def register():
                 for error in errors:
                     flash(f'{field}: {error}', 'danger')
     
-    return render_template('register.html', title='Register', form=form)
+    return render_template('auth/register.html', title='Register', form=form)
 
 @bp.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -174,7 +174,7 @@ def profile():
         form.timezone.data = current_user.timezone
         # reports_to field not available in current User model
     
-    return render_template('profile.html', title='Profile', form=form)
+    return render_template('auth/profile.html', title='Profile', form=form)
 
 # OAuth/SSO Routes
 @bp.route('/sso/<provider>')
