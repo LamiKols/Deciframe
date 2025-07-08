@@ -5,8 +5,10 @@ services:
   repo: https://github.com/LamiKols/Deciframe.git
   branch: main
   buildCommand: "pip install -r requirements.txt"
-  startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT --workers 2"
+  startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --worker-connections 1000"
   autoDeploy: true
   envVars:
     - key: FLASK_ENV
       value: production
+    - key: PYTHONPATH
+      value: /opt/render/project/src
