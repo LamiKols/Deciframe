@@ -506,8 +506,22 @@ def init_admin_routes(app):
     @admin_required
     def admin_workflows_fixed():
         """Fixed workflow templates management that bypasses transaction issues"""
-        # Simple fixed template rendering without any database calls
-        return render_template('admin/workflows_fixed.html', workflows=[], library_workflows=[])
+        try:
+            # Get workflows for current organization
+            workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
+            
+            # Get library workflows
+            library_workflows = WorkflowLibrary.query.all()
+            
+            print(f"🔧 Loaded {len(workflows)} workflows and {len(library_workflows)} library workflows")
+            
+            return render_template('admin/workflows_fixed.html', 
+                                 workflows=workflows, 
+                                 library_workflows=library_workflows)
+        except Exception as e:
+            print(f"🔧 Error loading workflows: {str(e)}")
+            # Return empty lists if there's an error
+            return render_template('admin/workflows_fixed.html', workflows=[], library_workflows=[])
 
     @app.route('/admin/workflows-import', methods=['POST'])
     @login_required
