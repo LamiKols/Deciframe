@@ -44,6 +44,7 @@ def init_admin_routes(app):
     @admin_required
     def admin_dashboard():
         # Calculate comprehensive statistics
+        from models import User, Department, Problem, Project, Epic, BusinessCase
         users_count = User.query.count()
         departments_count = Department.query.count()
         problems_count = Problem.query.count()
@@ -51,7 +52,6 @@ def init_admin_routes(app):
         
         # Calculate pending review counts
         try:
-            from models import Epic, BusinessCase, Project
             pending_epics = Epic.query.filter_by(status='Submitted').count()
             pending_cases = BusinessCase.query.filter_by(status='Submitted').count()
             pending_projects = Project.query.filter_by(status='Submitted').count()
