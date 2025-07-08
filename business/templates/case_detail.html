@@ -2,6 +2,10 @@
 
 {% block title %}Business Case {{ business_case.code }} - DeciFrame{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button-uniformity-fix.css') }}">
+{% endblock %}
+
 {% block content %}
     <div class="container mt-4">
         <div class="row">

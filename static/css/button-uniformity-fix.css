@@ -1,0 +1,58 @@
+/*
+  BUTTON UNIFORMITY FIX - July 8, 2025
+  Forces ALL action buttons to have identical dimensions
+  Targets the action buttons container in case detail view
+*/
+
+/* Force all buttons in action container to have same width and height */
+.card-body .btn,
+.card-body form .btn,
+.card-body .d-grid .btn,
+.card-body .mb-2 .btn,
+.card-body form.mb-2 .btn {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    min-height: 48px !important;
+    height: auto !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 8px !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+}
+
+/* Ensure forms don't interfere with button sizing */
+.card-body form {
+    width: 100% !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.card-body form.mb-2 {
+    margin-bottom: 8px !important;
+}
+
+/* Remove any conflicting inline styles */
+.card-body .btn.w-100 {
+    width: 100% !important;
+}
+
+/* Specific targeting for problematic buttons */
+.card-body form button[type="submit"] {
+    width: 100% !important;
+    min-width: 100% !important;
+    display: block !important;
+}
+
+/* Additional specificity for action buttons */
+.card .card-body .btn {
+    flex: none !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+}
