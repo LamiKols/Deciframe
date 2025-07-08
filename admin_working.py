@@ -2195,8 +2195,8 @@ def init_admin_routes(app):
     @admin_required
     def admin_help_center():
         """Help Center management dashboard"""
-        categories = HelpCategory.query.order_by(HelpCategory.sort_order, HelpCategory.name).all()
-        articles = HelpArticle.query.join(HelpCategory).order_by(HelpCategory.sort_order, HelpArticle.sort_order, HelpArticle.title).all()
+        categories = HelpCategory.query.filter_by(organization_id=current_user.organization_id).order_by(HelpCategory.sort_order, HelpCategory.name).all()
+        articles = HelpArticle.query.filter_by(organization_id=current_user.organization_id).join(HelpCategory).order_by(HelpCategory.sort_order, HelpArticle.sort_order, HelpArticle.title).all()
         
         # Add article count to categories
         for category in categories:
@@ -2225,6 +2225,7 @@ def init_admin_routes(app):
             
             try:
                 category = HelpCategory(
+                    organization_id=current_user.organization_id,
                     name=name,
                     sort_order=int(sort_order) if sort_order else 0
                 )
@@ -2309,7 +2310,7 @@ def init_admin_routes(app):
     @admin_required
     def admin_create_help_article():
         """Create new help article"""
-        categories = HelpCategory.query.order_by(HelpCategory.sort_order, HelpCategory.name).all()
+        categories = HelpCategory.query.filter_by(organization_id=current_user.organization_id).order_by(HelpCategory.sort_order, HelpCategory.name).all()
         
         if request.method == 'POST':
             category_id = request.form.get('category_id')
@@ -2331,6 +2332,7 @@ def init_admin_routes(app):
             
             try:
                 article = HelpArticle(
+                    organization_id=current_user.organization_id,
                     category_id=int(category_id),
                     title=title,
                     content=content,
@@ -2360,7 +2362,7 @@ def init_admin_routes(app):
     def admin_edit_help_article(id):
         """Edit help article"""
         article = HelpArticle.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
-        categories = HelpCategory.query.order_by(HelpCategory.sort_order, HelpCategory.name).all()
+        categories = HelpCategory.query.filter_by(organization_id=current_user.organization_id).order_by(HelpCategory.sort_order, HelpCategory.name).all()
         
         if request.method == 'POST':
             category_id = request.form.get('category_id')
