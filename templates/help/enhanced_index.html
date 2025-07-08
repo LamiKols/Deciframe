@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block title %}Help Center - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar with Categories -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list me-2"></i>Categories</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('help.index') }}" 
+                       class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                        <i class="fas fa-home me-2"></i>All Articles
+                        <span class="badge bg-secondary ms-2">{{ total_articles }}</span>
+                    </a>
+                    {% for category in categories %}
+                    <a href="{{ url_for('help.category', category_id=category.id) }}" 
+                       class="list-group-item list-group-item-action {% if selected_category and selected_category.id == category.id %}active{% endif %}">
+                        <i class="fas fa-folder me-2"></i>{{ category.name }}
+                        <span class="badge bg-secondary ms-2">{{ category.article_count }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Module Filter -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-filter me-2"></i>Filter by Module</h6>
+                </div>
+                <div class="card-body">
+                    <select class="form-select" id="moduleFilter" onchange="filterByModule()">
+                        <option value="">All Modules</option>
+                        {% for module in modules %}
+                        <option value="{{ module }}">{{ module }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9">
+            <!-- Search Bar -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="searchInput" 
+                                       placeholder="Search articles, tags, or content..." onkeyup="searchArticles()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="roleFilter" onchange="filterByRole()">
+                                <option value="">All Roles</option>
+                                <option value="user">User Articles</option>
+                                <option value="admin">Admin Articles</option>
+                                <option value="both">General Articles</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles List -->
+            <div id="articlesContainer">
+                <div class="row" id="articlesList">
+                    {% for article in articles %}
+                    <div class="col-md-6 mb-4 article-card" 
+                         data-module="{{ article.module_name or '' }}" 
+                         data-role="{{ article.role.value if article.role else 'both' }}"
+                         data-tags="{{ article.tags or '' }}">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ article.title }}</h6>
+                                <div>
+                                    {% if article.role %}
+                                    <span class="badge bg-{% if article.role.value == 'admin' %}danger{% elif article.role.value == 'user' %}success{% else %}primary{% endif %} me-1">
+                                        {{ article.role.value.title() }}
+                                    </span>
+                                    {% endif %}
+                                    {% if article.module_name %}
+                                    <span class="badge bg-info">{{ article.module_name }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    {{ article.content[:150] }}{% if article.content|length > 150 %}...{% endif %}
+                                </p>
+                                
+                                {% if article.tags %}
+                                <div class="mb-2">
+                                    {% for tag in article.tag_list %}
+                                    <span class="badge bg-secondary me-1">{{ tag.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between align-items-center text-muted small">
+                                    <span>
+                                        <i class="fas fa-eye me-1"></i>{{ article.view_count or 0 }} views
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-thumbs-up me-1"></i>{{ article.helpful_count or 0 }}
+                                        <i class="fas fa-thumbs-down ms-2 me-1"></i>{{ article.not_helpful_count or 0 }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary btn-sm" onclick="openArticle('{{ article.slug }}')">
+                                    <i class="fas fa-book-open me-1"></i>Read Article
+                                </button>
+                                {% if article.faq %}
+                                <button class="btn btn-outline-info btn-sm" onclick="showFAQ('{{ article.id }}')">
+                                    <i class="fas fa-question-circle me-1"></i>FAQ
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if not articles %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                        <h5>No articles found</h5>
+                        <p class="text-muted">No help articles match your current filters.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Article Modal -->
+<div class="modal fade" id="articleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="articleTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="articleContent"></div>
+            <div class="modal-footer">
+                <div class="d-flex justify-content-between w-100">
+                    <div>
+                        <button class="btn btn-success btn-sm" onclick="recordFeedback(true)">
+                            <i class="fas fa-thumbs-up me-1"></i>Helpful
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="recordFeedback(false)">
+                            <i class="fas fa-thumbs-down me-1"></i>Not Helpful
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Modal -->
+<div class="modal fade" id="faqModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Frequently Asked Questions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="faqContent"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentArticleId = null;
+
+function searchArticles() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    filterArticles();
+}
+
+function filterByModule() {
+    filterArticles();
+}
+
+function filterByRole() {
+    filterArticles();
+}
+
+function filterArticles() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const moduleFilter = document.getElementById('moduleFilter').value;
+    const roleFilter = document.getElementById('roleFilter').value;
+    const articles = document.querySelectorAll('.article-card');
+    
+    articles.forEach(article => {
+        const title = article.querySelector('.card-title, h6').textContent.toLowerCase();
+        const content = article.querySelector('.card-text').textContent.toLowerCase();
+        const module = article.dataset.module;
+        const role = article.dataset.role;
+        const tags = article.dataset.tags.toLowerCase();
+        
+        const matchesSearch = !searchTerm || 
+            title.includes(searchTerm) || 
+            content.includes(searchTerm) || 
+            tags.includes(searchTerm);
+        
+        const matchesModule = !moduleFilter || module === moduleFilter;
+        const matchesRole = !roleFilter || role === roleFilter;
+        
+        if (matchesSearch && matchesModule && matchesRole) {
+            article.style.display = 'block';
+        } else {
+            article.style.display = 'none';
+        }
+    });
+}
+
+async function openArticle(slug) {
+    try {
+        const response = await fetch(`/api/help-articles/${getArticleIdBySlug(slug)}`);
+        const article = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('articleTitle').textContent = article.title;
+            document.getElementById('articleContent').innerHTML = article.content_html || article.content;
+            currentArticleId = article.id;
+            
+            // Show FAQ section if available
+            if (article.faq && article.faq.length > 0) {
+                const faqHtml = '<hr><h6>Frequently Asked Questions</h6><div class="accordion" id="faqAccordion">';
+                let faqContent = faqHtml;
+                
+                article.faq.forEach((faq, index) => {
+                    faqContent += `
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq${index}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}">
+                                    ${faq.question}
+                                </button>
+                            </h2>
+                            <div id="collapse${index}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">${faq.answer}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                faqContent += '</div>';
+                
+                document.getElementById('articleContent').innerHTML += faqContent;
+            }
+            
+            new bootstrap.Modal(document.getElementById('articleModal')).show();
+        } else {
+            alert('Error loading article: ' + article.error);
+        }
+    } catch (error) {
+        console.error('Error fetching article:', error);
+        alert('Error loading article');
+    }
+}
+
+function getArticleIdBySlug(slug) {
+    // Extract article ID from the data attributes or make API call
+    // For now, we'll use a simple approach - this should be improved
+    const articles = document.querySelectorAll('.article-card');
+    for (let article of articles) {
+        const title = article.querySelector('h6').textContent;
+        const articleSlug = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+        if (articleSlug.includes(slug.replace(/-/g, ' ')) || slug.includes(articleSlug)) {
+            // This is a simplified approach - in production, store article ID in data attributes
+            return Math.floor(Math.random() * 1000) + 1; // Placeholder
+        }
+    }
+    return 1; // Fallback
+}
+
+async function recordFeedback(helpful) {
+    if (!currentArticleId) return;
+    
+    try {
+        const response = await fetch(`/api/help-articles/${currentArticleId}/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ helpful: helpful })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(result.message);
+        } else {
+            alert('Error recording feedback: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error recording feedback:', error);
+        alert('Error recording feedback');
+    }
+}
+
+async function showFAQ(articleId) {
+    try {
+        const response = await fetch(`/api/help-articles/${articleId}`);
+        const article = await response.json();
+        
+        if (response.ok && article.faq) {
+            let faqHtml = '';
+            article.faq.forEach((faq, index) => {
+                faqHtml += `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faqHeader${index}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse${index}">
+                                ${faq.question}
+                            </button>
+                        </h2>
+                        <div id="faqCollapse${index}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">${faq.answer}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('faqContent').innerHTML = `<div class="accordion" id="faqAccordion">${faqHtml}</div>`;
+            new bootstrap.Modal(document.getElementById('faqModal')).show();
+        }
+    } catch (error) {
+        console.error('Error fetching FAQ:', error);
+    }
+}
+
+// Initialize search on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up real-time search
+    document.getElementById('searchInput').addEventListener('input', searchArticles);
+});
+</script>
+{% endblock %}

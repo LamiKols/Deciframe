@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import or_, and_
 from models import HelpArticle, HelpCategory, HelpArticleRoleEnum, db
+from datetime import datetime
 import markdown
 
 help_api_bp = Blueprint('help_api', __name__, url_prefix='/api/help-articles')

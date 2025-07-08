@@ -525,8 +525,17 @@ def create_app():
     try:
         from help.routes import help_bp
         app.register_blueprint(help_bp, url_prefix='/help')
+        print("✓ Help routes registered successfully")
     except ImportError as e:
         logging.warning(f"Help blueprint not found: {e}")
+    
+    # Register Help API blueprint
+    try:
+        from help.api import help_api_bp
+        app.register_blueprint(help_api_bp)
+        print("✓ Help API routes registered successfully")
+    except Exception as e:
+        print(f"⚠️ Failed to register help API routes: {e}")
     
     try:
         from waitlist.routes import waitlist_bp
