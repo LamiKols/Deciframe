@@ -565,7 +565,7 @@ def init_admin_routes(app):
             # Skip audit logging to avoid transaction issues
             print(f"🔧 Successfully loaded {len(workflows)} workflows for org {current_user.organization_id}")
             
-            return render_template('admin/workflows.html', workflows=workflows, library_workflows=library_workflows)
+            return render_template('admin/workflows_simple.html', workflows=workflows, library_workflows=library_workflows)
             
         except Exception as e:
             print(f"🔧 Workflow Error: {str(e)}")
