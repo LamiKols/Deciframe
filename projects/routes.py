@@ -343,6 +343,9 @@ def new_milestone(project_id):
     form = MilestoneForm(project_id=project_id)
     
     if form.validate_on_submit():
+        # Convert status to boolean completed field
+        is_completed = form.status.data == 'completed'
+        
         milestone = ProjectMilestone(
             project_id=project_id,
             name=form.name.data,
@@ -350,9 +353,9 @@ def new_milestone(project_id):
             due_date=form.due_date.data,
             owner_id=form.owner_id.data,
             organization_id=current_user.organization_id,
-            completed=form.completed.data,
-            completion_date=form.completion_date.data if form.completed.data else None,
-            completion_notes=form.completion_notes.data if form.completed.data else None
+            completed=is_completed,
+            completion_date=form.completion_date.data if is_completed else None,
+            completion_notes=form.completion_notes.data if is_completed else None
         )
         
         db.session.add(milestone)
@@ -402,18 +405,29 @@ def edit_milestone(id):
     milestone = ProjectMilestone.query.get_or_404(id)
     form = MilestoneForm(project_id=milestone.project_id, obj=milestone)
     
+    # Pre-populate status field based on completed boolean
+    if request.method == 'GET':
+        if milestone.completed:
+            form.status.data = 'completed'
+        else:
+            form.status.data = 'open'  # Default for non-completed milestones
+    
     if form.validate_on_submit():
+        was_completed = milestone.completed
+        
         milestone.name = form.name.data
         milestone.description = form.description.data
         milestone.due_date = form.due_date.data
         milestone.owner_id = form.owner_id.data
-        milestone.completed = form.completed.data
         
-        was_completed = milestone.completed
-        if form.completed.data and not milestone.completion_date:
+        # Convert status to boolean completed field
+        is_completed = form.status.data == 'completed'
+        milestone.completed = is_completed
+        
+        if is_completed and not milestone.completion_date:
             milestone.completion_date = form.completion_date.data or date.today()
             milestone.completion_notes = form.completion_notes.data
-        elif not form.completed.data:
+        elif not is_completed:
             milestone.completion_date = None
             milestone.completion_notes = None
         

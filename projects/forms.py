@@ -78,7 +78,12 @@ class MilestoneForm(FlaskForm):
     description = TextAreaField('Description', validators=[Optional()])
     due_date = DateField('Due Date', validators=[DataRequired()])
     owner_id = SelectField('Owner', validators=[DataRequired()], coerce=safe_int_coerce)
-    completed = BooleanField('Completed')
+    status = SelectField('Status', validators=[DataRequired()], choices=[
+        ('open', 'Open'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('on_hold', 'On Hold')
+    ], default='open')
     completion_date = DateField('Completion Date', validators=[Optional()])
     completion_notes = TextAreaField('Completion Notes', validators=[Optional()])
     submit = SubmitField('Save Milestone')

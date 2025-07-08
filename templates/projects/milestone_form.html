@@ -81,19 +81,27 @@
                                 </div>
                             </div>
 
-                            <!-- Completion Section -->
+                            <!-- Status Section -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card border-secondary mb-3">
                                         <div class="card-header">
-                                            <h6 class="mb-0">Completion Status</h6>
+                                            <h6 class="mb-0">Milestone Status</h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="form-check mb-3">
-                                                        {{ form.completed(class="form-check-input", id="completedCheck", onclick="toggleCompletionFields()") }}
-                                                        {{ form.completed.label(class="form-check-label", for="completedCheck") }}
+                                                    <div class="mb-3">
+                                                        {{ form.status.label(class="form-label") }}
+                                                        {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else ""), id="statusSelect", onchange="toggleCompletionFields()") }}
+                                                        {% if form.status.errors %}
+                                                            <div class="invalid-feedback">
+                                                                {% for error in form.status.errors %}
+                                                                    {{ error }}
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
+                                                        <small class="text-muted">Select the current status of this milestone</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -154,10 +162,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function toggleCompletionFields() {
-            const completed = document.getElementById('completedCheck').checked;
+            const statusSelect = document.getElementById('statusSelect');
             const completionFields = document.getElementById('completionFields');
             
-            if (completed) {
+            if (statusSelect.value === 'completed') {
                 completionFields.style.display = 'block';
                 // Set completion date to today if not already set
                 const completionDateField = document.querySelector('input[name="completion_date"]');
@@ -167,7 +175,7 @@
                 }
             } else {
                 completionFields.style.display = 'none';
-                // Clear completion fields when unchecked
+                // Clear completion fields when not completed
                 document.querySelector('input[name="completion_date"]').value = '';
                 document.querySelector('textarea[name="completion_notes"]').value = '';
             }
