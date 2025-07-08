@@ -46,3 +46,29 @@
 .d-grid .btn {
     grid-column: 1 / -1 !important;
 }
+
+/* Fix for header buttons to prevent overflow */
+.card-header .btn-sm {
+    width: auto !important;
+    min-width: 100px !important;
+    max-width: 150px !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Specific fix for epic section button container */
+.card-header .d-flex .btn {
+    flex-shrink: 0 !important;
+    width: auto !important;
+    min-height: auto !important;
+}
+
+/* Override button width rules for card headers */
+.card-header .btn {
+    width: auto !important;
+    min-width: auto !important;
+    max-width: 150px !important;
+}
