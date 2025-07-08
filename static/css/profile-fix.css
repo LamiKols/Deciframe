@@ -79,3 +79,80 @@ html[data-bs-theme="light"] .profile-content * {
 body .profile-content * {
     color: var(--bs-body-color) !important;
 }
+
+/* Button text visibility fixes - critical for all buttons */
+.btn, button, .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: none !important;
+}
+
+/* Specific button color fixes */
+.btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+.btn-secondary {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+.btn-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    color: #ffffff !important;
+}
+
+/* Outline button fixes */
+.btn-outline-secondary {
+    background-color: transparent !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-primary {
+    background-color: transparent !important;
+    border-color: #0d6efd !important;
+    color: #0d6efd !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+/* Nuclear option for button text visibility */
+html .btn,
+html button,
+body .btn,
+body button {
+    font-weight: 600 !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+/* Force solid button text to be white */
+html .btn-primary,
+html .btn-secondary,
+html .btn-success,
+html .btn-danger,
+html .btn-warning,
+html .btn-info,
+body .btn-primary,
+body .btn-secondary,
+body .btn-success,
+body .btn-danger,
+body .btn-warning,
+body .btn-info {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
