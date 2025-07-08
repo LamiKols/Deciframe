@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* Fix dropdown option visibility in dark theme */
+select.form-select option {
+    color: #000 !important;
+    background-color: #fff !important;
+}
+select.form-select option:hover {
+    background-color: #007bff !important;
+    color: #fff !important;
+}
+
+
+</style>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h3 class="card-title mb-0">
+                    <i class="bi bi-person-plus me-2"></i>Create Account
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('auth.register') }}">
+                    
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Enter your full name (2-100 characters)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Information about automatic admin assignment -->
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>New Organization Setup:</strong> If you're the first user from your organization, you'll automatically be assigned Administrator privileges to set up the system.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.role.label(class="form-label") }}
+                            {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else "")) }}
+                            {% if form.role.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.role.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.department_id.label(class="form-label") }}
+                            {{ form.department_id(class="form-select" + (" is-invalid" if form.department_id.errors else "")) }}
+                            {% if form.department_id.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.department_id.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.reports_to.label(class="form-label") }}
+                        {{ form.reports_to(class="form-select" + (" is-invalid" if form.reports_to.errors else "")) }}
+                        {% if form.reports_to.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.reports_to.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Select your direct manager (optional)</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Minimum 8 characters</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.password2.label(class="form-label") }}
+                            {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else "")) }}
+                            {% if form.password2.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password2.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 1px solid #dee2e6; border-radius: 5px; background-color: #f8f9fa;">
+                            <input type="checkbox" id="agree_terms" name="agree_terms" required 
+                                   style="width: 18px; height: 18px; margin-top: 2px; accent-color: #0d6efd; cursor: pointer;">
+                            <label for="agree_terms" style="cursor: pointer; font-size: 14px; line-height: 1.4; flex: 1;">
+                                <span style="color: red; font-weight: bold;">*</span> I agree to the 
+                                <a href="{{ url_for('public.terms') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Terms of Use</a>
+                                and <a href="{{ url_for('public.privacy') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Privacy Policy</a>.
+                            </label>
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="bi bi-info-circle"></i> You must accept the terms to create an account
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">
+                    Already have an account? 
+                    <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Sign in here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
