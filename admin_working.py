@@ -156,13 +156,18 @@ def init_admin_routes(app):
         users = query.all()
         
         # Also scope departments dropdown for non-Admin users
-        # CRITICAL: Always filter departments by organization
-        departments_query = Department.query.filter(Department.organization_id == current_user.organization_id)
+        # Note: Department model doesn't have organization_id, so we filter by users in the organization
         if current_user.role.value != 'Admin' and current_user.dept_id:
             allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
-            departments = departments_query.filter(Department.id.in_(allowed_dept_ids)).all()
+            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
         else:
-            departments = departments_query.all()
+            # Get all departments, but only those used by users in this organization
+            dept_ids_in_org = db.session.query(User.dept_id).filter(
+                User.organization_id == current_user.organization_id,
+                User.dept_id.isnot(None)
+            ).distinct().all()
+            dept_ids = [dept_id[0] for dept_id in dept_ids_in_org]
+            departments = Department.query.filter(Department.id.in_(dept_ids)).all() if dept_ids else []
         
         return render_template('admin/users.html', 
                              users=users, 
