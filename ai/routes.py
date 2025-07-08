@@ -1171,7 +1171,8 @@ def generate_requirements_epic(case_id):
                     case_id=case_id,
                     answers_json=json.dumps(answers),
                     epics_json=json.dumps(generated_epics),
-                    created_by=user.id
+                    created_by=user.id,
+                    organization_id=user.organization_id
                 )
                 db.session.add(backup)
                 
