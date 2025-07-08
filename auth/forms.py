@@ -181,19 +181,25 @@ class ProfileForm(FlaskForm):
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.original_email = original_email
         # Filter departments and users by organization for existing users
-        if current_user.is_authenticated and hasattr(current_user, 'organization_id'):
-            org_id = current_user.organization_id
-            # Get departments used by users in the same organization
-            dept_ids_in_org = db.session.query(User.dept_id).filter(
-                User.organization_id == org_id,
-                User.dept_id.isnot(None)
-            ).distinct().all()
-            dept_ids = [dept_id[0] for dept_id in dept_ids_in_org]
-            departments = Department.query.filter(Department.id.in_(dept_ids)).all() if dept_ids else []
-            self.department_id.choices = [(0, 'Select Department')] + [(d.id, d.name) for d in departments]
-            self.reports_to.choices = [(0, 'No Manager')] + [(u.id, u.name) for u in User.query.filter_by(organization_id=org_id).all()]
-        else:
-            # For unauthenticated users or users without org, show empty lists
+        try:
+            if current_user.is_authenticated and hasattr(current_user, 'organization_id') and current_user.organization_id:
+                org_id = current_user.organization_id
+                # Get departments used by users in the same organization
+                dept_ids_in_org = db.session.query(User.dept_id).filter(
+                    User.organization_id == org_id,
+                    User.dept_id.isnot(None)
+                ).distinct().all()
+                dept_ids = [dept_id[0] for dept_id in dept_ids_in_org]
+                departments = Department.query.filter(Department.id.in_(dept_ids)).all() if dept_ids else []
+                self.department_id.choices = [(0, 'Select Department')] + [(d.id, d.name) for d in departments]
+                self.reports_to.choices = [(0, 'No Manager')] + [(u.id, u.name) for u in User.query.filter_by(organization_id=org_id).all()]
+            else:
+                # For unauthenticated users or users without org, show empty lists
+                self.department_id.choices = [(0, 'Select Department')]
+                self.reports_to.choices = [(0, 'No Manager')]
+        except Exception as e:
+            # Fallback in case of any database errors
+            print(f"ProfileForm initialization error: {e}")
             self.department_id.choices = [(0, 'Select Department')]
             self.reports_to.choices = [(0, 'No Manager')]
         
