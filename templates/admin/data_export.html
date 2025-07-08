@@ -1,0 +1,173 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Data Export{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Data Export & Retention</h2>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Export Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-sitemap fa-2x text-primary mb-2"></i>
+                    <h4>{{ export_stats.org_units }}</h4>
+                    <p class="text-muted mb-0">Organizational Units</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                    <h4>{{ export_stats.problems }}</h4>
+                    <p class="text-muted mb-0">Problems</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-briefcase fa-2x text-info mb-2"></i>
+                    <h4>{{ export_stats.business_cases }}</h4>
+                    <p class="text-muted mb-0">Business Cases</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-project-diagram fa-2x text-success mb-2"></i>
+                    <h4>{{ export_stats.projects }}</h4>
+                    <p class="text-muted mb-0">Projects</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Exports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('export_org_structure') }}" class="btn btn-primary">
+                            <i class="fas fa-download me-2"></i>Export Organizational Structure
+                        </a>
+                        <a href="{{ url_for('org_reports') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-chart-bar me-2"></i>Organizational Reports
+                        </a>
+                        <a href="{{ url_for('download_org_chart', format='csv') }}" class="btn btn-outline-success">
+                            <i class="fas fa-file-csv me-2"></i>Download Org Chart CSV
+                        </a>
+                        <a href="{{ url_for('download_org_chart', format='pdf') }}" class="btn btn-outline-danger">
+                            <i class="fas fa-file-pdf me-2"></i>Download Org Chart PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Advanced Export</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Configure custom data exports with date ranges and filters.</p>
+                    
+                    <form method="GET" action="{{ url_for('export_org_structure') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Export Format</label>
+                            <select class="form-select" name="format">
+                                <option value="csv">CSV (Comma Separated)</option>
+                                <option value="excel">Excel Spreadsheet</option>
+                                <option value="json">JSON Data</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Date Range</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" class="form-control" name="start_date" placeholder="Start Date">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="date" class="form-control" name="end_date" placeholder="End Date">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-download me-2"></i>Generate Export
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Exports -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Export Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Export Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Records</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-sitemap me-2"></i>Organizational Structure
+                                    </td>
+                                    <td>{{ moment().format('DD/MM/YYYY HH:mm') }}</td>
+                                    <td><span class="badge bg-success">Ready</span></td>
+                                    <td>{{ export_stats.org_units }}</td>
+                                    <td>
+                                        <a href="{{ url_for('export_org_structure') }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-chart-bar me-2"></i>Organizational Reports
+                                    </td>
+                                    <td>{{ moment().format('DD/MM/YYYY HH:mm') }}</td>
+                                    <td><span class="badge bg-info">Available</span></td>
+                                    <td>Multiple</td>
+                                    <td>
+                                        <a href="{{ url_for('org_reports') }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

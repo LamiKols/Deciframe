@@ -1747,6 +1747,30 @@ def init_admin_routes(app):
             return f"Export test successful for user: {current_user.email} in org: {current_user.organization_id}"
         except Exception as e:
             return f"Export test failed: {str(e)}"
+    
+    @app.route('/admin/data-export', methods=['GET'])
+    @login_required
+    def admin_data_export():
+        """Admin data export page with multiple export options"""
+        try:
+            from models import OrgUnit, Problem, BusinessCase, Project
+            
+            # Get counts for current organization
+            org_id = current_user.organization_id
+            
+            export_stats = {
+                'org_units': OrgUnit.query.filter_by(organization_id=org_id).count(),
+                'problems': Problem.query.filter_by(organization_id=org_id).count(),
+                'business_cases': BusinessCase.query.filter_by(organization_id=org_id).count(),
+                'projects': Project.query.filter_by(organization_id=org_id).count()
+            }
+            
+            return render_template('admin/data_export.html', 
+                                 export_stats=export_stats,
+                                 user=current_user)
+        except Exception as e:
+            flash(f'Error loading export page: {str(e)}', 'error')
+            return redirect(url_for('admin_dashboard'))
 
     @app.route('/admin/org-reports', methods=['GET'])
     @login_required
