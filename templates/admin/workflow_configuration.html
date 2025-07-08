@@ -66,6 +66,61 @@ html body .container-fluid .card .card-body .form-check:hover .form-check-input,
     bottom: -10px !important;
     cursor: pointer !important;
 }
+
+/* Form field alignment fixes */
+.form-control, .input-group {
+    height: 48px !important;
+    min-height: 48px !important;
+}
+
+.input-group-text {
+    height: 48px !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+}
+
+.form-control {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+}
+
+/* Ensure consistent column heights */
+.col-md-4 {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.mb-3 {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.form-label {
+    margin-bottom: 8px !important;
+    font-weight: 600 !important;
+    color: var(--bs-body-color) !important;
+}
+
+/* Input group alignment */
+.input-group {
+    display: flex !important;
+    align-items: stretch !important;
+}
+
+.input-group .form-control {
+    flex: 1 !important;
+}
+
+/* Consistent spacing for small text */
+.form-text {
+    margin-top: 6px !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
 </style>
 {% endblock %}
 
