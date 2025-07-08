@@ -609,14 +609,15 @@ def init_admin_routes(app):
             for workflow in essential_workflows:
                 if workflow['name'] not in existing_names:
                     db.session.execute(
-                        text("""INSERT INTO workflow_templates (name, description, is_active, organization_id, definition) 
-                                VALUES (:name, :description, :is_active, :org_id, :definition)"""),
+                        text("""INSERT INTO workflow_templates (name, description, is_active, organization_id, definition, created_by) 
+                                VALUES (:name, :description, :is_active, :org_id, :definition, :created_by)"""),
                         {
                             'name': workflow['name'],
                             'description': workflow['description'],
                             'is_active': workflow['is_active'],
                             'org_id': current_user.organization_id,
-                            'definition': '{"type": "standard", "configurable": true}'
+                            'definition': '{"type": "standard", "configurable": true}',
+                            'created_by': current_user.id
                         }
                     )
                     print(f"🔧 Created essential workflow: {workflow['name']}")
