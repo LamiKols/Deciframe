@@ -290,10 +290,10 @@ function goToBusinessCase() {
     if (caseIdElement) {
         const caseId = caseIdElement.getAttribute('data-case-id');
         // Correct URL pattern for business case view
-        window.location.href = `/cases/${caseId}`;
+        window.location.href = `/business/cases/${caseId}`;
     } else {
         // Fallback to business cases list
-        window.location.href = '/cases';
+        window.location.href = '/business/cases';
     }
 }
 
