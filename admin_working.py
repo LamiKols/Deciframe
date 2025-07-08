@@ -1704,8 +1704,11 @@ def init_admin_routes(app):
             import io
             import csv
             
-            # Get all organizational units
+            print(f"🔧 Export Debug: User {current_user.email} requesting org structure export")
+            
+            # Get all organizational units for current organization
             units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            print(f"🔧 Export Debug: Found {len(units)} units for organization {current_user.organization_id}")
             
             # Create CSV content
             output = io.StringIO()
@@ -1724,6 +1727,8 @@ def init_admin_routes(app):
             csv_data = output.getvalue()
             output.close()
             
+            print(f"🔧 Export Debug: Generated CSV with {len(csv_data)} characters")
+            
             return Response(
                 csv_data,
                 mimetype='text/csv',
@@ -1731,7 +1736,17 @@ def init_admin_routes(app):
             )
             
         except Exception as e:
+            print(f"🔧 Export Error: {str(e)}")
             return f"Error exporting organizational structure: {str(e)}", 500
+    
+    @app.route('/admin/export-test', methods=['GET'])
+    @login_required  
+    def export_test():
+        """Simple export test route"""
+        try:
+            return f"Export test successful for user: {current_user.email} in org: {current_user.organization_id}"
+        except Exception as e:
+            return f"Export test failed: {str(e)}"
 
     @app.route('/admin/org-reports', methods=['GET'])
     @login_required
