@@ -250,13 +250,12 @@ def exec_dashboard():
     
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
     
-    # For now, show organization-wide metrics for all executive users
-    # TODO: Add department scoping for Directors in future iteration
-    problems = Problem.query
-    business_cases = BusinessCase.query
-    projects = Project.query
-    departments = Department.query
-    users = User.query
+    # Show organization-wide metrics filtered by current user's organization
+    problems = Problem.query.filter_by(organization_id=current_user.organization_id)
+    business_cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id)
+    projects = Project.query.filter_by(organization_id=current_user.organization_id)
+    departments = Department.query.filter_by(organization_id=current_user.organization_id)
+    users = User.query.filter_by(organization_id=current_user.organization_id)
     
     # Calculate key metrics
     metrics = {
