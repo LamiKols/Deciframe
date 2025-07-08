@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Selec
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from models import User, RoleEnum, Department
 from flask_login import current_user
+from utils.email_validation import validate_business_email, is_new_organization_domain, extract_domain
 import pytz
 
 class LoginForm(FlaskForm):
@@ -39,6 +40,45 @@ class RegistrationForm(FlaskForm):
                       ])
     department_id = SelectField('Department', validators=[DataRequired()], coerce=int)
     reports_to = SelectField('Reports To', coerce=int, validators=[])
+    
+    # Organization fields (shown only for new email domains)
+    organization_name = StringField('Organization Name', validators=[])
+    industry = SelectField('Industry', validators=[], choices=[
+        ('', 'Select Industry'),
+        ('Technology', 'Technology'),
+        ('Healthcare', 'Healthcare'),
+        ('Finance', 'Finance & Banking'),
+        ('Manufacturing', 'Manufacturing'),
+        ('Retail', 'Retail & E-commerce'),
+        ('Education', 'Education'),
+        ('Government', 'Government & Public Sector'),
+        ('Non-profit', 'Non-profit'),
+        ('Consulting', 'Consulting'),
+        ('Real Estate', 'Real Estate'),
+        ('Other', 'Other')
+    ])
+    organization_size = SelectField('Organization Size', validators=[], choices=[
+        ('', 'Select Size'),
+        ('1-10', '1-10 employees'),
+        ('11-50', '11-50 employees'),
+        ('51-200', '51-200 employees'),
+        ('201-1000', '201-1000 employees'),
+        ('1000+', '1000+ employees')
+    ])
+    country = SelectField('Country', validators=[], choices=[
+        ('', 'Select Country'),
+        ('United States', 'United States'),
+        ('United Kingdom', 'United Kingdom'),
+        ('Canada', 'Canada'),
+        ('Australia', 'Australia'),
+        ('Germany', 'Germany'),
+        ('France', 'France'),
+        ('Netherlands', 'Netherlands'),
+        ('Singapore', 'Singapore'),
+        ('Japan', 'Japan'),
+        ('Other', 'Other')
+    ])
+    
     password = PasswordField('Password', validators=[
         DataRequired(),
         Length(min=8, message='Password must be at least 8 characters long')
@@ -80,10 +120,23 @@ class RegistrationForm(FlaskForm):
             self.reports_to.choices = [(0, 'No Manager')]
 
     def validate_email(self, email):
-        """Check if email is already registered"""
+        """Check if email is already registered and is a valid business email"""
+        # Check if email is already registered
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Email already registered. Please use a different email address.')
+        
+        # Validate business email
+        is_valid, error_message = validate_business_email(email.data)
+        if not is_valid:
+            raise ValidationError(error_message)
+        
+        # If this is a new organization domain, require organization fields
+        domain = extract_domain(email.data)
+        if is_new_organization_domain(domain):
+            # This validation will be checked in the route after form submission
+            # to avoid circular dependency issues with form initialization
+            pass
 
 class ProfileForm(FlaskForm):
     """Profile management form"""

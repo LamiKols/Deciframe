@@ -5,8 +5,9 @@ from auth import bp
 from auth.forms import LoginForm, RegistrationForm, ProfileForm
 from auth.oauth import oauth_manager, UserManager, OAuthError
 from auth.oidc import oauth, get_oidc_client
-from models import User
+from models import User, Organization, RoleEnum
 from app import db
+from utils.email_validation import extract_domain, is_new_organization_domain
 import logging
 
 logger = logging.getLogger(__name__)
@@ -88,18 +89,23 @@ def register():
         from models import RoleEnum, Organization
         
         # Extract email domain for organization assignment
-        email_domain = form.email.data.split('@')[1].lower()
+        email_domain = extract_domain(form.email.data)
         
         # Find or create organization based on email domain
         organization = Organization.query.filter_by(domain=email_domain).first()
         if not organization:
-            # Create new organization for this domain
-            organization_name = email_domain.replace('.com', '').replace('.org', '').replace('.net', '').title()
+            # This is a new organization - validate required fields
+            if not form.organization_name.data:
+                flash("Organization name is required for new organizations.", "danger")
+                return render_template('auth/register.html', title='Register', form=form)
+            
+            # Create new organization with provided details
             organization = Organization(
-                name=f"{organization_name} Organization",
+                name=form.organization_name.data,
                 domain=email_domain,
-                is_active=True,
-                subscription_plan='basic'
+                industry=form.industry.data if form.industry.data else None,
+                size=form.organization_size.data if form.organization_size.data else None,
+                country=form.country.data if form.country.data else None
             )
             db.session.add(organization)
             db.session.flush()  # Get the organization ID before committing
@@ -408,3 +414,19 @@ def mark_onboarded():
         logger.error(f"Error marking user as onboarded: {e}")
         flash("Error completing onboarding", "error")
         return redirect(request.referrer or url_for('index'))
+
+@bp.route('/check-domain', methods=['POST'])
+def check_domain():
+    """AJAX endpoint to check if email domain is new"""
+    try:
+        data = request.get_json()
+        domain = data.get('domain', '').lower()
+        
+        if not domain:
+            return {'is_new_domain': False}
+        
+        is_new = is_new_organization_domain(domain)
+        return {'is_new_domain': is_new}
+    except Exception as e:
+        logger.error(f"Error checking domain: {e}")
+        return {'is_new_domain': False}

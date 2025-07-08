@@ -1,154 +1,225 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-/* Fix dropdown option visibility in dark theme */
-select.form-select option {
-    color: #000 !important;
-    background-color: #fff !important;
-}
-select.form-select option:hover {
-    background-color: #007bff !important;
-    color: #fff !important;
-}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="bi bi-person-plus me-2"></i>Create Your Account
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Email Domain Detection Alert -->
+                    <div id="org-setup-alert" class="alert alert-info d-none" role="alert">
+                        <i class="bi bi-building me-2"></i>
+                        <strong>New Organization Setup</strong><br>
+                        This appears to be the first registration from your organization. Please provide some basic information about your organization to complete the setup.
+                    </div>
 
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Basic User Information -->
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label fw-bold") }}
+                            {{ form.name(class="form-control") }}
+                            {% for error in form.name.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
 
-</style>
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow">
-            <div class="card-header text-center">
-                <h3 class="card-title mb-0">
-                    <i class="bi bi-person-plus me-2"></i>Create Account
-                </h3>
-            </div>
-            <div class="card-body">
-                <form method="post" action="{{ url_for('auth.register') }}">
-                    
-                    <div class="mb-3">
-                        {{ form.name.label(class="form-label") }}
-                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
-                        {% if form.name.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.name.errors %}
-                                    <div>{{ error }}</div>
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label fw-bold") }}
+                            {{ form.email(class="form-control", id="email-input") }}
+                            <div class="form-text">Use your business email address. Personal email providers are not allowed.</div>
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.role.label(class="form-label fw-bold") }}
+                            {{ form.role(class="form-select") }}
+                            {% for error in form.role.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.department_id.label(class="form-label fw-bold") }}
+                            {{ form.department_id(class="form-select") }}
+                            {% for error in form.department_id.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.reports_to.label(class="form-label fw-bold") }}
+                            {{ form.reports_to(class="form-select") }}
+                            {% for error in form.reports_to.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Organization Information (shown only for new domains) -->
+                        <div id="organization-fields" class="d-none">
+                            <hr class="my-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-building me-2"></i>Organization Information
+                            </h5>
+                            
+                            <div class="mb-3">
+                                {{ form.organization_name.label(class="form-label fw-bold") }}
+                                <span class="text-danger">*</span>
+                                {{ form.organization_name(class="form-control", required=True) }}
+                                <div class="form-text">Enter your organization's full name</div>
+                                {% for error in form.organization_name.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             </div>
-                        {% endif %}
-                        <div class="form-text">Enter your full name (2-100 characters)</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
-                        {% if form.email.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.email.errors %}
-                                    <div>{{ error }}</div>
+
+                            <div class="mb-3">
+                                {{ form.industry.label(class="form-label fw-bold") }}
+                                {{ form.industry(class="form-select") }}
+                                {% for error in form.industry.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             </div>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Information about automatic admin assignment -->
-                    <div class="alert alert-info mb-3">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>New Organization Setup:</strong> If you're the first user from your organization, you'll automatically be assigned Administrator privileges to set up the system.
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.role.label(class="form-label") }}
-                            {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else "")) }}
-                            {% if form.role.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.role.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            {{ form.department_id.label(class="form-label") }}
-                            {{ form.department_id(class="form-select" + (" is-invalid" if form.department_id.errors else "")) }}
-                            {% if form.department_id.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.department_id.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.reports_to.label(class="form-label") }}
-                        {{ form.reports_to(class="form-select" + (" is-invalid" if form.reports_to.errors else "")) }}
-                        {% if form.reports_to.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.reports_to.errors %}
-                                    <div>{{ error }}</div>
+
+                            <div class="mb-3">
+                                {{ form.organization_size.label(class="form-label fw-bold") }}
+                                {{ form.organization_size(class="form-select") }}
+                                {% for error in form.organization_size.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             </div>
-                        {% endif %}
-                        <div class="form-text">Select your direct manager (optional)</div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
-                            {% if form.password.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.password.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">Minimum 8 characters</div>
+
+                            <div class="mb-3">
+                                {{ form.country.label(class="form-label fw-bold") }}
+                                {{ form.country(class="form-select") }}
+                                {% for error in form.country.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
                         </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            {{ form.password2.label(class="form-label") }}
-                            {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else "")) }}
-                            {% if form.password2.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.password2.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+
+                        <!-- Password Fields -->
+                        <hr class="my-4">
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label fw-bold") }}
+                            {{ form.password(class="form-control") }}
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 1px solid #dee2e6; border-radius: 5px; background-color: #f8f9fa;">
-                            <input type="checkbox" id="agree_terms" name="agree_terms" required 
-                                   style="width: 18px; height: 18px; margin-top: 2px; accent-color: #0d6efd; cursor: pointer;">
-                            <label for="agree_terms" style="cursor: pointer; font-size: 14px; line-height: 1.4; flex: 1;">
-                                <span style="color: red; font-weight: bold;">*</span> I agree to the 
-                                <a href="{{ url_for('public.terms') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Terms of Use</a>
-                                and <a href="{{ url_for('public.privacy') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Privacy Policy</a>.
+
+                        <div class="mb-3">
+                            {{ form.password2.label(class="form-label fw-bold") }}
+                            {{ form.password2(class="form-control") }}
+                            {% for error in form.password2.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Terms and Privacy -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="agree_terms" name="agree_terms" required>
+                            <label class="form-check-label" for="agree_terms">
+                                I agree to the <a href="{{ url_for('public.terms') }}" target="_blank">Terms of Use</a> 
+                                and <a href="{{ url_for('public.privacy') }}" target="_blank">Privacy Policy</a>
+                                <span class="text-danger">*</span>
                             </label>
                         </div>
-                        <div class="form-text text-muted mt-2">
-                            <i class="bi bi-info-circle"></i> You must accept the terms to create an account
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
                         </div>
-                    </div>
-                    
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </div>
-                </form>
-            </div>
-            <div class="card-footer text-center">
-                <p class="mb-0">
-                    Already have an account? 
-                    <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Sign in here</a>
-                </p>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">
+                        Already have an account? <a href="{{ url_for('auth.login') }}">Sign in here</a>
+                    </small>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const emailInput = document.getElementById('email-input');
+    const orgFields = document.getElementById('organization-fields');
+    const orgAlert = document.getElementById('org-setup-alert');
+    const orgNameField = document.querySelector('input[name="organization_name"]');
+    
+    // Personal email domains to check against
+    const personalDomains = [
+        'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com',
+        'aol.com', 'icloud.com', 'me.com', 'mac.com', 'protonmail.com'
+    ];
+    
+    function checkEmailDomain() {
+        const email = emailInput.value.trim();
+        if (!email.includes('@')) {
+            orgFields.classList.add('d-none');
+            orgAlert.classList.add('d-none');
+            if (orgNameField) orgNameField.removeAttribute('required');
+            return;
+        }
+        
+        const domain = email.split('@')[1].toLowerCase();
+        
+        // Check if it's a personal email domain
+        if (personalDomains.includes(domain)) {
+            orgFields.classList.add('d-none');
+            orgAlert.classList.add('d-none');
+            if (orgNameField) orgNameField.removeAttribute('required');
+            return;
+        }
+        
+        // For business domains, check if it's a new organization
+        // (In a real implementation, this would be an AJAX call to check the backend)
+        // For now, we'll show organization fields for non-personal domains
+        fetch('/auth/check-domain', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            },
+            body: JSON.stringify({domain: domain})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.is_new_domain) {
+                orgFields.classList.remove('d-none');
+                orgAlert.classList.remove('d-none');
+                if (orgNameField) orgNameField.setAttribute('required', 'required');
+            } else {
+                orgFields.classList.add('d-none');
+                orgAlert.classList.add('d-none');
+                if (orgNameField) orgNameField.removeAttribute('required');
+            }
+        })
+        .catch(error => {
+            console.log('Domain check failed, showing org fields as fallback');
+            // On error, show org fields as fallback for safety
+            if (!personalDomains.includes(domain)) {
+                orgFields.classList.remove('d-none');
+                orgAlert.classList.remove('d-none');
+                if (orgNameField) orgNameField.setAttribute('required', 'required');
+            }
+        });
+    }
+    
+    emailInput.addEventListener('blur', checkEmailDomain);
+    emailInput.addEventListener('input', function() {
+        // Debounce the check
+        clearTimeout(this.checkTimeout);
+        this.checkTimeout = setTimeout(checkEmailDomain, 500);
+    });
+});
+</script>
 {% endblock %}

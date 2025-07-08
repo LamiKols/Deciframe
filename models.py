@@ -97,6 +97,9 @@ class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     domain = db.Column(db.String(100), unique=True, nullable=False)  # Email domain for auto-assignment
+    industry = db.Column(db.String(100), nullable=True)  # Organization industry
+    size = db.Column(db.String(50), nullable=True)  # Organization size range
+    country = db.Column(db.String(100), nullable=True)  # Organization country
     is_active = db.Column(db.Boolean, default=True)
     subscription_plan = db.Column(db.String(50), default='basic')  # basic, premium, enterprise
     
