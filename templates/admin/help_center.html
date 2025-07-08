@@ -65,7 +65,7 @@
                                             <span class="badge bg-info">{{ category.article_count or 0 }}</span>
                                         </td>
                                         <td>{{ category.sort_order }}</td>
-                                        <td>{{ category.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ category.created_at.strftime('%Y-%m-%d') if category.created_at else 'N/A' }}</td>
                                         <td>
                                             <a href="{{ url_for('admin_edit_help_category', id=category.id) }}" 
                                                class="btn btn-sm btn-outline-primary" title="Edit">
