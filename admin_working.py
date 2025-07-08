@@ -4,7 +4,7 @@ Working Admin Routes Implementation
 
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings
+from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, OrgUnit, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings
 from werkzeug.security import generate_password_hash
 from admin.forms import UserForm
 from datetime import datetime
@@ -44,9 +44,9 @@ def init_admin_routes(app):
     @admin_required
     def admin_dashboard():
         # Calculate comprehensive statistics
-        from models import User, Department, Problem, Project, Epic, BusinessCase
+        from models import User, Department, OrgUnit, Problem, Project, Epic, BusinessCase
         users_count = User.query.count()
-        departments_count = Department.query.count()
+        departments_count = OrgUnit.query.count()
         problems_count = Problem.query.count()
         projects_count = Project.query.count()
         
@@ -324,7 +324,7 @@ def init_admin_routes(app):
         # Create proper form with user data
         form = UserForm()
         
-        # Set department choices manually since Department.get_hierarchical_choices() might not exist
+        # Set department choices manually since OrgUnit.get_hierarchical_choices() might not exist
         dept_choices = [(0, 'No Department')] + [(d.id, d.name) for d in departments]
         form.department.choices = dept_choices
         
@@ -1133,7 +1133,7 @@ def init_admin_routes(app):
                                      auth_token=request.args.get('auth_token'))
             
             # For POST requests, execute the import
-            from models import ImportJob, Problem, BusinessCase, Project, User, Department
+            from models import ImportJob, Problem, BusinessCase, Project, User, Department, OrgUnit
             import pandas as pd
             
             job = ImportJob.query.get(int(job_id))
@@ -1206,7 +1206,7 @@ def init_admin_routes(app):
                             elif 'department_name' in csv_field:
                                 dept_id = _lookup_department_id(value)
                                 if dept_id:
-                                    data['dept_id'] = dept_id
+                                    data['org_unit_id'] = dept_id
                             elif model_field == 'problem_id':
                                 problem_id = _lookup_problem_id(value)
                                 if problem_id:
@@ -1228,14 +1228,14 @@ def init_admin_routes(app):
                         # Add default values for required fields if not provided
                         if 'reported_by' not in data:
                             data['reported_by'] = current_user.id
-                        if 'dept_id' not in data:
+                        if 'org_unit_id' not in data:
                             # Use current user's department or first available department
-                            if current_user.dept_id:
-                                data['dept_id'] = current_user.dept_id
+                            if current_user.org_unit_id:
+                                data['org_unit_id'] = current_user.org_unit_id
                             else:
-                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
-                                    data['dept_id'] = first_dept.id
+                                    data['org_unit_id'] = first_dept.id
                         
                         # Handle enum fields properly with proper casting
                         if 'priority' in data:
@@ -1290,13 +1290,13 @@ def init_admin_routes(app):
                         # Add default values for business case required fields
                         if 'submitted_by' not in data:
                             data['submitted_by'] = current_user.id
-                        if 'dept_id' not in data:
-                            if current_user.dept_id:
-                                data['dept_id'] = current_user.dept_id
+                        if 'org_unit_id' not in data:
+                            if current_user.org_unit_id:
+                                data['org_unit_id'] = current_user.org_unit_id
                             else:
-                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
-                                    data['dept_id'] = first_dept.id
+                                    data['org_unit_id'] = first_dept.id
                         
                         # Handle enum fields for business case
                         if 'case_type' in data:
@@ -1350,11 +1350,11 @@ def init_admin_routes(app):
                         # Department can be updated later via problem editing
                         if not data.get('department_id'):
                             # Try current user's department first
-                            if current_user.dept_id:
-                                data['department_id'] = current_user.dept_id
+                            if current_user.org_unit_id:
+                                data['department_id'] = current_user.org_unit_id
                             else:
                                 # Use first available department as fallback
-                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['department_id'] = first_dept.id
                                 else:
@@ -1366,8 +1366,8 @@ def init_admin_routes(app):
                                     continue
                         
                         # Remove any dept_id field to avoid conflicts (Problem model uses department_id)
-                        if 'dept_id' in data:
-                            del data['dept_id']
+                        if 'org_unit_id' in data:
+                            del data['org_unit_id']
                         
                         # Handle status mapping for Problems using StatusEnum (since ProblemStatusEnum doesn't exist)
                         if 'status' in data:
@@ -1406,13 +1406,13 @@ def init_admin_routes(app):
                             del data['submitted_by']
                         
                         # Handle department assignment (BusinessCase uses dept_id, not department_id)
-                        if not data.get('dept_id'):
-                            if current_user.dept_id:
-                                data['dept_id'] = current_user.dept_id
+                        if not data.get('org_unit_id'):
+                            if current_user.org_unit_id:
+                                data['org_unit_id'] = current_user.org_unit_id
                             else:
-                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
-                                    data['dept_id'] = first_dept.id
+                                    data['org_unit_id'] = first_dept.id
                         
                         # Remove department_id field if present (BusinessCase uses dept_id)
                         if 'department_id' in data:
@@ -1441,19 +1441,19 @@ def init_admin_routes(app):
                         # Department can be updated later via project editing
                         if not data.get('department_id'):
                             # Try current user's department first
-                            if current_user.dept_id:
-                                data['department_id'] = current_user.dept_id
+                            if current_user.org_unit_id:
+                                data['department_id'] = current_user.org_unit_id
                             else:
                                 # Use first available department as fallback
-                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['department_id'] = first_dept.id
                                 # If no departments exist, leave as None (nullable field)
                         
                         # Remove any dept_id field to avoid conflicts
-                        if 'dept_id' in data:
-                            del data['dept_id']
-                        data['department_id'] = data.get('department_id') or current_user.dept_id
+                        if 'org_unit_id' in data:
+                            del data['org_unit_id']
+                        data['department_id'] = data.get('department_id') or current_user.org_unit_id
                         
                         # Handle status mapping for Projects using StatusEnum
                         if 'status' in data:
