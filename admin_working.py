@@ -521,12 +521,15 @@ def init_admin_routes(app):
             # Convert to objects manually
             workflows = []
             for row in workflow_data:
-                workflow = type('obj', (object,), {
-                    'id': row[0],
-                    'name': row[1], 
-                    'description': row[2],
-                    'is_active': row[3]
-                })
+                # Create a proper object with all attributes
+                class WorkflowObj:
+                    def __init__(self, id, name, description, is_active):
+                        self.id = id
+                        self.name = name
+                        self.description = description
+                        self.is_active = is_active
+                
+                workflow = WorkflowObj(row[0], row[1], row[2], row[3])
                 workflows.append(workflow)
             
             # Get library workflows with raw SQL too
