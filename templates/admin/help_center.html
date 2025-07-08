@@ -134,8 +134,8 @@
                                             <code>{{ article.slug }}</code>
                                         </td>
                                         <td>{{ article.sort_order }}</td>
-                                        <td>{{ article.author.name if article.author else 'Unknown' }}</td>
-                                        <td>{{ article.updated_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ article.created_by_user.name if article.created_by_user else 'System' }}</td>
+                                        <td>{{ article.updated_at.strftime('%Y-%m-%d') if article.updated_at else 'N/A' }}</td>
                                         <td>
                                             <a href="{{ url_for('admin_edit_help_article', id=article.id) }}" 
                                                class="btn btn-sm btn-outline-primary" title="Edit">
