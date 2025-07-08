@@ -1,0 +1,110 @@
+CORE BUSINESS MODULES UPLOAD PACKAGE
+Priority modules needed after auth/ deployment succeeds
+
+========================================
+PHASE 2A: PRIMARY BUSINESS MODULES (Upload First)
+========================================
+
+1. problems/ folder (88K)
+   Required by: from problems.routes import problems_bp (line 459)
+   Files to upload:
+   - problems/__init__.py
+   - problems/routes.py
+   - problems/forms.py
+   - problems/templates/ (entire folder)
+     - problems/templates/problem_detail.html
+     - problems/templates/problem_form.html
+     - problems/templates/problems.html
+
+2. business/ folder (412K - LARGEST MODULE)
+   Required by: from business.routes import business_bp (line 462)
+   Files to upload:
+   - business/__init__.py
+   - business/routes.py
+   - business/forms.py
+   - business/epic_management.py
+   - business/templates/ (entire folder)
+     - business/templates/business_case_detail.html
+     - business/templates/business_case_form.html
+     - business/templates/business_cases.html
+     - business/templates/case_detail.html
+     - business/templates/case_form.html
+     - business/templates/cases.html
+     - business/templates/refine_stories.html
+     - business/templates/refine_stories_simple.html
+     - business/templates/requirements.html
+     - business/templates/requirements_clean.html
+
+3. projects/ folder (88K)
+   Required by: from projects.routes import projects_bp (line 465)
+   Files to upload:
+   - projects/__init__.py
+   - projects/routes.py
+   - projects/forms.py
+   Note: No templates folder present
+
+4. solutions/ folder (20K - SMALLEST)
+   Required by: from solutions.routes import solutions_bp (line 468)
+   Files to upload:
+   - solutions/__init__.py
+   - solutions/routes.py
+   - solutions/templates/ (entire folder)
+     - solutions/templates/solution_detail.html
+
+5. dept/ folder (48K)
+   Required by: from dept.routes import dept (line 471)
+   Files to upload:
+   - dept/__init__.py
+   - dept/routes.py
+   - dept/forms.py
+   - dept/templates/ (entire folder)
+     - dept/templates/department_form.html
+     - dept/templates/department_node.html
+     - dept/templates/departments.html
+     - dept/templates/dept/ (subfolder)
+
+========================================
+PHASE 2B: CORE FUNCTIONALITY MODULES (Upload Second)
+========================================
+
+6. predict/ folder (48K)
+   Required by: from predict.routes import predict_bp (line 474)
+   Files to upload:
+   - predict/routes.py
+   Note: Missing __init__.py - may need to create
+
+7. reports/ folder (108K)
+   Required by: from reports.routes import reports_bp (line 477)
+   Files to upload:
+   - reports/__init__.py
+   - reports/routes.py
+   - reports/scheduler.py
+   - reports/service.py
+
+8. notifications/ folder (148K)
+   Required by: from notifications.config_routes import notifications_config_bp (line 480)
+   Files to upload:
+   - notifications/__init__.py
+   - notifications/config_routes.py
+   - notifications/routes.py
+   - notifications/events.py
+   - notifications/service.py
+
+9. ai/ folder (192K)
+   Required by: from ai.routes import ai_bp (line 483)
+   Files to upload:
+   - ai/__init__.py
+   - ai/routes.py
+   - ai/summary_routes.py
+   - ai/problem_classifier.py
+
+========================================
+UPLOAD STRATEGY:
+========================================
+1. Upload Phase 2A modules first (problems, business, projects, solutions, dept)
+2. Test deployment after each upload
+3. Upload Phase 2B modules (predict, reports, notifications, ai)
+4. Monitor Render logs for next missing module errors
+
+Total size: ~1.2MB for all core modules
+Expected deployment time: 2-5 minutes per upload
