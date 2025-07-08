@@ -50,14 +50,23 @@
                                 {% if workflow.is_active %}Active{% else %}Inactive{% endif %}
                             </span>
                         </div>
-                        <div style="display: flex; gap: 10px; margin-left: 15px;">
-                            <a href="{{ url_for('configure_workflow', workflow_id=workflow.id) }}" 
-                               style="background: #17a2b8; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">
-                                <i class="bi bi-gear"></i> Configure
+                        <div style="display: flex; gap: 8px; align-items: flex-start;">
+                            <a href="/admin/workflows/{{ workflow.id }}/configure" 
+                               style="background: #ffc107; color: #000; padding: 4px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer; text-decoration: none; display: inline-block;">
+                                Configure
                             </a>
-                            <button onclick="toggleWorkflow({{ workflow.id }})" 
-                                    style="background: {% if workflow.is_active %}#dc3545{% else %}#28a745{% endif %}; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                                {% if workflow.is_active %}Deactivate{% else %}Activate{% endif %}
+                            <button style="background: #0d6efd; color: white; padding: 4px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;"
+                                    onclick="alert('Edit workflow functionality')">
+                                Edit
+                            </button>
+                            <form method="post" action="{{ url_for('toggle_workflow', workflow_id=workflow.id) }}" style="display: inline;">
+                                <button type="submit" style="background: {% if workflow.is_active %}#dc3545{% else %}#28a745{% endif %}; color: white; padding: 4px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
+                                    {% if workflow.is_active %}Deactivate{% else %}Activate{% endif %}
+                                </button>
+                            </form>
+                            <button style="background: #dc3545; color: white; padding: 4px 12px; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;"
+                                    onclick="if(confirm('Delete workflow?')) alert('Delete functionality')">
+                                Delete
                             </button>
                         </div>
                     </div>

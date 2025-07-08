@@ -507,18 +507,42 @@ def init_admin_routes(app):
     def admin_workflows_fixed():
         """Fixed workflow templates management that bypasses transaction issues"""
         try:
-            # Clear any existing transaction errors
-            db.session.rollback()
+            # Force close and recreate database session to clear transaction errors
+            db.session.close()
             
-            # Get workflows for current organization
-            workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
+            # Use raw SQL to bypass transaction issues
+            result = db.session.execute(
+                "SELECT id, name, description, is_active FROM workflow_templates WHERE organization_id = :org_id",
+                {"org_id": current_user.organization_id}
+            )
+            workflow_data = result.fetchall()
             
-            # Get library workflows
-            library_workflows = WorkflowLibrary.query.all()
+            # Convert to objects manually
+            workflows = []
+            for row in workflow_data:
+                workflow = type('obj', (object,), {
+                    'id': row[0],
+                    'name': row[1], 
+                    'description': row[2],
+                    'is_active': row[3]
+                })
+                workflows.append(workflow)
+            
+            # Get library workflows with raw SQL too
+            lib_result = db.session.execute("SELECT id, name, description FROM workflow_library")
+            library_data = lib_result.fetchall()
+            
+            library_workflows = []
+            for row in library_data:
+                lib_workflow = type('obj', (object,), {
+                    'id': row[0],
+                    'name': row[1],
+                    'description': row[2]
+                })
+                library_workflows.append(lib_workflow)
             
             print(f"🔧 Loaded {len(workflows)} workflows for org {current_user.organization_id}")
             print(f"🔧 Loaded {len(library_workflows)} library workflows")
-            print(f"🔧 User: {current_user.email}, Org: {current_user.organization_id}")
             
             # Debug: print workflow details
             for wf in workflows:
@@ -2806,6 +2830,8 @@ def init_admin_routes(app):
         return redirect(url_for('admin_triage_rules'))
 
     # Removed conflicting simple notification interface - using detailed interface at /admin/notifications/ instead
+
+
 
     print("✓ Admin routes initialized successfully")
 
