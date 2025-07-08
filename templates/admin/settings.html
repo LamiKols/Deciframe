@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Settings Management - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-light">Settings Management</h2>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSettingModal">
+                    <i class="fas fa-plus me-2"></i>Add Setting
+                </button>
+            </div>
+
+            <!-- Settings List -->
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5 class="text-light mb-0">System Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                    <th>Description</th>
+                                    <th>Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for setting in settings %}
+                                <tr>
+                                    <td><code class="text-warning">{{ setting.key }}</code></td>
+                                    <td>
+                                        <span class="text-info">{{ setting.value[:50] }}{% if setting.value|length > 50 %}...{% endif %}</span>
+                                    </td>
+                                    <td>{{ setting.description or '-' }}</td>
+                                    <td>
+                                        {% if setting.updated_at %}
+                                            <small class="text-muted">{{ setting.updated_at.strftime('%Y-%m-%d %H:%M') if setting.updated_at else 'N/A' }}</small>
+                                        {% else %}
+                                            <small class="text-muted">{{ setting.created_at.strftime('%Y-%m-%d %H:%M') if setting.created_at else 'N/A' }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" 
+                                                data-bs-toggle="modal" data-bs-target="#editSettingModal"
+                                                data-key="{{ setting.key }}" data-value="{{ setting.value }}" 
+                                                data-description="{{ setting.description or '' }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <form method="POST" action="{{ url_for('admin_delete_setting', setting_id=setting.key) }}" 
+                                              class="d-inline" onsubmit="return confirm('Delete this setting?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        No settings configured yet. Add your first setting to get started.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Setting Modal -->
+<div class="modal fade" id="addSettingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Add New Setting</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="key" class="form-label text-light">Setting Key</label>
+                        <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                               id="key" name="key" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="value" class="form-label text-light">Value</label>
+                        <textarea class="form-control bg-secondary text-light border-secondary" 
+                                  id="value" name="value" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label text-light">Description</label>
+                        <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                               id="description" name="description">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Setting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Setting Modal -->
+<div class="modal fade" id="editSettingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Edit Setting</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="editSettingForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_key" class="form-label text-light">Setting Key</label>
+                        <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                               id="edit_key" name="key" required readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_value" class="form-label text-light">Value</label>
+                        <textarea class="form-control bg-secondary text-light border-secondary" 
+                                  id="edit_value" name="value" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_description" class="form-label text-light">Description</label>
+                        <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                               id="edit_description" name="description">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Setting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle edit modal population
+document.addEventListener('DOMContentLoaded', function() {
+    var editModal = document.getElementById('editSettingModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var key = button.getAttribute('data-key');
+        var value = button.getAttribute('data-value');
+        var description = button.getAttribute('data-description');
+        
+        var form = document.getElementById('editSettingForm');
+        form.action = '{{ url_for("admin_update_setting", setting_id="") }}' + encodeURIComponent(key);
+        
+        document.getElementById('edit_key').value = key;
+        document.getElementById('edit_value').value = value;
+        document.getElementById('edit_description').value = description;
+    });
+});
+</script>
+{% endblock %}

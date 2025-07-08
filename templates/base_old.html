@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ effective_theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
+    <title>{% block title %}DeciFrame{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+    
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Dynamic Bootstrap Theme System -->
+    {% if org_prefs.theme == 'dark' %}
+        <!-- Bootstrap Dark Theme -->
+        <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-dark.css') }}">
+    {% else %}
+        <!-- Bootstrap Light Theme -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-light.css') }}">
+        <!-- Force dropdown text visibility for light theme -->
+        <style>
+            .dropdown-content a, 
+            .dropdown-content div,
+            .dropdown-content *,
+            .dropdown-menu a,
+            .dropdown-menu div,
+            .dropdown-menu * {
+                color: #212121 !important;
+                background-color: #fefefe !important;
+            }
+            .dropdown-content {
+                background-color: #fefefe !important;
+            }
+            .dropdown-menu {
+                background-color: #fefefe !important;
+            }
+        </style>
+    {% endif %}
+    
+    <!-- Existing CSS -->
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+    
+    <!-- Inter Font Typography -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inter-font.css') }}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='dropdown.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        /* Multi-level dropdown CSS */
+        .dropdown-submenu {
+            position: relative;
+        }
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+        }
+        .dropdown-submenu:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-submenu .dropdown-toggle::after {
+            transform: rotate(-90deg);
+            float: right;
+            margin-top: 8px;
+        }
+    </style>
+    
+    <!-- Note: JWT authentication now uses secure HttpOnly cookies -->
+</head>
+<body class="{% if org_prefs.theme == 'dark' %}dark-theme{% else %}light-theme{% endif %}">
+    <!-- Enterprise Navbar -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+
+    {% if logged_in %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+      <div class="container-fluid">
+        <!-- Brand Text -->
+        <a class="navbar-brand fw-bold text-white" href="{{ url_for('index') }}">DeciFrame</a>
+
+        <!-- Mobile Toggler -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+          aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Nav Links -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}"><i class="bi bi-house"></i> Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboards.dashboard_home') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            {% if user and user.role and user.role.value in ['Director', 'CEO', 'Admin'] %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboards.executive_dashboard') }}"><i class="bi bi-graph-up"></i> Executive</a></li>
+            {% endif %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('problems.index') }}"><i class="bi bi-exclamation-triangle"></i> Problems</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('business.list_cases') }}"><i class="bi bi-briefcase"></i> Cases</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('projects.index') }}"><i class="bi bi-kanban"></i> Projects</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('help.index') }}"><i class="bi bi-question-circle"></i> Help</a></li>
+          </ul>
+
+          <!-- Search Bar -->
+          <form class="d-flex me-3" role="search" action="{{ url_for('search.search_page') }}" method="get">
+            <input class="form-control form-control-sm" type="search" name="q" placeholder="Search..." aria-label="Search">
+          </form>
+
+          <!-- Management Dropdown -->
+          {% if user and user.role and user.role.value in ['Manager', 'Director', 'CEO', 'PM'] %}
+          <div class="dropdown me-3">
+            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-clipboard-check"></i> Management
+              {% if total_pending and total_pending > 0 %}
+                <span class="badge bg-danger ms-1">{{ total_pending }}</span>
+              {% endif %}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{{ url_for('review.review_summary') }}">
+                <i class="bi bi-speedometer2"></i> Review Dashboard
+                {% if total_pending > 0 %}
+                  <span class="badge bg-danger ms-2">{{ total_pending }}</span>
+                {% endif %}
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ url_for('review.review_business_cases') }}">
+                <i class="bi bi-briefcase"></i> Business Cases
+                {% if pending_cases > 0 %}
+                  <span class="badge bg-danger ms-2">{{ pending_cases }}</span>
+                {% endif %}
+              </a></li>
+              <li><a class="dropdown-item" href="{{ url_for('review.review_projects') }}">
+                <i class="bi bi-kanban"></i> Projects
+                {% if pending_projects > 0 %}
+                  <span class="badge bg-danger ms-2">{{ pending_projects }}</span>
+                {% endif %}
+              </a></li>
+              <li><a class="dropdown-item" href="{{ url_for('review.review_epics') }}">
+                <i class="bi bi-list-task"></i> Epics
+                {% if pending_epics > 0 %}
+                  <span class="badge bg-danger ms-2">{{ pending_epics }}</span>
+                {% endif %}
+              </a></li>
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- Admin Dropdown -->
+          {% if user and user.role and user.role.value == 'Admin' %}
+          <div class="dropdown me-3">
+            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-gear"></i> Admin Center
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/admin/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+              <li><a class="dropdown-item" href="/admin/users"><i class="bi bi-people"></i> User Management</a></li>
+              <li><a class="dropdown-item" href="/admin/settings"><i class="bi bi-gear"></i> Settings</a></li>
+              <li><a class="dropdown-item" href="/admin/org-structure"><i class="bi bi-diagram-3"></i> Org Structure</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/admin/import-data"><i class="bi bi-upload"></i> Bulk Import</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('data_management.export_data') }}"><i class="bi bi-download"></i> Export Data</a></li>
+              <li><a class="dropdown-item" href="/admin/workflows"><i class="bi bi-arrow-repeat"></i> Workflows</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('notifications_config.notification_settings') }}"><i class="bi bi-bell"></i> Notifications</a></li>
+              <li><a class="dropdown-item" href="/admin/audit-logs"><i class="bi bi-file-text"></i> Audit Logs</a></li>
+              <li><a class="dropdown-item" href="/monitoring/dashboard"><i class="bi bi-activity"></i> Monitoring</a></li>
+              <li><a class="dropdown-item" href="/admin/help-center"><i class="bi bi-question-circle"></i> Help Center</a></li>
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- User Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i> {{ user.name }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="{{ url_for('auth.toggle_theme') }}" class="px-3">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}"/>
+                  <button type="submit" class="btn btn-sm btn-outline-secondary w-100" title="Toggle Theme">
+                    {% if current_user.theme == 'dark' %}
+                      <i class="bi bi-sun"></i> Switch to Light
+                    {% else %}
+                      <i class="bi bi-moon"></i> Switch to Dark
+                    {% endif %}
+                  </button>
+                </form>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+    {% else %}
+    <!-- Login/Register Navigation for non-authenticated users -->
+    <style>
+        .navbar-force-white {
+            background-color: #343a40 !important;
+        }
+        .navbar-force-white .navbar-brand,
+        .navbar-force-white .nav-link,
+        .navbar-force-white .nav-link i {
+            color: #ffffff !important;
+        }
+        .navbar-force-white .nav-link:hover,
+        .navbar-force-white .nav-link:hover i {
+            color: #4CAF50 !important;
+        }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-force-white border-bottom">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                DeciFrame
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('auth.login') }}">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                </a>
+                <a class="nav-link" href="{{ url_for('auth.register') }}">
+                    <i class="fas fa-user-plus me-1"></i>Register
+                </a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        <!-- Flash Messages - Now using Toast Notifications (see bottom of page) -->
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark border-top mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0">&copy; 2025 DeciFrame. Organizational Management System.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="text-muted mb-0">
+                        <a href="{{ url_for('public.terms') }}" class="text-muted text-decoration-none">Terms of Use</a> | 
+                        <a href="{{ url_for('public.privacy') }}" class="text-muted text-decoration-none">Privacy Policy</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Organization Preferences Global Variables -->
+    <script>
+        window.ORG_PREFS = {
+            currency: '{{ org_prefs.currency }}',
+            date_format: '{{ org_prefs.date_format }}',
+            timezone: '{{ org_prefs.timezone }}',
+            theme: '{{ org_prefs.theme }}'
+        };
+        
+        // Currency symbol mapping for JavaScript
+        window.CURRENCY_SYMBOLS = {
+            'USD': '$', 'EUR': '€', 'GBP': '£', 'CAD': 'C$', 
+            'AUD': 'A$', 'JPY': '¥', 'CNY': '¥', 'INR': '₹'
+        };
+        
+        window.CURRENCY_SYMBOL = window.CURRENCY_SYMBOLS[window.ORG_PREFS.currency] || window.ORG_PREFS.currency || '$';
+        
+        // Theme System Global Variables
+        window.THEME_DATA = {
+            effective_theme: '{{ effective_theme }}',
+            user_theme: '{{ user_theme }}',
+            org_default_theme: '{{ org_default_theme }}'
+        };
+    </script>
+    
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+    
+    <!-- Global search functionality for navbar -->
+    <script>
+    // Global search initialization for navbar
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle both old and new navbar search forms
+        const navSearchForm = document.getElementById('searchForm');
+        const enterpriseSearchForm = document.querySelector('.enterprise-navbar form');
+        
+        if (navSearchForm) {
+            navSearchForm.onsubmit = function(e) {
+                e.preventDefault();
+                const query = document.getElementById('searchInput').value.trim();
+                if (query) {
+                    window.location.href = '/search/?q=' + encodeURIComponent(query);
+                }
+            };
+        }
+        
+        if (enterpriseSearchForm) {
+            enterpriseSearchForm.onsubmit = function(e) {
+                e.preventDefault();
+                const query = this.querySelector('input[name="q"]').value.trim();
+                if (query) {
+                    window.location.href = '/search/?q=' + encodeURIComponent(query);
+                }
+            };
+        }
+    });
+    </script>
+    
+    <!-- Contextual Help System -->
+    <script src="{{ url_for('static', filename='js/contextual_help.js') }}"></script>
+    
+    <!-- Simple Theme Toggle System -->
+    <script src="{{ url_for('static', filename='js/theme-toggle-simple.js') }}"></script>
+    
+    <!-- Help Assistant Chat Widget -->
+    {% include 'help/chat_widget.html' %}
+    
+    <!-- Welcome Onboarding Modal for New Users -->
+    {% if current_user.is_authenticated and not current_user.onboarded %}
+    <div class="modal fade show" id="onboardingModal" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Welcome to DeciFrame!</h5>
+          </div>
+          <div class="modal-body">
+            <p>Start by exploring:</p>
+            <ul>
+              <li>✅ Create or review Business Cases</li>
+              <li>🔍 Analyze Problems and convert them</li>
+              <li>📊 Review dashboards for performance</li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <form method="post" action="{{ url_for('auth.mark_onboarded') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}"/>
+              <button type="submit" class="btn btn-primary">Get Started</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Toast Notification Container -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="toast align-items-center text-white bg-{{ 'success' if category == 'success' else 'danger' if category == 'error' or category == 'danger' else 'warning' if category == 'warning' else 'info' }} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+          <div class="d-flex">
+            <div class="toast-body">
+              <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' or category == 'error' %}exclamation-triangle{% elif category == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+        {% endfor %}
+      {% endwith %}
+    </div>
+
+    <!-- Toast Notification JavaScript -->
+    <script>
+      window.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        toastElList.forEach(function (toastEl) {
+          new bootstrap.Toast(toastEl).show()
+        })
+      });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Manager Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-users me-2"></i>Manager Dashboard</h2>
+            <p class="text-muted">Department overview for {{ user.first_name }}</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    {% include 'includes/quick_actions.html' %}
+
+    <div class="row mt-4">
+        <!-- Dept. Problems Panel -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Dept. Problems</h5>
+                    <a href="{{ url_for('problems.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if dept_problems %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Reporter</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for problem in dept_problems %}
+                                    <tr>
+                                        <td><a href="{{ url_for('problems.problem_detail', id=problem.id) }}">{{ problem.code }}</a></td>
+                                        <td>{{ problem.title[:30] }}{% if problem.title|length > 30 %}...{% endif %}</td>
+                                        <td>{{ problem.reported_by.first_name }} {{ problem.reported_by.last_name }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if problem.priority.value == 'High' %}danger{% elif problem.priority.value == 'Medium' %}warning{% else %}secondary{% endif %}">
+                                                {{ problem.priority.value }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if problem.status.value == 'Open' %}danger{% elif problem.status.value == 'InProgress' %}warning{% else %}success{% endif %}">
+                                                {{ problem.status.value }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No problems reported in your department.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Cases Panel -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-briefcase me-2"></i>Pending Cases</h5>
+                    <a href="{{ url_for('business.list_cases') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if pending_cases %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>ROI</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for case in pending_cases %}
+                                    <tr>
+                                        <td><a href="{{ url_for('business.view_case', id=case.id) }}">{{ case.code }}</a></td>
+                                        <td>{{ case.title[:30] }}{% if case.title|length > 30 %}...{% endif %}</td>
+                                        <td>
+                                            <span class="badge bg-{% if case.case_type.value == 'Reactive' %}warning{% else %}info{% endif %}">
+                                                {{ case.case_type.value }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if case.estimated_roi %}
+                                                <span class="text-success">{{ "%.0f"|format(case.estimated_roi) }}%</span>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ case.created_at | format_org_date }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No pending cases in your department.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Stats -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar me-2"></i>Department Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-danger">{{ kpis.open_problems }}</h4>
+                                <small class="text-muted">Total Problems</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-warning">{{ kpis.pending_cases }}</h4>
+                                <small class="text-muted">Pending Cases</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-info">{{ kpis.active_projects }}</h4>
+                                <small class="text-muted">Active Projects</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-success">{{ kpis.avg_roi }}%</h4>
+                                <small class="text-muted">Average ROI</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

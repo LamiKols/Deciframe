@@ -1,0 +1,1897 @@
+{% from 'macros/forms.html' import dropdown, priority_dropdown %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Dashboard - DeciFrame</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Define currency symbol for JavaScript usage
+        window.CURRENCY_SYMBOL = '{{ currency_symbol }}';
+    </script>
+    <style>
+        .kpi-card {
+            background: var(--bs-dark);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: var(--bs-dark);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .kpi-icon {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--bs-primary);
+        }
+        .kpi-label {
+            color: var(--bs-secondary);
+            font-size: 0.9rem;
+        }
+        .export-section {
+            background: var(--bs-dark);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0">Executive Dashboard</h1>
+                        <p class="text-muted mb-0">Real-time insights into organizational performance</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-success">Live Data</span>
+                        <small class="text-muted ms-2">Updated: {{ datetime.now().strftime('%b %d, %Y %H:%M') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Dashboard Filters</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="dashboardFilters" class="row g-3">
+                            <!-- Date Range -->
+                            <div class="col-md-2">
+                                <label for="fromDate" class="form-label">From Date</label>
+                                <input type="date" class="form-control" id="fromDate" name="from">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="toDate" class="form-label">To Date</label>
+                                <input type="date" class="form-control" id="toDate" name="to">
+                            </div>
+                            
+                            <!-- Department Filter -->
+                            <div class="col-md-2">
+                                <label for="departmentFilter" class="form-label">Departments</label>
+                                {{ dropdown('departments', [('', 'All Departments')], 
+                                           id='departmentFilter', multiple=True,
+                                           class='form-select') }}
+                            </div>
+                            
+                            <!-- Case Type Filter -->
+                            <div class="col-md-1">
+                                <label for="caseTypeFilter" class="form-label">Case Type</label>
+                                {{ dropdown('case_type', [('', 'All Types'), ('Reactive', 'Reactive'), ('Proactive', 'Proactive')], 
+                                           id='caseTypeFilter',
+                                           class='form-select') }}
+                            </div>
+                            
+                            <!-- Priority Filter -->
+                            <div class="col-md-2">
+                                <label for="priorityFilter" class="form-label">Priority</label>
+                                {{ priority_dropdown('priority', placeholder='All Priorities', 
+                                                     id='priorityFilter', multiple=True,
+                                                     class='form-select') }}
+                            </div>
+                            
+                            <!-- Manager Filter -->
+                            <div class="col-md-2">
+                                <label for="managerFilter" class="form-label">Manager/BA</label>
+                                {{ dropdown('manager', [('', 'All Managers')], 
+                                           id='managerFilter',
+                                           class='form-select') }}
+                            </div>
+                            
+                            <!-- Status Filter -->
+                            <div class="col-md-1">
+                                <label for="statusFilter" class="form-label">Status</label>
+                                {{ dropdown('status', [('', 'All Status'), ('Open', 'Open'), ('In Progress', 'In Progress'), 
+                                                   ('Resolved', 'Resolved'), ('On Hold', 'On Hold')], 
+                                           id='statusFilter', multiple=True,
+                                           class='form-select') }}
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary" id="applyFilters">Apply Filters</button>
+                                <button type="button" class="btn btn-secondary ms-2" id="clearFilters">Clear All</button>
+                                <button type="button" class="btn btn-info ms-2" id="exportFiltered">Export Filtered Data</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.problems_count }}</div>
+                            <div class="kpi-label">Total Problems</div>
+                        </div>
+                        <i class="fas fa-exclamation-triangle kpi-icon text-warning"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.open_cases }}</div>
+                            <div class="kpi-label">Open Business Cases</div>
+                        </div>
+                        <i class="fas fa-briefcase kpi-icon text-info"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.active_projects }}</div>
+                            <div class="kpi-label">Active Projects</div>
+                        </div>
+                        <i class="fas fa-project-diagram kpi-icon text-success"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.avg_roi }}%</div>
+                            <div class="kpi-label">Average ROI</div>
+                        </div>
+                        <i class="fas fa-chart-line kpi-icon text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary KPIs -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="kpi-card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h5 mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(metrics.total_investment) }}</div>
+                            <small class="text-muted">Total Investment</small>
+                        </div>
+                        <i class="fas fa-dollar-sign text-danger"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="kpi-card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h5 mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(metrics.total_benefits) }}</div>
+                            <small class="text-muted">Expected Benefits</small>
+                        </div>
+                        <i class="fas fa-arrow-trend-up text-success"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="kpi-card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h5 mb-0">{{ metrics.completion_rate }}%</div>
+                            <small class="text-muted">Project Completion Rate</small>
+                        </div>
+                        <i class="fas fa-check-circle text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Problem Trends (Last 90 Days)</h5>
+                    <canvas id="problemTrendsChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Status Distribution</h5>
+                    <canvas id="statusBreakdownChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Problem-to-Case Conversion</h5>
+                    <canvas id="conversionChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Project Performance</h5>
+                    <canvas id="projectMetricsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Analytics Section -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <h4 class="text-primary">Advanced Analytics</h4>
+                <hr>
+            </div>
+        </div>
+
+        <!-- Advanced Charts Row 1 -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <h5 class="mb-3">Department Heat-Map</h5>
+                    <canvas id="deptHeatmap"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="chart-container">
+                    <h5 class="mb-3">Resource Utilization</h5>
+                    <canvas id="utilGauge"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Charts Row 2 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Time-to-Value Distribution</h5>
+                    <canvas id="t2vDist"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Risk & Issue Backlog</h5>
+                    <canvas id="riskIssue"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Charts Row 3 -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h5 class="mb-3">Problem Clusters</h5>
+                    <canvas id="probClusters"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h5 class="mb-3">ROI Waterfall</h5>
+                    <canvas id="roiWaterfall"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h5 class="mb-3">Milestone Burn-Down</h5>
+                    <canvas id="burnDown"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h5 class="mb-3">Data Export</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-muted mb-3">Download dashboard data for further analysis</p>
+                    <a href="/admin/export/dashboard-csv" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-download me-1"></i> Download CSV
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="exportPDF()">
+                        <i class="fas fa-file-pdf me-1"></i> Export PDF
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-end">
+                        <small class="text-muted">
+                            Last updated: {{ datetime.now().strftime('%B %d, %Y at %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Chart configuration
+        Chart.defaults.color = '#fff';
+        Chart.defaults.borderColor = '#404040';
+
+        // Problem Trends Chart
+        fetch('/admin/api/dashboard/problems-trend-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('problemTrendsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(item => new Date(item.date).toLocaleDateString()),
+                        datasets: [{
+                            label: 'Problems Created',
+                            data: data.map(item => item.count),
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#404040'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: '#404040'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading problem trends:', error));
+
+        // Status Breakdown Chart
+        fetch('/admin/api/dashboard/status-breakdown-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('statusBreakdownChart').getContext('2d');
+                
+                // Combine all status data
+                const statusCounts = {};
+                data.problems.forEach(item => {
+                    statusCounts[item.status] = (statusCounts[item.status] || 0) + item.count;
+                });
+                data.cases.forEach(item => {
+                    statusCounts[item.status] = (statusCounts[item.status] || 0) + item.count;
+                });
+                data.projects.forEach(item => {
+                    statusCounts[item.status] = (statusCounts[item.status] || 0) + item.count;
+                });
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(statusCounts),
+                        datasets: [{
+                            data: Object.values(statusCounts),
+                            backgroundColor: [
+                                '#0d6efd',
+                                '#6f42c1',
+                                '#d63384',
+                                '#dc3545',
+                                '#fd7e14',
+                                '#ffc107',
+                                '#198754',
+                                '#20c997'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading status breakdown:', error));
+
+        // Conversion Chart
+        fetch('/admin/api/dashboard/case-conversion-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('conversionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(item => item.month),
+                        datasets: [
+                            {
+                                label: 'Problems',
+                                data: data.map(item => item.problems),
+                                backgroundColor: '#dc3545',
+                                borderColor: '#dc3545'
+                            },
+                            {
+                                label: 'Business Cases',
+                                data: data.map(item => item.cases),
+                                backgroundColor: '#198754',
+                                borderColor: '#198754'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#404040'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: '#404040'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading conversion data:', error));
+
+        // Project Metrics Chart
+        fetch('/admin/api/dashboard/project-metrics-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('projectMetricsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['On Time', 'Delayed', 'In Progress'],
+                        datasets: [{
+                            data: [data.on_time, data.delayed, data.in_progress],
+                            backgroundColor: ['#198754', '#dc3545', '#ffc107']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading project metrics:', error));
+
+        // Advanced Analytics Charts
+
+        // Department Heat-Map
+        fetch('/admin/api/dashboard/department-heatmap-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('deptHeatmap').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(item => item.department),
+                        datasets: [
+                            {
+                                label: 'Problems',
+                                data: data.map(item => item.problems),
+                                backgroundColor: '#dc3545',
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Cases',
+                                data: data.map(item => item.cases),
+                                backgroundColor: '#198754',
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Projects',
+                                data: data.map(item => item.projects),
+                                backgroundColor: '#0d6efd',
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Avg ROI %',
+                                data: data.map(item => item.avg_roi),
+                                backgroundColor: '#ffc107',
+                                type: 'line',
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                grid: { color: '#404040' }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: { drawOnChartArea: false }
+                            },
+                            x: { grid: { color: '#404040' } }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading department heatmap:', error));
+
+        // Resource Utilization Gauge
+        fetch('/admin/api/dashboard/resource-utilization-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('utilGauge').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Utilized', 'Available'],
+                        datasets: [{
+                            data: [data.utilization_pct, 100 - data.utilization_pct],
+                            backgroundColor: ['#dc3545', '#198754'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.parsed + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading resource utilization:', error));
+
+        // Time-to-Value Distribution
+        fetch('/admin/api/dashboard/time-to-value-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('t2vDist').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.approval_to_start.labels,
+                        datasets: [
+                            {
+                                label: 'Approval to Start (days)',
+                                data: data.approval_to_start.data,
+                                backgroundColor: '#0d6efd'
+                            },
+                            {
+                                label: 'Start to Completion (days)',
+                                data: data.start_to_completion.data,
+                                backgroundColor: '#6f42c1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#404040' } },
+                            x: { grid: { color: '#404040' } }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading time-to-value:', error));
+
+        // Risk & Issue Backlog
+        fetch('/admin/api/dashboard/risks-issues-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('riskIssue').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(item => item.project_code),
+                        datasets: [
+                            {
+                                label: 'Risks',
+                                data: data.map(item => item.risk_count),
+                                backgroundColor: data.map(item => 
+                                    item.highest_severity === 'High' ? '#dc3545' :
+                                    item.highest_severity === 'Medium' ? '#ffc107' : '#198754'
+                                )
+                            },
+                            {
+                                label: 'Issues',
+                                data: data.map(item => item.issue_count),
+                                backgroundColor: '#6c757d'
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { beginAtZero: true, grid: { color: '#404040' } },
+                            y: { grid: { color: '#404040' } }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading risks/issues:', error));
+
+        // Problem Clusters
+        fetch('/admin/api/dashboard/problem-clusters-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('probClusters').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.map(item => item.cluster_label),
+                        datasets: [{
+                            data: data.map(item => item.count),
+                            backgroundColor: [
+                                '#0d6efd', '#6f42c1', '#d63384', 
+                                '#dc3545', '#fd7e14', '#ffc107'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const item = data[context.dataIndex];
+                                        return `Avg Resolution: ${item.avg_resolution_days} days`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading problem clusters:', error));
+
+        // ROI Waterfall
+        fetch('/admin/api/dashboard/roi-waterfall-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('roiWaterfall').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(item => item.case_code),
+                        datasets: [{
+                            label: 'Net Benefit ($)',
+                            data: data.map(item => item.net_benefit),
+                            backgroundColor: data.map(item => item.net_benefit > 0 ? '#198754' : '#dc3545')
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: '#404040' },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            },
+                            x: { grid: { color: '#404040' } }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const item = data[context.dataIndex];
+                                        return [
+                                            `Net Benefit: ${window.CURRENCY_SYMBOL}${context.parsed.y.toLocaleString()}`,
+                                            `Cost: ${window.CURRENCY_SYMBOL}${item.cost.toLocaleString()}`,
+                                            `Benefit: ${window.CURRENCY_SYMBOL}${item.benefit.toLocaleString()}`
+                                        ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading ROI waterfall:', error));
+
+        // Milestone Burn-Down
+        fetch('/admin/api/dashboard/milestone-burndown-demo')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('burnDown').getContext('2d');
+                
+                // Use first project's data or create empty chart
+                const projectData = data.length > 0 ? data[0] : { project: 'No Data', timeline: [] };
+                
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: projectData.timeline.map(item => new Date(item.date).toLocaleDateString()),
+                        datasets: [
+                            {
+                                label: 'Planned',
+                                data: projectData.timeline.map(item => item.planned),
+                                borderColor: '#0d6efd',
+                                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Actual',
+                                data: projectData.timeline.map(item => item.actual),
+                                borderColor: '#dc3545',
+                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: '#404040' },
+                                title: {
+                                    display: true,
+                                    text: 'Milestones Remaining'
+                                }
+                            },
+                            x: { grid: { color: '#404040' } }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: projectData.project
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading milestone burndown:', error));
+
+        // Filter Management and Drill-down System
+        
+        // Global chart references for updating
+        let chartInstances = {};
+        
+        // Initialize filter dropdowns on page load
+        function initializeFilters() {
+            // Load departments
+            fetch('/admin/api/dashboard/department-heatmap-demo')
+                .then(response => response.json())
+                .then(data => {
+                    const deptSelect = document.getElementById('departmentFilter');
+                    data.forEach((dept, index) => {
+                        const option = document.createElement('option');
+                        option.value = index + 1; // Assuming department IDs start from 1
+                        option.textContent = dept.department;
+                        deptSelect.appendChild(option);
+                    });
+                });
+            
+            // Load managers/BAs (simplified - in real app would fetch from API)
+            const managerSelect = document.getElementById('managerFilter');
+            const managers = [
+                {id: 1, name: 'John Smith (CEO)'}, 
+                {id: 2, name: 'Jane Doe (PM)'}, 
+                {id: 3, name: 'Bob Wilson (BA)'}
+            ];
+            managers.forEach(manager => {
+                const option = document.createElement('option');
+                option.value = manager.id;
+                option.textContent = manager.name;
+                managerSelect.appendChild(option);
+            });
+        }
+        
+        // Get current filter parameters
+        function getFilterParams() {
+            const form = document.getElementById('dashboardFilters');
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            
+            // Date filters
+            if (formData.get('from')) params.append('from', formData.get('from'));
+            if (formData.get('to')) params.append('to', formData.get('to'));
+            
+            // Multi-select departments
+            const deptSelect = document.getElementById('departmentFilter');
+            const selectedDepts = Array.from(deptSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            if (selectedDepts.length > 0) params.append('departments', selectedDepts.join(','));
+            
+            // Case type
+            if (formData.get('case_type')) params.append('case_type', formData.get('case_type'));
+            
+            // Multi-select priorities
+            const prioSelect = document.getElementById('priorityFilter');
+            const selectedPrios = Array.from(prioSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            if (selectedPrios.length > 0) params.append('priority', selectedPrios.join(','));
+            
+            // Manager
+            if (formData.get('manager')) params.append('manager', formData.get('manager'));
+            
+            // Multi-select status
+            const statusSelect = document.getElementById('statusFilter');
+            const selectedStatus = Array.from(statusSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            if (selectedStatus.length > 0) params.append('status', selectedStatus.join(','));
+            
+            return params;
+        }
+        
+        // Refresh all charts with current filters
+        function refreshAllCharts() {
+            const params = getFilterParams();
+            const baseUrl = '/admin/api/dashboard-demo';
+            
+            // Update all seven advanced analytics charts
+            updateDepartmentHeatmap(params);
+            updateTimeToValue(params);
+            updateRisksIssues(params);
+            updateMilestoneBurndown(params);
+            updateROIWaterfall(params);
+            updateProblemClusters(params);
+            updateResourceUtilization(params);
+            
+            // Update original dashboard charts
+            updateProblemsChart(params);
+            updateConversionChart(params);
+            updateProjectMetrics(params);
+            updateStatusChart(params);
+        }
+        
+        // Individual chart update functions with filtering
+        function updateDepartmentHeatmap(params) {
+            fetch(`/admin/api/dashboard-demo/department-heatmap?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.deptHeatmap) {
+                        chartInstances.deptHeatmap.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('deptHeatmap').getContext('2d');
+                    chartInstances.deptHeatmap = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => item.department),
+                            datasets: [
+                                {
+                                    label: 'Problems',
+                                    data: data.map(item => item.problems),
+                                    backgroundColor: '#dc3545',
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    label: 'Cases',
+                                    data: data.map(item => item.cases),
+                                    backgroundColor: '#198754',
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    label: 'Projects',
+                                    data: data.map(item => item.projects),
+                                    backgroundColor: '#0d6efd',
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    label: 'Avg ROI %',
+                                    data: data.map(item => item.avg_roi),
+                                    backgroundColor: '#ffc107',
+                                    type: 'line',
+                                    yAxisID: 'y1'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onClick: (event, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const department = data[index].department;
+                                    openDrillModal('deptHeatmap', department);
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    grid: { color: '#404040' }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    grid: { drawOnChartArea: false }
+                                },
+                                x: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading department heatmap:', error));
+        }
+        
+        function updateTimeToValue(params) {
+            fetch(`/admin/api/dashboard-demo/time-to-value?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.t2vDist) {
+                        chartInstances.t2vDist.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('t2vDist').getContext('2d');
+                    chartInstances.t2vDist = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.approval_to_start.labels,
+                            datasets: [
+                                {
+                                    label: 'Approval to Start (days)',
+                                    data: data.approval_to_start.data,
+                                    backgroundColor: '#0d6efd'
+                                },
+                                {
+                                    label: 'Start to Completion (days)',
+                                    data: data.start_to_completion.data,
+                                    backgroundColor: '#6f42c1'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onClick: (event, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const timeRange = data.approval_to_start.labels[index];
+                                    openDrillModal('timeToValue', timeRange);
+                                }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#404040' } },
+                                x: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading time-to-value:', error));
+        }
+        
+        function updateRisksIssues(params) {
+            fetch(`/admin/api/dashboard-demo/risks-issues?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.riskIssue) {
+                        chartInstances.riskIssue.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('riskIssue').getContext('2d');
+                    chartInstances.riskIssue = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => item.project_code),
+                            datasets: [
+                                {
+                                    label: 'Risks',
+                                    data: data.map(item => item.risk_count),
+                                    backgroundColor: data.map(item => 
+                                        item.highest_severity === 'High' ? '#dc3545' :
+                                        item.highest_severity === 'Medium' ? '#ffc107' : '#198754'
+                                    )
+                                },
+                                {
+                                    label: 'Issues',
+                                    data: data.map(item => item.issue_count),
+                                    backgroundColor: '#6c757d'
+                                }
+                            ]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onClick: (event, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const projectCode = data[index].project_code;
+                                    openDrillModal('riskIssue', projectCode);
+                                }
+                            },
+                            scales: {
+                                x: { beginAtZero: true, grid: { color: '#404040' } },
+                                y: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading risks/issues:', error));
+        }
+        
+        // Comprehensive drill-down modal system
+        function openDrillModal(chartType, value) {
+            const params = getFilterParams();
+            params.append('chart', chartType);
+            params.append('value', value);
+            
+            fetch(`/admin/api/dashboard-demo/drilldown?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showErrorModal('Error', data.error);
+                        return;
+                    }
+                    
+                    let content = '';
+                    let title = '';
+                    
+                    if (chartType === 'deptHeatmap') {
+                        title = `Department: ${data.department}`;
+                        content = buildDepartmentDrillContent(data);
+                    } else if (chartType === 'timeToValue') {
+                        title = `Time Range: ${data.time_range} days`;
+                        content = buildTimeRangeDrillContent(data);
+                    } else if (chartType === 'riskIssue') {
+                        title = `Project: ${data.project.code}`;
+                        content = buildProjectRiskDrillContent(data);
+                    } else if (chartType === 'problemClusters') {
+                        title = `Problem Cluster: ${data.cluster}`;
+                        content = buildProblemClusterDrillContent(data);
+                    } else if (chartType === 'roiWaterfall') {
+                        title = `Business Case: ${data.case.code}`;
+                        content = buildBusinessCaseDrillContent(data);
+                    } else if (chartType === 'milestones') {
+                        title = `Project Milestones: ${data.project.code}`;
+                        content = buildMilestonesDrillContent(data);
+                    }
+                    
+                    showDrillDownModal(title, content);
+                })
+                .catch(error => {
+                    console.error('Drill-down error:', error);
+                    showErrorModal('Error', 'Failed to load drill-down data');
+                });
+        }
+        
+        function buildDepartmentDrillContent(data) {
+            let content = `<div class="row">`;
+            
+            // Problems tab
+            content += `
+                <div class="col-12 mb-3">
+                    <ul class="nav nav-tabs" id="deptTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="problems-tab" data-bs-toggle="tab" data-bs-target="#problems" type="button">
+                                Problems (${data.problems.length})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cases-tab" data-bs-toggle="tab" data-bs-target="#cases" type="button">
+                                Business Cases (${data.cases.length})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button">
+                                Projects (${data.projects.length})
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="deptTabsContent">
+                        <div class="tab-pane fade show active" id="problems" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-dark table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Title</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+            
+            data.problems.forEach(problem => {
+                content += `
+                    <tr>
+                        <td><span class="badge bg-warning">${problem.code}</span></td>
+                        <td>${problem.title}</td>
+                        <td><span class="badge bg-${problem.priority === 'High' ? 'danger' : problem.priority === 'Medium' ? 'warning' : 'success'}">${problem.priority}</span></td>
+                        <td><span class="badge bg-secondary">${problem.status}</span></td>
+                        <td>${problem.created_at}</td>
+                        <td><a href="${problem.url}" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>`;
+            });
+            
+            content += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="cases" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-dark table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Title</th>
+                                            <th>Cost</th>
+                                            <th>Benefit</th>
+                                            <th>ROI</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+            
+            data.cases.forEach(case_item => {
+                content += `
+                    <tr>
+                        <td><span class="badge bg-success">${case_item.code}</span></td>
+                        <td>${case_item.title}</td>
+                        <td>$${case_item.cost_estimate.toLocaleString()}</td>
+                        <td>$${case_item.benefit_estimate.toLocaleString()}</td>
+                        <td><span class="badge bg-${case_item.roi > 100 ? 'success' : 'warning'}">${case_item.roi}%</span></td>
+                        <td><span class="badge bg-secondary">${case_item.status}</span></td>
+                        <td><a href="${case_item.url}" class="btn btn-sm btn-outline-success">View</a></td>
+                    </tr>`;
+            });
+            
+            content += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="projects" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-dark table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Budget</th>
+                                            <th>Status</th>
+                                            <th>Duration</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+            
+            data.projects.forEach(project => {
+                content += `
+                    <tr>
+                        <td><span class="badge bg-info">${project.code}</span></td>
+                        <td>${project.name}</td>
+                        <td>$${project.budget ? project.budget.toLocaleString() : 'N/A'}</td>
+                        <td><span class="badge bg-secondary">${project.status}</span></td>
+                        <td>${project.start_date} to ${project.end_date || 'Ongoing'}</td>
+                        <td><a href="${project.url}" class="btn btn-sm btn-outline-info">View</a></td>
+                    </tr>`;
+            });
+            
+            content += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            
+            return content;
+        }
+        
+        function buildTimeRangeDrillContent(data) {
+            let content = `
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Project Code</th>
+                                <th>Project Name</th>
+                                <th>Approval Days</th>
+                                <th>Start Date</th>
+                                <th>Business Case</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            
+            data.projects.forEach(project => {
+                content += `
+                    <tr>
+                        <td><span class="badge bg-info">${project.code}</span></td>
+                        <td>${project.name}</td>
+                        <td><span class="badge bg-primary">${project.approval_days} days</span></td>
+                        <td>${project.start_date}</td>
+                        <td>${project.case_title}</td>
+                        <td><a href="${project.url}" class="btn btn-sm btn-outline-primary">View Project</a></td>
+                    </tr>`;
+            });
+            
+            content += `
+                        </tbody>
+                    </table>
+                </div>`;
+            
+            return content;
+        }
+        
+        function buildProjectRiskDrillContent(data) {
+            let content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Risks</h6>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th>Severity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+            
+            data.risks.forEach(risk => {
+                content += `
+                    <tr>
+                        <td>${risk.type}</td>
+                        <td>${risk.description}</td>
+                        <td><span class="badge bg-${risk.severity === 'High' ? 'danger' : 'warning'}">${risk.severity}</span></td>
+                    </tr>`;
+            });
+            
+            content += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Issues (Overdue Milestones)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Milestone</th>
+                                        <th>Due Date</th>
+                                        <th>Days Overdue</th>
+                                        <th>Owner</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+            
+            data.issues.forEach(issue => {
+                content += `
+                    <tr>
+                        <td>${issue.name}</td>
+                        <td>${issue.due_date}</td>
+                        <td><span class="badge bg-danger">${issue.days_overdue}</span></td>
+                        <td>${issue.owner}</td>
+                    </tr>`;
+            });
+            
+            content += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="${data.project.url}" class="btn btn-primary">View Full Project Details</a>
+                </div>`;
+            
+            return content;
+        }
+        
+        function buildProblemClusterDrillContent(data) {
+            let content = `
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Title</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Resolution Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            
+            data.problems.forEach(problem => {
+                content += `
+                    <tr>
+                        <td><span class="badge bg-warning">${problem.code}</span></td>
+                        <td>${problem.title}</td>
+                        <td><span class="badge bg-${problem.priority === 'High' ? 'danger' : problem.priority === 'Medium' ? 'warning' : 'success'}">${problem.priority}</span></td>
+                        <td><span class="badge bg-secondary">${problem.status}</span></td>
+                        <td>${problem.created_at}</td>
+                        <td>${problem.resolution_days ? problem.resolution_days + ' days' : 'Ongoing'}</td>
+                        <td><a href="${problem.url}" class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>`;
+            });
+            
+            content += `
+                        </tbody>
+                    </table>
+                </div>`;
+            
+            return content;
+        }
+        
+        function buildBusinessCaseDrillContent(data) {
+            let content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Business Case Details</h6>
+                        <table class="table table-dark table-sm">
+                            <tr><th>Cost Estimate</th><td>$${data.case.cost_estimate.toLocaleString()}</td></tr>
+                            <tr><th>Benefit Estimate</th><td>$${data.case.benefit_estimate.toLocaleString()}</td></tr>
+                            <tr><th>Net Benefit</th><td class="text-${data.case.net_benefit > 0 ? 'success' : 'danger'}">$${data.case.net_benefit.toLocaleString()}</td></tr>
+                            <tr><th>ROI</th><td><span class="badge bg-${data.case.roi > 100 ? 'success' : 'warning'}">${data.case.roi}%</span></td></tr>
+                            <tr><th>Status</th><td><span class="badge bg-secondary">${data.case.status}</span></td></tr>
+                        </table>
+                        <a href="${data.case.url}" class="btn btn-primary">View Full Case</a>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Related Projects</h6>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>Budget</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+            
+            data.projects.forEach(project => {
+                content += `
+                    <tr>
+                        <td><span class="badge bg-info">${project.code}</span></td>
+                        <td>${project.name}</td>
+                        <td><span class="badge bg-secondary">${project.status}</span></td>
+                        <td>$${project.budget ? project.budget.toLocaleString() : 'N/A'}</td>
+                        <td><a href="${project.url}" class="btn btn-sm btn-outline-info">View</a></td>
+                    </tr>`;
+            });
+            
+            content += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
+            
+            return content;
+        }
+        
+        function buildMilestonesDrillContent(data) {
+            let content = `
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Milestone Name</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Completion Date</th>
+                                <th>Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            
+            data.milestones.forEach(milestone => {
+                content += `
+                    <tr class="${milestone.status === 'Overdue' ? 'table-danger' : milestone.status === 'Completed' ? 'table-success' : ''}">
+                        <td>${milestone.name}</td>
+                        <td>${milestone.due_date}</td>
+                        <td><span class="badge bg-${milestone.status === 'Completed' ? 'success' : milestone.status === 'Overdue' ? 'danger' : 'primary'}">${milestone.status}</span></td>
+                        <td>${milestone.completion_date || 'N/A'}</td>
+                        <td>${milestone.owner}</td>
+                    </tr>`;
+            });
+            
+            content += `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <a href="${data.project.url}" class="btn btn-primary">View Full Project</a>
+                </div>`;
+            
+            return content;
+        }
+        
+        function showDrillDownModal(title, content) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('drillDownModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'drillDownModal';
+                modal.className = 'modal fade';
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="drillDownModalTitle"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="drillDownModalBody"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById('drillDownModalTitle').textContent = title;
+            document.getElementById('drillDownModalBody').innerHTML = content;
+            
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+        
+        function showErrorModal(title, message) {
+            // Create error modal if it doesn't exist
+            let modal = document.getElementById('errorModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'errorModal';
+                modal.className = 'modal fade';
+                modal.innerHTML = `
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="errorModalTitle"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="errorModalBody"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById('errorModalTitle').textContent = title;
+            document.getElementById('errorModalBody').textContent = message;
+            
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+        
+        // Navigation functions for drill-down
+        function navigateToProblems(department) {
+            const params = new URLSearchParams();
+            if (department) params.append('department', department);
+            window.location.href = `/problems?${params}`;
+        }
+        
+        function navigateToCases(department) {
+            const params = new URLSearchParams();
+            if (department) params.append('department', department);
+            window.location.href = `/business?${params}`;
+        }
+        
+        function navigateToProjects(department) {
+            const params = new URLSearchParams();
+            if (department) params.append('department', department);
+            window.location.href = `/projects?${params}`;
+        }
+        
+        // Event listeners for filter controls
+        document.getElementById('applyFilters').addEventListener('click', refreshAllCharts);
+        
+        document.getElementById('clearFilters').addEventListener('click', function() {
+            document.getElementById('dashboardFilters').reset();
+            refreshAllCharts();
+        });
+        
+        document.getElementById('exportFiltered').addEventListener('click', function() {
+            const params = getFilterParams();
+            window.location.href = `/admin/dashboard/export?${params}`;
+        });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFilters();
+        });
+        
+        // Complete implementation of remaining chart update functions
+        function updateMilestoneBurndown(params) {
+            fetch(`/admin/api/dashboard-demo/milestone-burndown?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.milestoneBurndown) {
+                        chartInstances.milestoneBurndown.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('milestoneBurndown').getContext('2d');
+                    chartInstances.milestoneBurndown = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'Planned',
+                                    data: data.planned,
+                                    borderColor: '#0d6efd',
+                                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                                    fill: false
+                                },
+                                {
+                                    label: 'Actual',
+                                    data: data.actual,
+                                    borderColor: '#dc3545',
+                                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                    fill: false
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onClick: (event, elements) => {
+                                if (elements.length > 0 && data.project_code) {
+                                    openDrillModal('milestones', data.project_code);
+                                }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#404040' } },
+                                x: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading milestone burndown:', error));
+        }
+        
+        function updateROIWaterfall(params) {
+            fetch(`/admin/api/dashboard-demo/roi-waterfall?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.roiWaterfall) {
+                        chartInstances.roiWaterfall.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('roiWaterfall').getContext('2d');
+                    chartInstances.roiWaterfall = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => item.case_code),
+                            datasets: [{
+                                label: 'Net Benefit ($)',
+                                data: data.map(item => item.net_benefit),
+                                backgroundColor: data.map(item => item.net_benefit > 0 ? '#198754' : '#dc3545')
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onClick: (event, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const caseCode = data[index].case_code;
+                                    openDrillModal('roiWaterfall', caseCode);
+                                }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#404040' } },
+                                x: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading ROI waterfall:', error));
+        }
+        
+        function updateProblemClusters(params) {
+            fetch(`/admin/api/dashboard-demo/problem-clusters?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.problemClusters) {
+                        chartInstances.problemClusters.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('problemClusters').getContext('2d');
+                    chartInstances.problemClusters = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.map(item => item.cluster),
+                            datasets: [{
+                                data: data.map(item => item.count),
+                                backgroundColor: ['#dc3545', '#ffc107', '#198754', '#0d6efd', '#6f42c1']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onClick: (event, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const cluster = data[index].cluster;
+                                    openDrillModal('problemClusters', cluster);
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading problem clusters:', error));
+        }
+        
+        function updateResourceUtilization(params) {
+            fetch(`/admin/api/dashboard-demo/resource-utilization?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.resourceUtil) {
+                        chartInstances.resourceUtil.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('resourceUtil').getContext('2d');
+                    chartInstances.resourceUtil = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Utilized', 'Available'],
+                            datasets: [{
+                                data: [data.utilization_percent, 100 - data.utilization_percent],
+                                backgroundColor: ['#198754', '#6c757d']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading resource utilization:', error));
+        }
+        
+        function updateProblemsChart(params) {
+            fetch(`/admin/api/dashboard-demo/problems-trend?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.problemsChart) {
+                        chartInstances.problemsChart.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('problemsChart').getContext('2d');
+                    chartInstances.problemsChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels || [],
+                            datasets: [{
+                                label: 'Problems Created',
+                                data: data.data || [],
+                                borderColor: '#dc3545',
+                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onClick: (event, elements) => {
+                                if (elements.length > 0) {
+                                    const dataIndex = elements[0].index;
+                                    const weekDate = data.labels[dataIndex];
+                                    openDrillModal('problemTrend', weekDate);
+                                }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#404040' } },
+                                x: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading problems chart:', error));
+        }
+        
+        function updateConversionChart(params) {
+            fetch(`/admin/api/dashboard-demo/case-conversion?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.conversionChart) {
+                        chartInstances.conversionChart.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('conversionChart').getContext('2d');
+                    chartInstances.conversionChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'Problems',
+                                    data: data.problems,
+                                    backgroundColor: '#dc3545'
+                                },
+                                {
+                                    label: 'Business Cases',
+                                    data: data.cases,
+                                    backgroundColor: '#198754'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#404040' } },
+                                x: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading conversion chart:', error));
+        }
+        
+        function updateProjectMetrics(params) {
+            fetch(`/admin/api/dashboard-demo/project-metrics?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.projectMetrics) {
+                        chartInstances.projectMetrics.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('projectMetrics').getContext('2d');
+                    chartInstances.projectMetrics = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                data: data.data,
+                                backgroundColor: ['#198754', '#ffc107']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading project metrics:', error));
+        }
+        
+        function updateStatusChart(params) {
+            fetch(`/admin/api/dashboard-demo/status-breakdown?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (chartInstances.statusChart) {
+                        chartInstances.statusChart.destroy();
+                    }
+                    
+                    const ctx = document.getElementById('statusChart').getContext('2d');
+                    chartInstances.statusChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => item.status),
+                            datasets: [
+                                {
+                                    label: 'Problems',
+                                    data: data.map(item => item.problems),
+                                    backgroundColor: '#dc3545'
+                                },
+                                {
+                                    label: 'Cases',
+                                    data: data.map(item => item.cases),
+                                    backgroundColor: '#198754'
+                                },
+                                {
+                                    label: 'Projects',
+                                    data: data.map(item => item.projects),
+                                    backgroundColor: '#0d6efd'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#404040' } },
+                                x: { grid: { color: '#404040' } }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading status chart:', error));
+        }
+
+        // PDF Export function
+        function exportPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

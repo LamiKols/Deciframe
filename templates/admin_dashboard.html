@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Dashboard - DeciFrame{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+    <style>
+        .kpi-card {
+            background: var(--bs-dark);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: var(--bs-dark);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .kpi-icon {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--bs-primary);
+        }
+        .kpi-label {
+            color: var(--bs-secondary);
+            font-size: 0.9rem;
+        }
+        .export-section {
+            background: var(--bs-dark);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0">Executive Dashboard</h1>
+                        <p class="text-muted mb-0">Real-time insights into organizational performance</p>
+                    </div>
+                    <div>
+                        <span class="badge bg-success">Live Data</span>
+                        <small class="text-muted ms-2">Updated: {{ datetime.now().strftime('%b %d, %Y %H:%M') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.problems_count }}</div>
+                            <div class="kpi-label">Total Problems</div>
+                        </div>
+                        <i class="fas fa-exclamation-triangle kpi-icon text-warning"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.open_cases }}</div>
+                            <div class="kpi-label">Open Business Cases</div>
+                        </div>
+                        <i class="fas fa-briefcase kpi-icon text-info"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.active_projects }}</div>
+                            <div class="kpi-label">Active Projects</div>
+                        </div>
+                        <i class="fas fa-project-diagram kpi-icon text-success"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="kpi-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="kpi-value">{{ metrics.avg_roi }}%</div>
+                            <div class="kpi-label">Average ROI</div>
+                        </div>
+                        <i class="fas fa-chart-line kpi-icon text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary KPIs -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="kpi-card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h5 mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(metrics.total_investment) }}</div>
+                            <small class="text-muted">Total Investment</small>
+                        </div>
+                        <i class="fas fa-dollar-sign text-danger"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="kpi-card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h5 mb-0">{{ currency_symbol }}{{ "{:,.0f}".format(metrics.total_benefits) }}</div>
+                            <small class="text-muted">Expected Benefits</small>
+                        </div>
+                        <i class="fas fa-arrow-trend-up text-success"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="kpi-card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h5 mb-0">{{ metrics.completion_rate }}%</div>
+                            <small class="text-muted">Project Completion Rate</small>
+                        </div>
+                        <i class="fas fa-check-circle text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Problem Trends (Last 90 Days)</h5>
+                    <canvas id="problemTrendsChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Status Distribution</h5>
+                    <canvas id="statusBreakdownChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Problem-to-Case Conversion</h5>
+                    <canvas id="conversionChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Project Performance</h5>
+                    <canvas id="projectMetricsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h5 class="mb-3">Data Export</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-muted mb-3">Download dashboard data for further analysis</p>
+                    <a href="/admin/export/dashboard-csv" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-download me-1"></i> Download CSV
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="exportPDF()">
+                        <i class="fas fa-file-pdf me-1"></i> Export PDF
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-end">
+                        <small class="text-muted">
+                            Last updated: {{ datetime.now().strftime('%B %d, %Y at %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Chart configuration
+        Chart.defaults.color = '#fff';
+        Chart.defaults.borderColor = '#404040';
+
+        // Problem Trends Chart
+        fetch('/admin/api/dashboard/problems-trend')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('problemTrendsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(item => new Date(item.date).toLocaleDateString()),
+                        datasets: [{
+                            label: 'Problems Created',
+                            data: data.map(item => item.count),
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#404040'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: '#404040'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading problem trends:', error));
+
+        // Status Breakdown Chart
+        fetch('/admin/api/dashboard/status-breakdown')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('statusBreakdownChart').getContext('2d');
+                
+                // Combine all status data
+                const statusCounts = {};
+                data.problems.forEach(item => {
+                    statusCounts[item.status] = (statusCounts[item.status] || 0) + item.count;
+                });
+                data.cases.forEach(item => {
+                    statusCounts[item.status] = (statusCounts[item.status] || 0) + item.count;
+                });
+                data.projects.forEach(item => {
+                    statusCounts[item.status] = (statusCounts[item.status] || 0) + item.count;
+                });
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(statusCounts),
+                        datasets: [{
+                            data: Object.values(statusCounts),
+                            backgroundColor: [
+                                '#0d6efd',
+                                '#6f42c1',
+                                '#d63384',
+                                '#dc3545',
+                                '#fd7e14',
+                                '#ffc107',
+                                '#198754',
+                                '#20c997'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading status breakdown:', error));
+
+        // Conversion Chart
+        fetch('/admin/api/dashboard/case-conversion')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('conversionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(item => item.month),
+                        datasets: [
+                            {
+                                label: 'Problems',
+                                data: data.map(item => item.problems),
+                                backgroundColor: '#dc3545',
+                                borderColor: '#dc3545'
+                            },
+                            {
+                                label: 'Business Cases',
+                                data: data.map(item => item.cases),
+                                backgroundColor: '#198754',
+                                borderColor: '#198754'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#404040'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: '#404040'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading conversion data:', error));
+
+        // Project Metrics Chart
+        fetch('/admin/api/dashboard/project-metrics')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('projectMetricsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['On Time', 'Delayed', 'In Progress'],
+                        datasets: [{
+                            data: [data.on_time, data.delayed, data.in_progress],
+                            backgroundColor: ['#198754', '#dc3545', '#ffc107']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading project metrics:', error));
+
+        // PDF Export function
+        function exportPDF() {
+            // Simple approach - open print dialog
+            window.print();
+        }
+
+        // Auto-refresh dashboard every 5 minutes
+        setTimeout(() => {
+            location.reload();
+        }, 300000);
+    </script>
+{% endblock %}

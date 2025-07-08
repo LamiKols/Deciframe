@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Refinement - DeciFrame</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .story-row {
+            transition: background-color 0.2s ease;
+        }
+        .story-row:hover {
+            background-color: var(--bs-gray-800);
+        }
+        .story-actions {
+            white-space: nowrap;
+        }
+        .epic-header {
+            background-color: var(--bs-primary);
+            color: white;
+            font-weight: bold;
+        }
+        .story-form {
+            background-color: var(--bs-gray-900);
+            border: 1px solid var(--bs-gray-700);
+        }
+        .sub-story {
+            padding-left: 2rem;
+            border-left: 3px solid var(--bs-info);
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+        }
+        .priority-high { color: var(--bs-danger); }
+        .priority-medium { color: var(--bs-warning); }
+        .priority-low { color: var(--bs-secondary); }
+        .effort-xs { background-color: var(--bs-success); }
+        .effort-s { background-color: var(--bs-info); }
+        .effort-m { background-color: var(--bs-warning); }
+        .effort-l { background-color: var(--bs-orange); }
+        .effort-xl { background-color: var(--bs-danger); }
+    </style>
+</head>
+<body class="bg-dark text-light">
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1><i class="fas fa-tasks text-primary"></i> Story Refinement</h1>
+                        <p class="text-light mb-0">Business Case: <span id="case-title" class="fw-bold"></span></p>
+                    </div>
+                    <div>
+                        <button id="save-all-btn" class="btn btn-success me-2" disabled>
+                            <i class="fas fa-save"></i> Save All Changes
+                        </button>
+                        <button id="add-epic-btn" class="btn btn-primary me-2">
+                            <i class="fas fa-plus"></i> Add Epic
+                        </button>
+                        <a href="#" id="back-to-case" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Case
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading stories...</span>
+                    </div>
+                    <p class="mt-2">Loading epics and stories...</p>
+                </div>
+
+                <!-- Stories Container -->
+                <div id="stories-container" class="d-none">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list-ul"></i> Epics & User Stories
+                                <span class="badge bg-info ms-2" id="story-count">0 stories</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover mb-0">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th style="width: 40%">Title & Description</th>
+                                            <th style="width: 15%">Priority</th>
+                                            <th style="width: 15%">Effort</th>
+                                            <th style="width: 20%">Acceptance Criteria</th>
+                                            <th style="width: 10%">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stories-table-body">
+                                        <!-- Stories will be loaded here via AJAX -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="text-center py-5 d-none">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Stories Found</h4>
+                    <p class="text-muted">Generate requirements first or add your first epic to get started.</p>
+                    <button id="add-first-epic-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add First Epic
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Epic Modal -->
+    <div class="modal fade" id="epicModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-book"></i> <span id="epic-modal-title">Add Epic</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="epic-form">
+                        <input type="hidden" id="epic-id">
+                        <div class="mb-3">
+                            <label for="epic-title" class="form-label">Epic Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-dark border-secondary text-light" id="epic-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="epic-description" class="form-label">Epic Description</label>
+                            <textarea class="form-control bg-dark border-secondary text-light" id="epic-description" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="epic-priority" class="form-label">Priority</label>
+                                <select class="form-select bg-dark border-secondary text-light" id="epic-priority">
+                                    <option value="High">High</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="epic-effort" class="form-label">Effort Estimate</label>
+                                <select class="form-select bg-dark border-secondary text-light" id="epic-effort">
+                                    <option value="XS">XS (1-2 days)</option>
+                                    <option value="S">S (3-5 days)</option>
+                                    <option value="M" selected>M (1-2 weeks)</option>
+                                    <option value="L">L (2-4 weeks)</option>
+                                    <option value="XL">XL (1+ months)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-epic-btn">
+                        <i class="fas fa-save"></i> Save Epic
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Story Modal -->
+    <div class="modal fade" id="storyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bookmark"></i> <span id="story-modal-title">Add Story</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="story-form">
+                        <input type="hidden" id="story-id">
+                        <input type="hidden" id="story-epic-id">
+                        <div class="mb-3">
+                            <label for="story-title" class="form-label">Story Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-dark border-secondary text-light" id="story-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="story-description" class="form-label">Story Description</label>
+                            <textarea class="form-control bg-dark border-secondary text-light" id="story-description" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="story-priority" class="form-label">Priority</label>
+                                <select class="form-select bg-dark border-secondary text-light" id="story-priority">
+                                    <option value="High">High</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="story-effort" class="form-label">Effort Estimate</label>
+                                <select class="form-select bg-dark border-secondary text-light" id="story-effort">
+                                    <option value="XS">XS (1-2 hours)</option>
+                                    <option value="S" selected>S (half day)</option>
+                                    <option value="M">M (1-2 days)</option>
+                                    <option value="L">L (3-5 days)</option>
+                                    <option value="XL">XL (1+ weeks)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="story-acceptance-criteria" class="form-label">Acceptance Criteria</label>
+                            <textarea class="form-control bg-dark border-secondary text-light" id="story-acceptance-criteria" rows="4" placeholder="Given... When... Then..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-story-btn">
+                        <i class="fas fa-save"></i> Save Story
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Story Refinement JavaScript -->
+    <script>
+        class StoryRefinementUI {
+            constructor() {
+                this.caseId = this.getCaseIdFromUrl();
+                this.authToken = this.getAuthToken();
+                this.epics = [];
+                this.stories = [];
+                this.changedItems = new Set();
+                this.epicModal = new bootstrap.Modal(document.getElementById('epicModal'));
+                this.storyModal = new bootstrap.Modal(document.getElementById('storyModal'));
+                
+                this.init();
+            }
+
+            getCaseIdFromUrl() {
+                const pathParts = window.location.pathname.split('/');
+                const caseIndex = pathParts.indexOf('cases');
+                return caseIndex !== -1 ? pathParts[caseIndex + 1] : null;
+            }
+
+            getAuthToken() {
+                return new URLSearchParams(window.location.search).get('auth_token');
+            }
+
+            async init() {
+                this.bindEvents();
+                await this.loadCaseInfo();
+                await this.loadEpicsAndStories();
+            }
+
+            bindEvents() {
+                // Header actions
+                document.getElementById('save-all-btn').addEventListener('click', () => this.saveAllChanges());
+                document.getElementById('add-epic-btn').addEventListener('click', () => this.showEpicModal());
+                document.getElementById('add-first-epic-btn').addEventListener('click', () => this.showEpicModal());
+                
+                // Modal actions
+                document.getElementById('save-epic-btn').addEventListener('click', () => this.saveEpic());
+                document.getElementById('save-story-btn').addEventListener('click', () => this.saveStory());
+            }
+
+            async loadCaseInfo() {
+                try {
+                    const response = await fetch(`/business/cases/${this.caseId}?auth_token=${this.authToken}`);
+                    if (response.ok) {
+                        const html = await response.text();
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const titleElement = doc.querySelector('h1');
+                        if (titleElement) {
+                            document.getElementById('case-title').textContent = titleElement.textContent.trim();
+                        }
+                        
+                        // Set back link
+                        document.getElementById('back-to-case').href = `/business/cases/${this.caseId}?auth_token=${this.authToken}`;
+                    }
+                } catch (error) {
+                    console.error('Error loading case info:', error);
+                }
+            }
+
+            async loadEpicsAndStories() {
+                try {
+                    document.getElementById('loading-state').classList.remove('d-none');
+                    
+                    const response = await fetch(`/api/epics/${this.caseId}`, {
+                        credentials: 'same-origin',
+                        headers: {
+                            'Authorization': `Bearer ${this.authToken}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.epics = data.epics || [];
+                        this.stories = data.stories || [];
+                        
+                        this.renderStoriesTable();
+                        this.updateStoryCount();
+                    } else {
+                        this.showError('Failed to load epics and stories');
+                    }
+                } catch (error) {
+                    console.error('Error loading epics and stories:', error);
+                    this.showError('Error loading data');
+                } finally {
+                    document.getElementById('loading-state').classList.add('d-none');
+                }
+            }
+
+            renderStoriesTable() {
+                const tbody = document.getElementById('stories-table-body');
+                tbody.innerHTML = '';
+
+                if (this.epics.length === 0) {
+                    document.getElementById('empty-state').classList.remove('d-none');
+                    document.getElementById('stories-container').classList.add('d-none');
+                    return;
+                }
+
+                document.getElementById('empty-state').classList.add('d-none');
+                document.getElementById('stories-container').classList.remove('d-none');
+
+                this.epics.forEach(epic => {
+                    this.renderEpicRow(epic, tbody);
+                    
+                    const epicStories = this.stories.filter(story => story.epic_id === epic.id);
+                    epicStories.forEach(story => {
+                        this.renderStoryRow(story, tbody);
+                    });
+                });
+            }
+
+            renderEpicRow(epic, tbody) {
+                const row = document.createElement('tr');
+                row.className = 'epic-header';
+                row.innerHTML = `
+                    <td colspan="3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-book me-2"></i>
+                            <strong>${this.escapeHtml(epic.title)}</strong>
+                            ${epic.description ? `<span class="text-light ms-2 small">- ${this.escapeHtml(epic.description)}</span>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge priority-${epic.priority.toLowerCase()}">${epic.priority}</span>
+                        <span class="badge effort-${epic.effort_estimate.toLowerCase()} ms-1">${epic.effort_estimate}</span>
+                    </td>
+                    <td class="story-actions">
+                        <button class="btn btn-sm btn-outline-light me-1" onclick="storyUI.editEpic(${epic.id})" title="Edit Epic">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-success me-1" onclick="storyUI.addStoryToEpic(${epic.id})" title="Add Story">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="storyUI.deleteEpic(${epic.id})" title="Delete Epic">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            renderStoryRow(story, tbody) {
+                const row = document.createElement('tr');
+                row.className = 'story-row';
+                row.innerHTML = `
+                    <td>
+                        <div class="ps-3">
+                            <div class="fw-bold">${this.escapeHtml(story.title)}</div>
+                            ${story.description ? `<div class="text-light small mt-1">${this.escapeHtml(story.description)}</div>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge priority-${story.priority.toLowerCase()}">${story.priority}</span>
+                    </td>
+                    <td>
+                        <span class="badge effort-${story.effort_estimate.toLowerCase()}">${story.effort_estimate}</span>
+                    </td>
+                    <td>
+                        <div class="small text-light">
+                            ${story.acceptance_criteria ? this.escapeHtml(story.acceptance_criteria) : '<em>No criteria defined</em>'}
+                        </div>
+                    </td>
+                    <td class="story-actions">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="storyUI.editStory(${story.id})" title="Edit Story">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="storyUI.deleteStory(${story.id})" title="Delete Story">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            showEpicModal(epic = null) {
+                const modalTitle = document.getElementById('epic-modal-title');
+                const form = document.getElementById('epic-form');
+                
+                if (epic) {
+                    modalTitle.textContent = 'Edit Epic';
+                    document.getElementById('epic-id').value = epic.id;
+                    document.getElementById('epic-title').value = epic.title;
+                    document.getElementById('epic-description').value = epic.description || '';
+                    document.getElementById('epic-priority').value = epic.priority;
+                    document.getElementById('epic-effort').value = epic.effort_estimate;
+                } else {
+                    modalTitle.textContent = 'Add Epic';
+                    form.reset();
+                    document.getElementById('epic-id').value = '';
+                }
+                
+                this.epicModal.show();
+            }
+
+            showStoryModal(story = null, epicId = null) {
+                const modalTitle = document.getElementById('story-modal-title');
+                const form = document.getElementById('story-form');
+                
+                if (story) {
+                    modalTitle.textContent = 'Edit Story';
+                    document.getElementById('story-id').value = story.id;
+                    document.getElementById('story-epic-id').value = story.epic_id;
+                    document.getElementById('story-title').value = story.title;
+                    document.getElementById('story-description').value = story.description || '';
+                    document.getElementById('story-priority').value = story.priority;
+                    document.getElementById('story-effort').value = story.effort_estimate;
+                    document.getElementById('story-acceptance-criteria').value = story.acceptance_criteria || '';
+                } else {
+                    modalTitle.textContent = 'Add Story';
+                    form.reset();
+                    document.getElementById('story-id').value = '';
+                    document.getElementById('story-epic-id').value = epicId;
+                }
+                
+                this.storyModal.show();
+            }
+
+            async saveEpic() {
+                const form = document.getElementById('epic-form');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const epicId = document.getElementById('epic-id').value;
+                const epicData = {
+                    case_id: this.caseId,
+                    title: document.getElementById('epic-title').value,
+                    description: document.getElementById('epic-description').value,
+                    priority: document.getElementById('epic-priority').value,
+                    effort_estimate: document.getElementById('epic-effort').value
+                };
+
+                try {
+                    const method = epicId ? 'PUT' : 'POST';
+                    const url = epicId ? `/api/epics/${epicId}` : '/api/epics';
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.authToken}`
+                        },
+                        body: JSON.stringify(epicData)
+                    });
+
+                    if (response.ok) {
+                        this.epicModal.hide();
+                        this.showSuccess(epicId ? 'Epic updated successfully' : 'Epic created successfully');
+                        await this.loadEpicsAndStories();
+                    } else {
+                        const error = await response.json();
+                        this.showError(error.error || 'Failed to save epic');
+                    }
+                } catch (error) {
+                    console.error('Error saving epic:', error);
+                    this.showError('Error saving epic');
+                }
+            }
+
+            async saveStory() {
+                const form = document.getElementById('story-form');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const storyId = document.getElementById('story-id').value;
+                const storyData = {
+                    epic_id: document.getElementById('story-epic-id').value,
+                    title: document.getElementById('story-title').value,
+                    description: document.getElementById('story-description').value,
+                    priority: document.getElementById('story-priority').value,
+                    effort_estimate: document.getElementById('story-effort').value,
+                    acceptance_criteria: document.getElementById('story-acceptance-criteria').value
+                };
+
+                try {
+                    const method = storyId ? 'PUT' : 'POST';
+                    const url = storyId ? `/api/stories/${storyId}` : '/api/stories';
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.authToken}`
+                        },
+                        body: JSON.stringify(storyData)
+                    });
+
+                    if (response.ok) {
+                        this.storyModal.hide();
+                        this.showSuccess(storyId ? 'Story updated successfully' : 'Story created successfully');
+                        await this.loadEpicsAndStories();
+                    } else {
+                        const error = await response.json();
+                        this.showError(error.error || 'Failed to save story');
+                    }
+                } catch (error) {
+                    console.error('Error saving story:', error);
+                    this.showError('Error saving story');
+                }
+            }
+
+            editEpic(epicId) {
+                const epic = this.epics.find(e => e.id === epicId);
+                if (epic) {
+                    this.showEpicModal(epic);
+                }
+            }
+
+            addStoryToEpic(epicId) {
+                this.showStoryModal(null, epicId);
+            }
+
+            editStory(storyId) {
+                const story = this.stories.find(s => s.id === storyId);
+                if (story) {
+                    this.showStoryModal(story);
+                }
+            }
+
+            async deleteEpic(epicId) {
+                if (!confirm('Delete this epic and all its stories? This action cannot be undone.')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/epics/${epicId}`, {
+                        method: 'DELETE',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Authorization': `Bearer ${this.authToken}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        this.showSuccess('Epic deleted successfully');
+                        await this.loadEpicsAndStories();
+                    } else {
+                        this.showError('Failed to delete epic');
+                    }
+                } catch (error) {
+                    console.error('Error deleting epic:', error);
+                    this.showError('Error deleting epic');
+                }
+            }
+
+            async deleteStory(storyId) {
+                if (!confirm('Delete this story? This action cannot be undone.')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/stories/${storyId}`, {
+                        method: 'DELETE',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Authorization': `Bearer ${this.authToken}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        this.showSuccess('Story deleted successfully');
+                        await this.loadEpicsAndStories();
+                    } else {
+                        this.showError('Failed to delete story');
+                    }
+                } catch (error) {
+                    console.error('Error deleting story:', error);
+                    this.showError('Error deleting story');
+                }
+            }
+
+            async saveAllChanges() {
+                // This could be implemented for batch operations
+                this.showInfo('Individual save operations completed');
+            }
+
+            updateStoryCount() {
+                const count = this.stories.length;
+                document.getElementById('story-count').textContent = `${count} ${count === 1 ? 'story' : 'stories'}`;
+            }
+
+            showSuccess(message) {
+                this.showNotification(message, 'success');
+            }
+
+            showError(message) {
+                this.showNotification(message, 'danger');
+            }
+
+            showInfo(message) {
+                this.showNotification(message, 'info');
+            }
+
+            showNotification(message, type = 'info') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                alertDiv.style.top = '20px';
+                alertDiv.style.right = '20px';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    if (alertDiv.parentElement) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize the Story Refinement UI
+        let storyUI;
+        document.addEventListener('DOMContentLoaded', () => {
+            storyUI = new StoryRefinementUI();
+        });
+    </script>
+</body>
+</html>

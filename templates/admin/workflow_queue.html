@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Queue Status - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-stream text-primary me-2"></i>
+                    Workflow Event Queue
+                </h2>
+                <button id="refreshBtn" class="btn btn-outline-primary">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Queue Status Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Queue Status</h6>
+                                    <h4 id="queueStatus">Loading...</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-power-off fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Queue Size</h6>
+                                    <h4 id="queueSize">-</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-list fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Processed</h6>
+                                    <h4 id="processedCount">-</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-check-circle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Errors</h6>
+                                    <h4 id="errorCount">-</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">System Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Worker Thread Status:</strong></td>
+                                    <td id="workerStatus">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Last Updated:</strong></td>
+                                    <td id="lastUpdated">-</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-muted">
+                                <small>
+                                    <strong>About Workflow Queue:</strong><br>
+                                    The workflow event queue processes organizational events in the background, 
+                                    triggering automated workflows without blocking user interactions. 
+                                    Events are queued and processed asynchronously for optimal performance.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class WorkflowQueueMonitor {
+    constructor() {
+        this.refreshBtn = document.getElementById('refreshBtn');
+        this.setupEventListeners();
+        this.loadStats();
+        // Auto-refresh every 30 seconds
+        setInterval(() => this.loadStats(), 30000);
+    }
+    
+    setupEventListeners() {
+        this.refreshBtn.addEventListener('click', () => {
+            this.loadStats();
+        });
+    }
+    
+    async loadStats() {
+        try {
+            this.refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            
+            const response = await fetch('/api/admin/workflow-queue/stats', {
+                credentials: 'same-origin'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to load queue stats');
+            }
+            
+            const result = await response.json();
+            if (result.status === 'success') {
+                this.updateDisplay(result.data);
+            } else {
+                throw new Error(result.message || 'Failed to load stats');
+            }
+            
+        } catch (error) {
+            console.error('Error loading queue stats:', error);
+            this.showError(error.message);
+        } finally {
+            this.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+        }
+    }
+    
+    updateDisplay(stats) {
+        // Update status indicators
+        document.getElementById('queueStatus').textContent = stats.running ? 'Running' : 'Stopped';
+        document.getElementById('queueSize').textContent = stats.queue_size;
+        document.getElementById('processedCount').textContent = stats.processed_count;
+        document.getElementById('errorCount').textContent = stats.error_count;
+        document.getElementById('workerStatus').textContent = stats.worker_alive ? 'Active' : 'Inactive';
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        
+        // Update card colors based on status
+        const statusCard = document.getElementById('queueStatus').closest('.card');
+        if (stats.running) {
+            statusCard.className = 'card bg-success text-white';
+        } else {
+            statusCard.className = 'card bg-danger text-white';
+        }
+    }
+    
+    showError(message) {
+        document.getElementById('queueStatus').textContent = 'Error';
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        console.error('Queue monitor error:', message);
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    new WorkflowQueueMonitor();
+});
+</script>
+{% endblock %}

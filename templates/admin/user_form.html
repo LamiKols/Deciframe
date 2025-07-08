@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Create' if not user else 'Update' }} User - DeciFrame{% endblock %}
+
+{% block head %}
+<style>
+/* Fix dropdown visibility in dark theme with maximum specificity */
+select.form-select option,
+#role option,
+#department option {
+    background-color: #212529 !important;
+    color: #ffffff !important;
+    padding: 8px 12px !important;
+}
+
+select.form-select option:hover,
+#role option:hover,
+#department option:hover {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+/* Force dropdown styling */
+select.form-select,
+#role,
+#department {
+    background-color: #212529 !important;
+    color: #ffffff !important;
+    border: 1px solid #495057 !important;
+}
+
+/* Additional targeting for dark theme compatibility */
+[data-bs-theme="dark"] select option {
+    background-color: #212529 !important;
+    color: #ffffff !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Force styling on all dropdown options
+    const selects = document.querySelectorAll('select.form-select');
+    selects.forEach(function(select) {
+        select.style.backgroundColor = '#212529';
+        select.style.color = '#ffffff';
+        select.style.border = '1px solid #495057';
+        
+        // Style all option elements
+        const options = select.querySelectorAll('option');
+        options.forEach(function(option) {
+            option.style.backgroundColor = '#212529';
+            option.style.color = '#ffffff';
+            option.style.padding = '8px 12px';
+        });
+        
+        // Add event listener for focus to ensure options are visible
+        select.addEventListener('focus', function() {
+            const options = this.querySelectorAll('option');
+            options.forEach(function(option) {
+                option.style.backgroundColor = '#212529';
+                option.style.color = '#ffffff';
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ 'Create' if not user else 'Update' }} User</h5>
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary btn-sm">
+                        Back to Users
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.role.label(class="form-label") }}
+                            <div class="custom-dropdown">
+                                {{ form.role(class="form-select", style="background-color: #212529 !important; color: #ffffff !important; border: 1px solid #495057 !important;") }}
+                            </div>
+                            {% if form.role.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.role.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.department.label(class="form-label") }}
+                            <div class="custom-dropdown">
+                                {{ form.department(class="form-select", style="background-color: #212529 !important; color: #ffffff !important; border: 1px solid #495057 !important;") }}
+                            </div>
+                            {% if form.department.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.department.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_active(class="form-check-input") }}
+                                {{ form.is_active.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        
+                        {% if user %}
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control", placeholder="Leave blank to keep current password") }}
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Leave blank to keep current password</div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Cancel</a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

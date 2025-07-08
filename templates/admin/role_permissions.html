@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Role Permissions - Admin Center{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-light">Role Permissions</h2>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                    <i class="fas fa-plus me-2"></i>Add Role Permission
+                </button>
+            </div>
+
+            <!-- Role Permissions Table -->
+            <div class="card bg-dark border-secondary">
+                <div class="card-header border-secondary">
+                    <h5 class="text-light mb-0">System Role Permissions</h5>
+                </div>
+                <div class="card-body">
+                    {% if roles %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Module</th>
+                                        <th>Create</th>
+                                        <th>Read</th>
+                                        <th>Update</th>
+                                        <th>Delete</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for role in roles %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-info">{{ role.role.value }}</span>
+                                            </td>
+                                            <td>{{ role.module }}</td>
+                                            <td>
+                                                {% if role.can_create %}
+                                                    <i class="fas fa-check text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if role.can_read %}
+                                                    <i class="fas fa-check text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if role.can_update %}
+                                                    <i class="fas fa-check text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if role.can_delete %}
+                                                    <i class="fas fa-check text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">{{ role.created_at.strftime('%Y-%m-%d') if role.created_at else 'N/A' }}</small>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-warning me-1" 
+                                                        data-bs-toggle="modal" data-bs-target="#editRoleModal{{ role.id }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <form method="post" action="{{ url_for('delete_role_permission', role_id=role.id) }}" 
+                                                      style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this permission?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Edit Role Permission Modals -->
+                        {% for role in roles %}
+                        <div class="modal fade" id="editRoleModal{{ role.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content bg-dark">
+                                    <div class="modal-header border-secondary">
+                                        <h5 class="modal-title text-light">Edit Role Permission</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="{{ url_for('edit_role_permission', role_id=role.id) }}">
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label text-light">Role</label>
+                                                <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                                                       value="{{ role.role.value }}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-light">Module</label>
+                                                <input type="text" class="form-control bg-secondary text-light border-secondary" 
+                                                       value="{{ role.module }}" readonly>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="can_create" 
+                                                               {% if role.can_create %}checked{% endif %}>
+                                                        <label class="form-check-label text-light">Create</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="can_read" 
+                                                               {% if role.can_read %}checked{% endif %}>
+                                                        <label class="form-check-label text-light">Read</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="can_update" 
+                                                               {% if role.can_update %}checked{% endif %}>
+                                                        <label class="form-check-label text-light">Update</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="can_delete" 
+                                                               {% if role.can_delete %}checked{% endif %}>
+                                                        <label class="form-check-label text-light">Delete</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-secondary">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Update Permission</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-shield fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No role permissions configured yet.</p>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                                Create First Role Permission
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Role Permission Modal -->
+<div class="modal fade" id="addRoleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-light">Add Role Permission</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="role" class="form-label text-light">Role</label>
+                        <select class="form-control bg-secondary text-light border-secondary" id="role" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Manager">Manager</option>
+                            <option value="BA">Business Analyst</option>
+                            <option value="Director">Director</option>
+                            <option value="CEO">CEO</option>
+                            <option value="PM">Project Manager</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="module" class="form-label text-light">Module</label>
+                        <select class="form-control bg-secondary text-light border-secondary" id="module" name="module" required>
+                            <option value="">Select Module</option>
+                            {% for module in available_modules %}
+                                <option value="{{ module }}">{{ module }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="can_create" name="can_create">
+                                <label class="form-check-label text-light" for="can_create">Create</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="can_read" name="can_read">
+                                <label class="form-check-label text-light" for="can_read">Read</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="can_update" name="can_update">
+                                <label class="form-check-label text-light" for="can_update">Update</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="can_delete" name="can_delete">
+                                <label class="form-check-label text-light" for="can_delete">Delete</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Permission</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Business Analyst Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-chart-line me-2"></i>Business Analyst Dashboard</h2>
+            <p class="text-muted">Requirements and analysis workspace for {{ user.first_name }}</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    {% include 'includes/quick_actions.html' %}
+
+    <div class="row mt-4">
+        <!-- Assigned Cases Panel -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-briefcase me-2"></i>Assigned Cases</h5>
+                    <a href="{{ url_for('business.list_cases') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if assigned_cases %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for case in assigned_cases %}
+                                    <tr>
+                                        <td><a href="{{ url_for('business.view_case', id=case.id) }}">{{ case.code }}</a></td>
+                                        <td>{{ case.title[:30] }}{% if case.title|length > 30 %}...{% endif %}</td>
+                                        <td>
+                                            <span class="badge bg-{% if case.case_type.value == 'Reactive' %}warning{% else %}info{% endif %}">
+                                                {{ case.case_type.value }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if case.status.value == 'Open' %}danger{% elif case.status.value == 'InProgress' %}warning{% else %}success{% endif %}">
+                                                {{ case.status.value }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if case.priority %}
+                                                <span class="badge bg-{% if case.priority.value == 'High' %}danger{% elif case.priority.value == 'Medium' %}warning{% else %}secondary{% endif %}">
+                                                    {{ case.priority.value }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No cases currently assigned to you.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Needs Requirements Panel -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-clipboard-list me-2"></i>Needs Requirements</h5>
+                    <a href="{{ url_for('business.list_cases') }}?filter=needs_requirements" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if needs_requirements %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Department</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for case in needs_requirements %}
+                                    <tr>
+                                        <td><a href="{{ url_for('business.view_case', id=case.id) }}">{{ case.code }}</a></td>
+                                        <td>{{ case.title[:30] }}{% if case.title|length > 30 %}...{% endif %}</td>
+                                        <td>{{ case.department.name if case.department else 'N/A' }}</td>
+                                        <td>{{ case.created_at | format_org_date }}</td>
+                                        <td>
+                                            <a href="{{ url_for('business.requirements', id=case.id) }}" class="btn btn-xs btn-info">Generate</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No cases currently need requirements generation.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BA Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar me-2"></i>Requirements Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-primary">{{ stats.total_assigned }}</h4>
+                                <small class="text-muted">Assigned Cases</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-danger">{{ stats.needs_requirements }}</h4>
+                                <small class="text-muted">Needs Requirements</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-calendar me-2"></i>Monthly Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-warning">{{ stats.in_progress }}</h4>
+                                <small class="text-muted">In Progress</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-success">{{ stats.completed_this_month }}</h4>
+                                <small class="text-muted">Completed</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_cases %}
+                        <div class="list-group list-group-flush">
+                            {% for case in recent_cases[:3] %}
+                            <div class="list-group-item border-0 p-2">
+                                <small class="text-muted">{{ case.created_at | format_org_date }}</small>
+                                <div><a href="{{ url_for('business.view_case', id=case.id) }}">{{ case.code }}</a></div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ url_for('business.list_cases') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-briefcase me-2"></i>Business Cases
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ url_for('business.list_cases') }}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-briefcase me-2"></i>All Cases
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ url_for('projects.index') }}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-project-diagram me-2"></i>Projects
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
