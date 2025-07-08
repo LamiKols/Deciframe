@@ -269,7 +269,7 @@ def exec_dashboard():
         
         'total_projects': projects.count(),
         'projects_active': projects.filter(Project.status.in_(['In_Progress', 'InProgress'])).count(),
-        'projects_completed': projects.filter(Project.status == 'Completed').count(),
+        'projects_completed': projects.filter(Project.status == 'Resolved').count(),
         
         'total_departments': departments.count(),
         'total_users': users.count()
