@@ -20,10 +20,11 @@
                     </div>
                     
                     <!-- My Workflows Actions -->
-                    <div id="workflow-actions">
+                    <div id="workflow-actions" style="display: block; visibility: visible;">
                         <div class="d-flex align-items-center">
                             <small class="text-muted me-3">Manage your workflow templates</small>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkflowModal">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkflowModal" 
+                                    style="display: inline-block; visibility: visible; color: white !important; background-color: var(--bs-primary) !important;">
                                 <i class="fas fa-plus me-1"></i>Add New Workflow
                             </button>
                         </div>
@@ -996,19 +997,7 @@ function initializeEditModal(workflowId) {
 
 
 
-// Tab and search functionality
-function updateActionButtons(activeTab) {
-    const importActions = document.getElementById('import-actions');
-    const workflowActions = document.getElementById('workflow-actions');
-    
-    if (activeTab === 'library') {
-        if (importActions) importActions.style.display = 'block';
-        if (workflowActions) workflowActions.style.display = 'none';
-    } else if (activeTab === 'my-workflows') {
-        if (importActions) importActions.style.display = 'none';
-        if (workflowActions) workflowActions.style.display = 'block';
-    }
-}
+// Tab and search functionality - REMOVED DUPLICATE FUNCTION
 
 function filterLibraryItems() {
     const searchTerm = document.getElementById('librarySearchInput').value.toLowerCase();
