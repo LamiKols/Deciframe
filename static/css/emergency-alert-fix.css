@@ -4,7 +4,8 @@
    This CSS uses the highest possible specificity
 */
 
-/* EMERGENCY SUCCESS ALERT VISIBILITY - LIGHT THEME */
+/* EMERGENCY SUCCESS ALERT VISIBILITY - LIGHT THEME - MAX SPECIFICITY */
+html body div.alert.alert-success.alert-dismissible.fade.show,
 html body div.alert.alert-success,
 html body .alert.alert-success,
 html body div[class*="alert-success"],
@@ -17,23 +18,26 @@ body *[class*="alert-success"],
 div.alert.alert-success,
 [class*="alert-success"] {
   background-color: #d1e7dd !important;
+  background: #d1e7dd !important;
   border: 3px solid #0f5132 !important;
   color: #0f5132 !important;
   -webkit-text-fill-color: #0f5132 !important;
   font-weight: 700 !important;
-  font-size: 16px !important;
+  font-size: 18px !important;
   text-shadow: none !important;
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
   text-decoration: none !important;
-  line-height: 1.5 !important;
-  padding: 12px 20px !important;
-  margin: 10px 0 !important;
+  line-height: 1.6 !important;
+  padding: 15px 25px !important;
+  margin: 15px 0 !important;
   border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
-/* EMERGENCY SUCCESS ALERT VISIBILITY - DARK THEME */
+/* EMERGENCY SUCCESS ALERT VISIBILITY - DARK THEME - MAX SPECIFICITY */
+html[data-bs-theme="dark"] body div.alert.alert-success.alert-dismissible.fade.show,
 html[data-bs-theme="dark"] body div.alert.alert-success,
 html[data-bs-theme="dark"] body .alert.alert-success,
 html[data-bs-theme="dark"] body div[class*="alert-success"],
@@ -46,20 +50,22 @@ html[data-bs-theme="dark"] body *[class*="alert-success"],
 [data-bs-theme="dark"] div.alert.alert-success,
 [data-bs-theme="dark"] [class*="alert-success"] {
   background-color: #0f5132 !important;
+  background: #0f5132 !important;
   border: 3px solid #2ea043 !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
   font-weight: 700 !important;
-  font-size: 16px !important;
+  font-size: 18px !important;
   text-shadow: none !important;
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
   text-decoration: none !important;
-  line-height: 1.5 !important;
-  padding: 12px 20px !important;
-  margin: 10px 0 !important;
+  line-height: 1.6 !important;
+  padding: 15px 25px !important;
+  margin: 15px 0 !important;
   border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(255,255,255,0.1) !important;
 }
 
 /* FORCE ALL OTHER ALERT TYPES TO BE VISIBLE TOO */

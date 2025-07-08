@@ -1147,7 +1147,8 @@ def generate_requirements_epic(case_id):
                         case_id=case_id,
                         title=epic_data['title'],
                         description=epic_data['description'],
-                        creator_id=user.id
+                        creator_id=user.id,
+                        organization_id=user.organization_id
                     )
                     db.session.add(epic)
                     db.session.flush()  # Get epic ID
@@ -1160,7 +1161,8 @@ def generate_requirements_epic(case_id):
                             description=story_data['description'],
                             acceptance_criteria=json.dumps(story_data.get('acceptance_criteria', [])),
                             priority=story_data.get('priority', 'Medium'),
-                            effort_estimate=story_data.get('effort_estimate', '5 story points')
+                            effort_estimate=story_data.get('effort_estimate', '5 story points'),
+                            organization_id=user.organization_id
                         )
                         db.session.add(story)
                 
