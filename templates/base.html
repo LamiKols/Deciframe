@@ -23,12 +23,12 @@
     <!-- Page-specific CSS -->
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <!-- Navigation -->
     {% include 'partials/navbar.html' %}
 
     <!-- Main Content -->
-    <main class="container my-4">
+    <main class="container my-4 flex-grow-1">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -50,8 +50,8 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark border-top mt-5 py-4">
+    <!-- Footer - Always at bottom -->
+    <footer class="bg-dark border-top py-4 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
