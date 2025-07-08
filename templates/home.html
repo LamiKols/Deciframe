@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="mb-1">Welcome back, {{ user.first_name or user.email.split('@')[0] }}!</h1>
+          <p class="text-muted mb-0">{{ user.role.value }} | Organization: {{ user.organization.name if user.organization else 'TechVision Solutions' }}</p>
+        </div>
+        <div class="text-end">
+          <small class="text-muted">{{ moment().format('LLLL') if moment else 'Today' }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Based on Role -->
+  <div class="row g-4 mb-5">
+    <div class="col-12">
+      <h4 class="mb-3">🚀 Quick Actions</h4>
+      <div class="row g-3">
+        {% if user.role.value in ['Director', 'CEO', 'Admin'] %}
+        <!-- Executive Actions -->
+        <div class="col-md-3">
+          <a href="{{ url_for('dashboards.executive_dashboard') }}" class="btn btn-primary w-100 py-3">
+            <i class="bi bi-bar-chart fs-4 d-block mb-2"></i>
+            Executive Dashboard
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="{{ url_for('admin_organization_settings') }}" class="btn btn-outline-primary w-100 py-3">
+            <i class="bi bi-gear fs-4 d-block mb-2"></i>
+            Organization Settings
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="{{ url_for('admin_workflows') }}" class="btn btn-outline-primary w-100 py-3">
+            <i class="bi bi-diagram-3 fs-4 d-block mb-2"></i>
+            Workflow Management
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary w-100 py-3">
+            <i class="bi bi-people fs-4 d-block mb-2"></i>
+            User Management
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- Common Actions for All Users -->
+        <div class="col-md-3">
+          <a href="{{ url_for('dashboards.dashboard_home') }}" class="btn btn-info w-100 py-3">
+            <i class="bi bi-speedometer2 fs-4 d-block mb-2"></i>
+            My Dashboard
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="{{ url_for('problems.problems') }}" class="btn btn-outline-info w-100 py-3">
+            <i class="bi bi-exclamation-triangle fs-4 d-block mb-2"></i>
+            Problems
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="{{ url_for('business.business_cases') }}" class="btn btn-outline-info w-100 py-3">
+            <i class="bi bi-briefcase fs-4 d-block mb-2"></i>
+            Business Cases
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="{{ url_for('projects.projects') }}" class="btn btn-outline-info w-100 py-3">
+            <i class="bi bi-kanban fs-4 d-block mb-2"></i>
+            Projects
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Overview -->
+  <div class="row g-4">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">📈 Activity Overview</h5>
+          <small class="text-muted">Last 7 days</small>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-4">
+              <div class="border-end">
+                <h3 class="text-primary mb-1">{{ total_pending or 0 }}</h3>
+                <small class="text-muted">Pending Items</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="border-end">
+                <h3 class="text-success mb-1">{{ pending_projects or 0 }}</h3>
+                <small class="text-muted">Active Projects</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <h3 class="text-info mb-1">{{ pending_cases or 0 }}</h3>
+              <small class="text-muted">Open Cases</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">🔗 Quick Links</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('help.help_center') }}" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-question-circle me-2"></i>Help Center
+            </a>
+            <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-person-circle me-2"></i>My Profile
+            </a>
+            <a href="{{ url_for('search.search') }}" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-search me-2"></i>Search
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

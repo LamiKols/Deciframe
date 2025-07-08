@@ -614,16 +614,13 @@ app = create_app()
 # Main route
 @app.route('/')
 def index():
-    """Main application landing page"""
+    """Main application home page"""
     from flask_login import current_user
     from flask import render_template, redirect, url_for
     
     if current_user.is_authenticated:
-        # Redirect authenticated users to their appropriate dashboard
-        if current_user.role.value in ['Director', 'CEO', 'Admin']:
-            return redirect(url_for('dashboards.executive_dashboard'))
-        else:
-            return redirect(url_for('dashboard.user_dashboard'))
+        # Show home page for authenticated users with role-based quick actions
+        return render_template('home.html', user=current_user)
     else:
         # Show landing page for unauthenticated users
         return render_template('landing.html')
