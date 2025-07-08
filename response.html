@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Business Case - DeciFrame</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Create New Business Case</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" id="businessCaseForm">
+                            <input id="csrf_token" name="csrf_token" type="hidden" value="ImExOWJmMGNkOTAzNjc5YTAzMDY0MTdhNjEyZDI3ODMzYzllMmI3MmEi.aFl1bQ.ufM86uzCYl5XU1l8aBjXOVpHTc4">
+                            <input type="hidden" name="auth_token" value="None">
+                            
+                            <!-- Case Type Selection -->
+                            <div class="mb-3">
+                                <label class="form-label" for="case_type">Case Type</label>
+                                <div class="mt-2">
+                                    
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" id="case_type-0" name="case_type" onclick="toggleFields()" type="radio" value="Reactive">
+                                            <label class="form-check-label" for="case_type-0">Reactive</label>
+                                        </div>
+                                    
+                                        <div class="form-check form-check-inline">
+                                            <input checked class="form-check-input" id="case_type-1" name="case_type" onclick="toggleFields()" type="radio" value="Proactive">
+                                            <label class="form-check-label" for="case_type-1">Proactive</label>
+                                        </div>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            <!-- Problem Selection (for Reactive cases) -->
+                            <div class="mb-3" id="problemField">
+                                <label class="form-label" for="problem">From Problem</label>
+                                <select class="form-select is-invalid" id="problem" name="problem"><option value="8">P0008 – Manual Process for Creating MPL</option></select>
+                                
+                                    <div class="invalid-feedback">
+                                        
+                                            Not a valid choice.
+                                        
+                                    </div>
+                                
+                            </div>
+
+                            <!-- Initiative Name (for Proactive cases) -->
+                            <div class="mb-3" id="initiativeField" style="display: none;">
+                                <label class="form-label" for="initiative_name">Initiative Name</label>
+                                <input class="form-control" id="initiative_name" name="initiative_name" type="text" value="AI Implementation Project">
+                                
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="title">Title</label>
+                                <input class="form-control" id="title" maxlength="200" name="title" required type="text" value="AI Integration Business Case">
+                                
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="description">Description</label>
+                                <textarea class="form-control" id="description" name="description" required rows="4">
+Strategic initiative to implement AI across business operations</textarea>
+                                
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="cost_estimate">Cost Estimate</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input class="form-control" id="cost_estimate" name="cost_estimate" required step="0.01" type="number" value="50000">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="benefit_estimate">Benefit Estimate</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input class="form-control" id="benefit_estimate" name="benefit_estimate" required step="0.01" type="number" value="200000">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/cases" class="btn btn-secondary">
+                                    Back to Business Cases
+                                </a>
+                                <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create Business Case">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleFields() {
+            const caseType = document.querySelector('input[name="case_type"]:checked').value;
+            const problemField = document.getElementById('problemField');
+            const initiativeField = document.getElementById('initiativeField');
+            
+            if (caseType === 'Reactive') {
+                problemField.style.display = 'block';
+                initiativeField.style.display = 'none';
+            } else {
+                problemField.style.display = 'none';
+                initiativeField.style.display = 'block';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleFields();
+        });
+    </script>
+</body>
+</html>
