@@ -93,15 +93,15 @@ DEFAULT_NOTIFICATION_EVENTS = [
 def notification_settings():
     """Main notification settings page"""
     try:
-        # Get all notification settings
-        settings = NotificationSetting.query.all()
+        # Get all notification settings for current organization
+        settings = NotificationSetting.query.filter_by(organization_id=current_user.organization_id).all()
         settings_dict = {setting.event_name: setting for setting in settings}
         
         # Ensure all default events have settings
         _ensure_default_settings()
         
         # Refresh after ensuring defaults
-        settings = NotificationSetting.query.all()
+        settings = NotificationSetting.query.filter_by(organization_id=current_user.organization_id).all()
         settings_dict = {setting.event_name: setting for setting in settings}
         
         # Prepare display data
@@ -135,7 +135,7 @@ def notification_settings():
 @admin_required
 def edit_setting(setting_id):
     """Edit notification setting"""
-    setting = NotificationSetting.query.get_or_404(setting_id)
+    setting = NotificationSetting.query.filter_by(id=setting_id, organization_id=current_user.organization_id).first_or_404()
     
     if request.method == 'POST':
         try:
@@ -183,8 +183,8 @@ def create_setting():
                 flash('Event name is required', 'danger')
                 return redirect(request.url)
             
-            # Check if setting already exists
-            existing = NotificationSetting.query.filter_by(event_name=event_name).first()
+            # Check if setting already exists for this organization
+            existing = NotificationSetting.query.filter_by(event_name=event_name, organization_id=current_user.organization_id).first()
             if existing:
                 flash(f'Setting for {event_name} already exists', 'warning')
                 return redirect(url_for('notifications_config.edit_setting', setting_id=existing.id))
@@ -193,6 +193,7 @@ def create_setting():
             threshold_hours = request.form.get('threshold_hours')
             
             setting = NotificationSetting(
+                organization_id=current_user.organization_id,
                 event_name=event_name,
                 frequency=FrequencyEnum(frequency_value),
                 threshold_hours=int(threshold_hours) if threshold_hours and threshold_hours.isdigit() else None,
@@ -223,7 +224,7 @@ def create_setting():
 def delete_setting(setting_id):
     """Delete notification setting"""
     try:
-        setting = NotificationSetting.query.get_or_404(setting_id)
+        setting = NotificationSetting.query.filter_by(id=setting_id, organization_id=current_user.organization_id).first_or_404()
         event_name = setting.event_name
         
         db.session.delete(setting)
@@ -242,8 +243,8 @@ def delete_setting(setting_id):
 def reset_defaults():
     """Reset all settings to defaults"""
     try:
-        # Delete all existing settings
-        NotificationSetting.query.delete()
+        # Delete all existing settings for current organization
+        NotificationSetting.query.filter_by(organization_id=current_user.organization_id).delete()
         
         # Create default settings
         _create_default_settings()
@@ -263,7 +264,7 @@ def reset_defaults():
 def test_escalation(setting_id):
     """Test escalation for a specific setting"""
     try:
-        setting = NotificationSetting.query.get_or_404(setting_id)
+        setting = NotificationSetting.query.filter_by(id=setting_id, organization_id=current_user.organization_id).first_or_404()
         
         # Simulate escalation test
         test_result = {
@@ -287,8 +288,10 @@ def test_escalation(setting_id):
 
 def _ensure_default_settings():
     """Ensure all default events have notification settings"""
+    from flask_login import current_user
+    
     for event in DEFAULT_NOTIFICATION_EVENTS:
-        existing = NotificationSetting.query.filter_by(event_name=event['name']).first()
+        existing = NotificationSetting.query.filter_by(event_name=event['name'], organization_id=current_user.organization_id).first()
         if not existing:
             # Create default setting
             default_threshold = None
@@ -296,6 +299,7 @@ def _ensure_default_settings():
                 default_threshold = 24  # 24 hours for due/overdue events
             
             setting = NotificationSetting(
+                organization_id=current_user.organization_id,
                 event_name=event['name'],
                 frequency=FrequencyEnum.immediate,
                 threshold_hours=default_threshold,
@@ -313,12 +317,15 @@ def _ensure_default_settings():
 
 def _create_default_settings():
     """Create all default notification settings"""
+    from flask_login import current_user
+    
     for event in DEFAULT_NOTIFICATION_EVENTS:
         default_threshold = None
         if 'due_soon' in event['name'] or 'overdue' in event['name']:
             default_threshold = 24  # 24 hours for due/overdue events
         
         setting = NotificationSetting(
+            organization_id=current_user.organization_id,
             event_name=event['name'],
             frequency=FrequencyEnum.immediate,
             threshold_hours=default_threshold,
