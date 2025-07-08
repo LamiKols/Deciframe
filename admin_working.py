@@ -1694,7 +1694,7 @@ def init_admin_routes(app):
             db.session.rollback()
             return f"Error creating unit: {str(e)}", 500
 
-    @app.route('/admin/org-structure/export', methods=['GET'])
+    @app.route('/admin/org-structure/export')
     @login_required
     def export_org_structure():
         """Export organizational structure to CSV"""

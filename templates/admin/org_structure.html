@@ -377,8 +377,13 @@ async function deleteOrgUnit(unitId, unitName) {
 // Export organizational structure
 async function exportOrgStructure() {
   try {
+    console.log('🔧 Starting export...');
     const response = await fetch('/admin/org-structure/export', {
-      credentials: 'same-origin'
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'text/csv, */*'
+      }
     });
     
     if (response.ok) {
