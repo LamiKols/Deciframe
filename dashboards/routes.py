@@ -25,13 +25,15 @@ def compute_department_kpis(dept_id):
     
     # Get ALL active projects (organization-wide totals for KPI cards)
     active_projects = Project.query.filter(
-        Project.status.in_([StatusEnum.Open, StatusEnum.InProgress])
+        Project.status.in_([StatusEnum.Open, StatusEnum.InProgress]),
+        Project.organization_id == current_user.organization_id
     ).count()
     
     # Calculate average ROI across all approved cases (organization-wide)
     approved_cases = BusinessCase.query.filter(
         BusinessCase.status == StatusEnum.Approved,
-        BusinessCase.roi != None
+        BusinessCase.roi != None,
+        BusinessCase.organization_id == current_user.organization_id
     ).all()
     
     avg_roi = 0
