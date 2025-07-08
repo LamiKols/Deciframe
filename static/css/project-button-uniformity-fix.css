@@ -1,0 +1,48 @@
+/*
+  PROJECT BUTTON UNIFORMITY FIX - July 8, 2025
+  Forces ALL action buttons in project detail view to have identical dimensions
+*/
+
+/* Force all buttons in project actions container to have same width and height */
+.card-body .d-grid .btn,
+.card-body .btn,
+.card-body form .btn,
+.card-body form button[type="submit"] {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    min-height: 48px !important;
+    height: auto !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 8px !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+}
+
+/* Ensure forms don't interfere with button sizing */
+.card-body form {
+    width: 100% !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Additional specificity for project action buttons */
+.d-grid.gap-2 .btn,
+.d-grid.gap-2 form .btn,
+.d-grid.gap-2 form button {
+    width: 100% !important;
+    min-width: 100% !important;
+    display: block !important;
+    flex: none !important;
+}
+
+/* Remove any conflicting Bootstrap grid styles */
+.d-grid .btn {
+    grid-column: 1 / -1 !important;
+}
