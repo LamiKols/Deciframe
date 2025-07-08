@@ -1,0 +1,25 @@
+<li class="dept-node">
+  <div class="dept-label">
+    {% if dept.children %}
+      <span class="toggle-btn" onclick="toggleNode(this)">▶</span>
+    {% else %}
+      <span class="toggle-placeholder"></span>
+    {% endif %}
+    <span class="dept-name">{{ dept.name }}</span>
+
+    <div class="controls">
+      <a href="{{ url_for('dept.edit', id=dept.id, auth_token=request.args.get('auth_token')) }}">✏️</a>
+      <a href="{{ url_for('dept.delete', id=dept.id, auth_token=request.args.get('auth_token')) }}" onclick="return confirm('Delete?')">🗑</a>
+    </div>
+  </div>
+
+  {% if dept.children %}
+    <ul class="dept-subtree hidden">
+      {% for child in dept.children %}
+        {% with dept=child %}
+          {% include 'department_node.html' %}
+        {% endwith %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+</li>
