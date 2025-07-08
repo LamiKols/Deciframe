@@ -167,7 +167,7 @@
                                             <a href="{{ url_for('admin_edit_user', id=user.id) }}" 
                                                class="btn btn-sm btn-primary" 
                                                title="Edit User">
-                                                <i class="fas fa-edit"></i>
+                                                Edit
                                             </a>
                                             <form method="post" action="{{ url_for('admin_toggle_user_status', id=user.id) }}" 
                                                   class="d-inline">
@@ -175,7 +175,7 @@
                                                         class="btn btn-sm btn-{{ 'warning' if user.is_active else 'success' }}"
                                                         title="{{ 'Deactivate' if user.is_active else 'Activate' }} User"
                                                         onclick="return confirm('Are you sure you want to {{ 'deactivate' if user.is_active else 'activate' }} this user?')">
-                                                    <i class="fas fa-{{ 'pause' if user.is_active else 'play' }}"></i>
+                                                    {{ 'Off' if user.is_active else 'On' }}
                                                 </button>
                                             </form>
                                         </div>

@@ -283,6 +283,7 @@ def init_admin_routes(app):
             departments = Department.query.all()
         roles = list(RoleEnum)
         return render_template('admin/user_form.html', 
+                             form=form,
                              user=user, 
                              departments=departments, 
                              roles=roles)
