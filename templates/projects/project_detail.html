@@ -106,38 +106,29 @@
                         <!-- Business Case Integration -->
                         {% if project.business_case %}
                         <div class="card bg-dark border-success mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0"><i class="fas fa-link"></i> Linked Business Case</h6>
+                                <a href="{{ url_for('business.view_case', id=project.business_case.id, auth_token=request.args.get('auth_token')) }}" 
+                                   class="btn btn-sm btn-outline-success">
+                                    View Details
+                                </a>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-8">
+                                    <div class="col-md-9">
                                         <h6>{{ project.business_case.code }} - {{ project.business_case.title }}</h6>
                                         <p class="mb-2">{{ project.business_case.case_type.value }} | {{ project.business_case.case_depth.value }} Case</p>
                                         {% if project.business_case.summary %}
-                                            <p class="text-muted">{{ project.business_case.summary }}</p>
+                                            <p class="text-muted">{{ project.business_case.summary[:150] }}{% if project.business_case.summary|length > 150 %}...{% endif %}</p>
                                         {% endif %}
                                     </div>
-                                    <div class="col-md-4 text-end">
-                                        <div class="mb-2">
+                                    <div class="col-md-3 text-end">
+                                        <div class="mb-1">
                                             <strong>ROI:</strong> {{ "{:.1f}".format(project.business_case.roi) }}%
                                         </div>
-                                        <div class="mb-2">
-                                            <strong>BC Cost:</strong> {{ format_currency(project.business_case.cost_estimate) }}
+                                        <div class="mb-1">
+                                            <strong>Cost:</strong> {{ format_currency(project.business_case.cost_estimate) }}
                                         </div>
-                                        {% if project.budget and project.business_case.cost_estimate %}
-                                            {% set variance = ((project.budget - project.business_case.cost_estimate) / project.business_case.cost_estimate * 100) %}
-                                            <div class="mb-2">
-                                                <strong>Variance:</strong> 
-                                                <span class="text-{{ 'warning' if variance > 0 else 'success' }}">
-                                                    {{ "{:+.1f}".format(variance) }}%
-                                                </span>
-                                            </div>
-                                        {% endif %}
-                                        <a href="{{ url_for('business.view_case', id=project.business_case.id, auth_token=request.args.get('auth_token')) }}" 
-                                           class="btn btn-sm btn-outline-success">
-                                            View Business Case
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -147,88 +138,52 @@
                         <!-- Project Epics Section -->
                         {% if project_epics or business_case_epics %}
                         <div class="card bg-dark border-info mb-4">
-                            <div class="card-header">
-                                <h6 class="mb-0"><i class="fas fa-flag"></i> Project Epics & Sync Status</h6>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="fas fa-flag"></i> Project Epics ({{ (project_epics|length) + (business_case_epics|length) }})</h6>
+                                {% if project.business_case %}
+                                <a href="{{ url_for('business.refine_stories_page', id=project.business_case.id, auth_token=request.args.get('auth_token')) }}" 
+                                   class="btn btn-sm btn-outline-info">
+                                    Manage Epics
+                                </a>
+                                {% endif %}
                             </div>
                             <div class="card-body">
                                 {% if project_epics %}
-                                    <h6 class="text-light mb-3">Epics Linked to This Project:</h6>
-                                    <div class="row">
-                                        {% for epic in project_epics %}
-                                        <div class="col-md-6 mb-3">
-                                            <div class="card bg-secondary border-success">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between align-items-start">
-                                                        <div class="flex-grow-1">
-                                                            <h6 class="card-title text-light">{{ epic.title }}</h6>
-                                                            {% if epic.project_id == project.id %}
-                                                                <span class="badge bg-success">✅ Synced</span>
-                                                            {% else %}
-                                                                <span class="badge bg-warning">🔄 Not Synced</span>
-                                                            {% endif %}
-                                                            <span class="badge bg-{{ 'secondary' if epic.status.value == 'Draft' else 'warning' if epic.status.value == 'Submitted' else 'success' if epic.status.value == 'Approved' else 'danger' }}">
-                                                                {{ epic.status.value }}
-                                                            </span>
-                                                            {% if epic.description %}
-                                                                <p class="card-text small text-muted mt-2">{{ epic.description[:100] }}{% if epic.description|length > 100 %}...{% endif %}</p>
-                                                            {% endif %}
-                                                            <div class="small text-muted">
-                                                                <i class="fas fa-book"></i> {{ epic.stories|length }} user stories
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            {% if project.business_case %}
-                                                                <a href="{{ url_for('business.refine_stories_page', id=project.business_case.id, auth_token=request.args.get('auth_token')) }}" 
-                                                                   class="btn btn-sm btn-outline-info">
-                                                                    <i class="fas fa-edit"></i> Edit
-                                                                </a>
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                    {% for epic in project_epics %}
+                                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center">
+                                                <h6 class="mb-0 me-2">{{ epic.title }}</h6>
+                                                <span class="badge bg-success me-2">✅ Synced</span>
+                                                <span class="badge bg-{{ 'secondary' if epic.status.value == 'Draft' else 'warning' if epic.status.value == 'Submitted' else 'success' if epic.status.value == 'Approved' else 'danger' }}">
+                                                    {{ epic.status.value }}
+                                                </span>
                                             </div>
+                                            <small class="text-muted">{{ epic.stories|length }} user stories</small>
                                         </div>
-                                        {% endfor %}
+                                        <small class="text-muted">Click "Manage Epics" to view details</small>
                                     </div>
+                                    {% endfor %}
                                 {% endif %}
 
                                 {% if business_case_epics and project.business_case %}
-                                    <h6 class="text-light mb-3 mt-4">All Epics from Business Case {{ project.business_case.code }}:</h6>
-                                    <div class="row">
-                                        {% for epic in business_case_epics %}
-                                        <div class="col-md-6 mb-3">
-                                            <div class="card bg-dark border-{{ 'success' if epic.project_id == project.id else 'warning' }}">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between align-items-start">
-                                                        <div class="flex-grow-1">
-                                                            <h6 class="card-title text-light">{{ epic.title }}</h6>
-                                                            {% if epic.project_id == project.id %}
-                                                                <span class="badge bg-success">✅ Synced</span>
-                                                            {% else %}
-                                                                <span class="badge bg-warning">🔄 Not Synced</span>
-                                                            {% endif %}
-                                                            <span class="badge bg-{{ 'secondary' if epic.status.value == 'Draft' else 'warning' if epic.status.value == 'Submitted' else 'success' if epic.status.value == 'Approved' else 'danger' }}">
-                                                                {{ epic.status.value }}
-                                                            </span>
-                                                            {% if epic.description %}
-                                                                <p class="card-text small text-muted mt-2">{{ epic.description[:100] }}{% if epic.description|length > 100 %}...{% endif %}</p>
-                                                            {% endif %}
-                                                            <div class="small text-muted">
-                                                                <i class="fas fa-book"></i> {{ epic.stories|length }} user stories
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <a href="{{ url_for('business.refine_stories_page', id=project.business_case.id, auth_token=request.args.get('auth_token')) }}" 
-                                                               class="btn btn-sm btn-outline-info">
-                                                                <i class="fas fa-edit"></i> Edit
-                                                            </a>
-                                                        </div>
-                                                    </div>
+                                    {% for epic in business_case_epics %}
+                                        {% if epic.project_id != project.id %}
+                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center">
+                                                    <h6 class="mb-0 me-2">{{ epic.title }}</h6>
+                                                    <span class="badge bg-warning me-2">🔄 Not Synced</span>
+                                                    <span class="badge bg-{{ 'secondary' if epic.status.value == 'Draft' else 'warning' if epic.status.value == 'Submitted' else 'success' if epic.status.value == 'Approved' else 'danger' }}">
+                                                        {{ epic.status.value }}
+                                                    </span>
                                                 </div>
+                                                <small class="text-muted">{{ epic.stories|length }} user stories</small>
                                             </div>
+                                            <small class="text-muted">Available in Business Case</small>
                                         </div>
-                                        {% endfor %}
-                                    </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endif %}
 
                                 {% if not project_epics and not business_case_epics %}
@@ -243,42 +198,6 @@
                                             </a>
                                         {% endif %}
                                     </div>
-                                {% endif %}
-
-                                <!-- Epic Sync Summary -->
-                                {% if business_case_epics %}
-                                <div class="row mt-4">
-                                    <div class="col-12">
-                                        <div class="card bg-dark border-secondary">
-                                            <div class="card-body">
-                                                <h6 class="card-title text-light">Epic Sync Summary</h6>
-                                                <div class="row text-center">
-                                                    <div class="col-md-4">
-                                                        <div class="text-success">
-                                                            <i class="fas fa-link fa-2x"></i>
-                                                            <h4 class="text-light mt-2">{{ project_stats.synced_epics }}</h4>
-                                                            <small class="text-muted">Synced to Project</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="text-warning">
-                                                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                                                            <h4 class="text-light mt-2">{{ project_stats.business_case_epics - project_stats.synced_epics }}</h4>
-                                                            <small class="text-muted">Not Synced</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="text-info">
-                                                            <i class="fas fa-flag fa-2x"></i>
-                                                            <h4 class="text-light mt-2">{{ project_stats.business_case_epics }}</h4>
-                                                            <small class="text-muted">Total in Business Case</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -304,7 +223,7 @@
                 <!-- Milestones Section -->
                 <div class="card mt-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-flag-checkered"></i> Project Milestones</h5>
+                        <h5 class="mb-0"><i class="fas fa-flag-checkered"></i> Project Milestones ({{ milestones|length }})</h5>
                         <a href="{{ url_for('projects.new_milestone', project_id=project.id, auth_token=request.args.get('auth_token')) }}" 
                            class="btn btn-primary btn-sm">
                             <i class="fas fa-plus"></i> Add Milestone
@@ -312,112 +231,40 @@
                     </div>
                     <div class="card-body">
                         {% if milestones %}
-                            <div class="row">
-                                {% for milestone in milestones %}
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card border-{{ 'success' if milestone.completed else 'danger' if milestone.due_date < current_date and not milestone.completed else 'warning' if milestone.due_date <= upcoming_date and not milestone.completed else 'secondary' }}">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div class="flex-grow-1">
-                                                        <h6 class="card-title">
-                                                            {% if milestone.completed %}
-                                                                <i class="fas fa-check-circle text-success"></i>
-                                                            {% else %}
-                                                                <i class="fas fa-circle-o text-muted"></i>
-                                                            {% endif %}
-                                                            {{ milestone.name }}
-                                                        </h6>
-                                                        
-                                                        {% if milestone.description %}
-                                                            <p class="card-text small text-muted">{{ milestone.description }}</p>
-                                                        {% endif %}
-                                                        
-                                                        <div class="small">
-                                                            <div><strong>Due:</strong> {{ milestone.due_date | format_org_date }}</div>
-                                                            <div><strong>Owner:</strong> {{ milestone.owner.name }}</div>
-                                                            {% if milestone.completed and milestone.completion_date %}
-                                                                <div class="text-success">
-                                                                    <strong>Completed:</strong> {{ milestone.completion_date | format_org_date }}
-                                                                </div>
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="btn-group-vertical">
-                                                        {% if not milestone.completed %}
-                                                            <button type="button" class="btn btn-sm btn-success" 
-                                                                    data-bs-toggle="modal" 
-                                                                    data-bs-target="#completeModal{{ milestone.id }}">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        {% endif %}
-                                                        <a href="{{ url_for('projects.edit_milestone', id=milestone.id, auth_token=request.args.get('auth_token')) }}" 
-                                                           class="btn btn-sm btn-outline-secondary">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#deleteModal{{ milestone.id }}">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            {% for milestone in milestones %}
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center">
+                                        {% if milestone.completed %}
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-circle text-muted me-2"></i>
+                                        {% endif %}
+                                        <h6 class="mb-0 me-2">{{ milestone.name }}</h6>
+                                        <span class="badge bg-{{ 'success' if milestone.completed else 'danger' if milestone.due_date < current_date and not milestone.completed else 'warning' if milestone.due_date <= upcoming_date and not milestone.completed else 'secondary' }}">
+                                            {% if milestone.completed %}
+                                                Completed
+                                            {% elif milestone.due_date < current_date %}
+                                                Overdue
+                                            {% elif milestone.due_date <= upcoming_date %}
+                                                Due Soon
+                                            {% else %}
+                                                Pending
+                                            {% endif %}
+                                        </span>
                                     </div>
-
-                                    <!-- Complete Milestone Modal -->
-                                    {% if not milestone.completed %}
-                                    <div class="modal fade" id="completeModal{{ milestone.id }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Complete Milestone</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <form method="POST" action="{{ url_for('projects.complete_milestone', id=milestone.id) }}">
-                                                    <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
-                                                    <div class="modal-body">
-                                                        <p>Mark "{{ milestone.name }}" as completed?</p>
-                                                        <div class="mb-3">
-                                                            <label for="completion_notes{{ milestone.id }}" class="form-label">Completion Notes (Optional)</label>
-                                                            <textarea class="form-control" id="completion_notes{{ milestone.id }}" 
-                                                                      name="completion_notes" rows="3"></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-success">Complete Milestone</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    <!-- Delete Milestone Modal -->
-                                    <div class="modal fade" id="deleteModal{{ milestone.id }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Delete Milestone</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>Are you sure you want to delete "{{ milestone.name }}"? This action cannot be undone.</p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <form method="POST" action="{{ url_for('projects.delete_milestone', id=milestone.id) }}" class="d-inline">
-                                                        <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
-                                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
+                                    <small class="text-muted">
+                                        Due: {{ milestone.due_date | format_org_date }} | Owner: {{ milestone.owner.name }}
+                                    </small>
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('projects.edit_milestone', id=milestone.id, auth_token=request.args.get('auth_token')) }}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </div>
                             </div>
+                            {% endfor %}
                         {% else %}
                             <div class="text-center py-4">
                                 <i class="fas fa-flag-checkered fa-3x text-muted mb-3"></i>
