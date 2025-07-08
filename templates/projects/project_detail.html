@@ -139,65 +139,30 @@
                         {% if project_epics or business_case_epics %}
                         <div class="card bg-dark border-info mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0"><i class="fas fa-flag"></i> Project Epics ({{ (project_epics|length) + (business_case_epics|length) }})</h6>
+                                <h6 class="mb-0"><i class="fas fa-flag"></i> Project Epics</h6>
                                 {% if project.business_case %}
                                 <a href="{{ url_for('business.refine_stories_page', id=project.business_case.id, auth_token=request.args.get('auth_token')) }}" 
                                    class="btn btn-sm btn-outline-info">
-                                    Manage Epics
+                                    View Details
                                 </a>
                                 {% endif %}
                             </div>
                             <div class="card-body">
-                                {% if project_epics %}
-                                    {% for epic in project_epics %}
-                                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex align-items-center">
-                                                <h6 class="mb-0 me-2">{{ epic.title }}</h6>
-                                                <span class="badge bg-success me-2">✅ Synced</span>
-                                                <span class="badge bg-{{ 'secondary' if epic.status.value == 'Draft' else 'warning' if epic.status.value == 'Submitted' else 'success' if epic.status.value == 'Approved' else 'danger' }}">
-                                                    {{ epic.status.value }}
-                                                </span>
-                                            </div>
-                                            <small class="text-muted">{{ epic.stories|length }} user stories</small>
-                                        </div>
-                                        <small class="text-muted">Click "Manage Epics" to view details</small>
-                                    </div>
-                                    {% endfor %}
-                                {% endif %}
-
-                                {% if business_case_epics and project.business_case %}
-                                    {% for epic in business_case_epics %}
-                                        {% if epic.project_id != project.id %}
-                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex align-items-center">
-                                                    <h6 class="mb-0 me-2">{{ epic.title }}</h6>
-                                                    <span class="badge bg-warning me-2">🔄 Not Synced</span>
-                                                    <span class="badge bg-{{ 'secondary' if epic.status.value == 'Draft' else 'warning' if epic.status.value == 'Submitted' else 'success' if epic.status.value == 'Approved' else 'danger' }}">
-                                                        {{ epic.status.value }}
-                                                    </span>
-                                                </div>
-                                                <small class="text-muted">{{ epic.stories|length }} user stories</small>
-                                            </div>
-                                            <small class="text-muted">Available in Business Case</small>
-                                        </div>
+                                {% set all_epics = project_epics + business_case_epics %}
+                                {% if all_epics %}
+                                    <p class="mb-2">{{ all_epics|length }} epic(s) available | {{ project_epics|length }} synced to project</p>
+                                    <p class="text-muted">
+                                        {% if all_epics|length > 0 %}
+                                            {% for epic in all_epics[:2] %}
+                                                {{ epic.title }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                            {% if all_epics|length > 2 %}
+                                                and {{ all_epics|length - 2 }} more...
+                                            {% endif %}
                                         {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-
-                                {% if not project_epics and not business_case_epics %}
-                                    <div class="text-center py-4">
-                                        <i class="fas fa-flag fa-3x text-muted mb-3"></i>
-                                        <h6 class="text-light">No Epics Found</h6>
-                                        <p class="text-muted">This project doesn't have any linked epics yet.</p>
-                                        {% if project.business_case %}
-                                            <a href="{{ url_for('business.refine_stories_page', id=project.business_case.id, auth_token=request.args.get('auth_token')) }}" 
-                                               class="btn btn-primary">
-                                                <i class="fas fa-plus"></i> Create Epics in Business Case
-                                            </a>
-                                        {% endif %}
-                                    </div>
+                                    </p>
+                                {% else %}
+                                    <p class="text-muted">No epics available for this project.</p>
                                 {% endif %}
                             </div>
                         </div>
