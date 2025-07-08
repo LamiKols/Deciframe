@@ -313,7 +313,7 @@ def submit_for_review(id):
         return redirect(url_for('projects.view_project', id=id))
     
     # Only allow submission if project is in Open or Draft status
-    if project.status not in [StatusEnum.Open, StatusEnum.Draft]:
+    if project.status not in [StatusEnum.Open]:
         flash(f'Project cannot be submitted for review. Current status: {project.status.value}', 'error')
         return redirect(url_for('projects.view_project', id=id))
     
