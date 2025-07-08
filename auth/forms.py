@@ -183,6 +183,8 @@ class ProfileForm(FlaskForm):
         # Filter departments and users by organization for existing users
         try:
             if current_user.is_authenticated and hasattr(current_user, 'organization_id') and current_user.organization_id:
+                from app import db
+                from models import User, Department
                 org_id = current_user.organization_id
                 # Get departments used by users in the same organization
                 dept_ids_in_org = db.session.query(User.dept_id).filter(

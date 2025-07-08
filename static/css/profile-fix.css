@@ -1,0 +1,81 @@
+/* Profile Page Text Visibility Fixes */
+
+/* Profile header styling */
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.profile-header h1,
+.profile-header h2,
+.profile-header h3,
+.profile-header h4,
+.profile-header h5,
+.profile-header h6,
+.profile-header p,
+.profile-header span,
+.profile-header div {
+    color: white !important;
+}
+
+/* Profile content text visibility - comprehensive fix */
+.profile-content,
+.profile-content h1,
+.profile-content h2,
+.profile-content h3,
+.profile-content h4,
+.profile-content h5,
+.profile-content h6,
+.profile-content p,
+.profile-content span,
+.profile-content div,
+.profile-content label,
+.profile-content .form-label,
+.profile-content .card-body,
+.profile-content .card-title,
+.profile-content .card-text,
+.profile-content .btn,
+.profile-content .badge,
+.profile-content .alert {
+    color: var(--bs-body-color) !important;
+}
+
+/* Dark theme specific fixes */
+[data-bs-theme="dark"] .profile-content,
+[data-bs-theme="dark"] .profile-content *:not(.btn):not(.badge):not(.alert) {
+    color: #fff !important;
+}
+
+/* Light theme specific fixes */
+[data-bs-theme="light"] .profile-content,
+[data-bs-theme="light"] .profile-content *:not(.btn):not(.badge):not(.alert) {
+    color: #212529 !important;
+}
+
+/* Universal profile text visibility - nuclear option */
+html[data-bs-theme="dark"] .profile-content * {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme="light"] .profile-content * {
+    color: #212529 !important;
+}
+
+/* Ensure profile information is always visible */
+.profile-info,
+.profile-info *,
+.user-profile,
+.user-profile *,
+.user-details,
+.user-details * {
+    color: var(--bs-body-color) !important;
+}
+
+/* Force visibility for any profile-related content */
+.container .profile-content *,
+.main-content .profile-content *,
+body .profile-content * {
+    color: var(--bs-body-color) !important;
+}
