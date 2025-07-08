@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, session, current_app, make_response
+from flask import render_template, redirect, url_for, flash, request, session, current_app, make_response, Blueprint, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from urllib.parse import urlparse
 from auth import bp
@@ -9,6 +9,9 @@ from models import User, Organization, RoleEnum
 from app import db
 from utils.email_validation import extract_domain, is_new_organization_domain
 import logging
+
+# Create test blueprint for development and debugging
+test_bp = Blueprint('test', __name__, url_prefix='/test')
 
 logger = logging.getLogger(__name__)
 
@@ -437,3 +440,43 @@ def check_domain():
     except Exception as e:
         logger.error(f"Error checking domain: {e}")
         return {'is_new_domain': False}
+
+# Test routes for development and debugging
+@test_bp.route('/')
+def test_home():
+    """Test route home page"""
+    return jsonify({
+        'message': 'Test blueprint is working',
+        'user': current_user.email if current_user.is_authenticated else 'Anonymous',
+        'role': current_user.role.value if current_user.is_authenticated and current_user.role else None,
+        'authenticated': current_user.is_authenticated
+    })
+
+@test_bp.route('/session')
+def test_session():
+    """Debug session information"""
+    return jsonify({
+        'session': dict(session),
+        'user_authenticated': current_user.is_authenticated,
+        'user_email': current_user.email if current_user.is_authenticated else None,
+        'user_role': current_user.role.value if current_user.is_authenticated and current_user.role else None
+    })
+
+@test_bp.route('/first-user')
+def test_first_user():
+    """Test first user admin logic"""
+    if not current_user.is_authenticated:
+        return jsonify({'error': 'Not authenticated'})
+    
+    from models import User
+    org_users = User.query.filter_by(organization_id=current_user.organization_id).count()
+    is_first_user = org_users == 1 and current_user.role.value == 'Admin'
+    
+    return jsonify({
+        'user_email': current_user.email,
+        'organization_id': current_user.organization_id,
+        'org_users_count': org_users,
+        'user_role': current_user.role.value,
+        'is_first_user': is_first_user,
+        'unrestricted_admin': is_first_user
+    })

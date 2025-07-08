@@ -474,6 +474,14 @@ def create_app():
     from auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
     
+    # Register test blueprint for debugging
+    try:
+        from auth.routes import test_bp
+        app.register_blueprint(test_bp, url_prefix='/test')
+        print("✓ Test blueprint registered successfully")
+    except Exception as e:
+        print(f"⚠️ Test blueprint registration failed: {e}")
+    
     from problems.routes import problems_bp
     app.register_blueprint(problems_bp, url_prefix='/problems')
     
