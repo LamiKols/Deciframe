@@ -4,43 +4,67 @@
 
 {% block extra_css %}
 <style>
-/* Enhanced checkbox styling for better usability */
+/* Enhanced checkbox styling with nuclear override */
+html body .container-fluid .card .card-body .form-check .form-check-input,
 .form-check-input {
-    width: 1.5em !important;
-    height: 1.5em !important;
-    margin-top: 0.125em !important;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    margin-top: 0 !important;
     vertical-align: top !important;
-    border: 2px solid #6c757d !important;
-    border-radius: 0.375em !important;
+    border: 3px solid #6c757d !important;
+    border-radius: 6px !important;
     cursor: pointer !important;
+    transform: scale(1.5) !important;
+    transform-origin: left center !important;
 }
 
+html body .container-fluid .card .card-body .form-check .form-check-input:checked,
 .form-check-input:checked {
     background-color: #0d6efd !important;
     border-color: #0d6efd !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
 }
 
+html body .container-fluid .card .card-body .form-check .form-check-input:focus,
 .form-check-input:focus {
     border-color: #86b7fe !important;
     outline: 0 !important;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
 }
 
+html body .container-fluid .card .card-body .form-check .form-check-label,
 .form-check-label {
     cursor: pointer !important;
-    margin-left: 0.5em !important;
+    margin-left: 15px !important;
     font-weight: 500 !important;
+    line-height: 1.8 !important;
 }
 
-/* Improve form check container spacing */
+/* Improve form check container spacing with nuclear selectors */
+html body .container-fluid .card .card-body .form-check,
 .form-check {
-    margin-bottom: 0.75rem !important;
-    padding-left: 2rem !important;
+    margin-bottom: 1rem !important;
+    padding-left: 40px !important;
+    position: relative !important;
 }
 
 /* Make the entire checkbox area clickable */
+html body .container-fluid .card .card-body .form-check:hover .form-check-input,
 .form-check:hover .form-check-input {
     border-color: #0d6efd !important;
+}
+
+/* Extra large clickable area */
+.form-check-input::after {
+    content: "" !important;
+    position: absolute !important;
+    top: -10px !important;
+    left: -10px !important;
+    right: -10px !important;
+    bottom: -10px !important;
+    cursor: pointer !important;
 }
 </style>
 {% endblock %}
