@@ -5,8 +5,12 @@ Creates initial help articles for DeciFrame system
 
 import json
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from datetime import datetime
-from models import db, HelpCategory, HelpArticle, HelpArticleRoleEnum, Organization, User
+from app import db
+from models import HelpCategory, HelpArticle, HelpArticleRoleEnum, Organization, User
 
 def seed_help_articles():
     """Seed the database with initial help articles"""
