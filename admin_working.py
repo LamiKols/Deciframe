@@ -486,6 +486,9 @@ def init_admin_routes(app):
             return redirect(url_for('admin_workflows'))
         
         try:
+            # Roll back any pending transaction to start fresh
+            db.session.rollback()
+            
             workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
             
             # If no workflows exist, create some sample ones
@@ -533,20 +536,25 @@ def init_admin_routes(app):
                     }
                 ]
                 
-                for sample in sample_workflows:
-                    workflow = WorkflowTemplate(
-                        name=sample['name'],
-                        description=sample['description'],
-                        definition=sample['definition'],
-                        is_active=sample['is_active'],
-                        created_by=current_user.id,
-                        organization_id=current_user.organization_id
-                    )
-                    db.session.add(workflow)
-                
-                db.session.commit()
-                workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
-                print(f"🔧 Created {len(workflows)} sample workflows")
+                try:
+                    for sample in sample_workflows:
+                        workflow = WorkflowTemplate(
+                            name=sample['name'],
+                            description=sample['description'],
+                            definition=sample['definition'],
+                            is_active=sample['is_active'],
+                            created_by=current_user.id,
+                            organization_id=current_user.organization_id
+                        )
+                        db.session.add(workflow)
+                    
+                    db.session.commit()
+                    workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
+                    print(f"🔧 Created {len(workflows)} sample workflows")
+                except Exception as create_error:
+                    print(f"🔧 Error creating sample workflows: {create_error}")
+                    db.session.rollback()
+                    workflows = WorkflowTemplate.query.filter_by(organization_id=current_user.organization_id).all()
             
             # Get library workflows
             try:
@@ -554,11 +562,17 @@ def init_admin_routes(app):
             except:
                 library_workflows = []
             
-            log_action("Viewed workflow templates")
+            # Don't log action if it might cause transaction issues
+            try:
+                log_action("Viewed workflow templates")
+            except:
+                pass  # Skip logging if it fails
+            
             return render_template('admin/workflows.html', workflows=workflows, library_workflows=library_workflows)
             
         except Exception as e:
             print(f"🔧 Workflow Error: {str(e)}")
+            db.session.rollback()
             flash(f'Error loading workflows: {str(e)}', 'error')
             return redirect(url_for('admin_dashboard'))
     
