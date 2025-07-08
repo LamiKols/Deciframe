@@ -1,0 +1,138 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ role }} Role Permissions</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('admin.list_roles') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Roles
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Permission Matrix for {{ role }} Role</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th class="text-center">Create</th>
+                            <th class="text-center">Read</th>
+                            <th class="text-center">Update</th>
+                            <th class="text-center">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for module in modules %}
+                        {% set perm = permissions.get(module) %}
+                        <tr>
+                            <td><strong>{{ module }}</strong></td>
+                            <td class="text-center">
+                                <div class="form-check d-inline-block">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="{{ module }}_create" name="{{ module }}_create"
+                                           {{ 'checked' if perm and perm.can_create }}>
+                                    <label class="form-check-label" for="{{ module }}_create"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-check d-inline-block">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="{{ module }}_read" name="{{ module }}_read"
+                                           {{ 'checked' if perm and perm.can_read }}>
+                                    <label class="form-check-label" for="{{ module }}_read"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-check d-inline-block">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="{{ module }}_update" name="{{ module }}_update"
+                                           {{ 'checked' if perm and perm.can_update }}>
+                                    <label class="form-check-label" for="{{ module }}_update"></label>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-check d-inline-block">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="{{ module }}_delete" name="{{ module }}_delete"
+                                           {{ 'checked' if perm and perm.can_delete }}>
+                                    <label class="form-check-label" for="{{ module }}_delete"></label>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <a href="{{ url_for('admin.list_roles') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Permissions
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <button type="button" class="btn btn-sm btn-outline-success me-2" onclick="selectAll()">
+                    <i class="fas fa-check-square"></i> Select All
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-warning me-2" onclick="selectNone()">
+                    <i class="fas fa-square"></i> Clear All
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="selectReadOnly()">
+                    <i class="fas fa-eye"></i> Read Only
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Permission Guide</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Create:</strong> Add new records</li>
+                    <li><strong>Read:</strong> View existing records</li>
+                    <li><strong>Update:</strong> Modify existing records</li>
+                    <li><strong>Delete:</strong> Remove records</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function selectAll() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+}
+
+function selectNone() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+}
+
+function selectReadOnly() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = cb.name.includes('_read');
+    });
+}
+</script>
+{% endblock %}
