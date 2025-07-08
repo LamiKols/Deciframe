@@ -1429,9 +1429,16 @@ def init_admin_routes(app):
             from models import OrgUnit, User
             from flask import request, jsonify
             
-            # Get all org units with their hierarchy
-            org_units = OrgUnit.query.all()
-            roots = OrgUnit.query.filter_by(parent_id=None).all()
+            # Get all org units with their hierarchy - filter by organization
+            from flask_login import current_user
+            org_id = current_user.organization_id if current_user.is_authenticated else None
+            
+            if org_id:
+                org_units = OrgUnit.query.filter_by(organization_id=org_id).all()
+                roots = OrgUnit.query.filter_by(parent_id=None, organization_id=org_id).all()
+            else:
+                org_units = []
+                roots = []
             
             print(f"DEBUG: Total org units: {len(org_units)}")
             print(f"DEBUG: Root units: {len(roots)}")
@@ -1594,18 +1601,21 @@ def init_admin_routes(app):
             if not name:
                 return "Unit name is required", 400
             
-            # Create new unit
-            new_unit = OrgUnit(name=name)
+            # Create new unit with organization_id
+            from flask_login import current_user
+            org_id = current_user.organization_id if current_user.is_authenticated else None
             
-            # Set manager if provided
+            new_unit = OrgUnit(name=name, organization_id=org_id)
+            
+            # Set manager if provided - ensure manager is from same organization
             if manager_id and manager_id.strip():
-                manager = User.query.get(manager_id)
+                manager = User.query.filter_by(id=manager_id, organization_id=org_id).first()
                 if manager:
                     new_unit.manager_id = manager.id
             
-            # Set parent if provided
+            # Set parent if provided - ensure parent is from same organization
             if parent_id and parent_id.strip():
-                parent = OrgUnit.query.get(parent_id)
+                parent = OrgUnit.query.filter_by(id=parent_id, organization_id=org_id).first()
                 if parent:
                     new_unit.parent_id = parent.id
             

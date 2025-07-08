@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from models import User, RoleEnum, Department
+from flask_login import current_user
 import pytz
 
 class LoginForm(FlaskForm):
@@ -48,10 +49,35 @@ class RegistrationForm(FlaskForm):
     ])
     submit = SubmitField('Register')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, email_domain=None, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
-        self.department_id.choices = [(0, 'Select Department')] + Department.get_hierarchical_choices() + [(-1, 'My department isn\'t listed - Contact Admin')]
-        self.reports_to.choices = [(0, 'No Manager')] + [(u.id, u.name) for u in User.query.all()]
+        
+        # Get organization_id for filtering based on email domain
+        organization_id = None
+        if email_domain:
+            from models import Organization
+            organization = Organization.query.filter_by(domain=email_domain).first()
+            if organization:
+                organization_id = organization.id
+        
+        # Populate department choices - filter by organization if available
+        if organization_id:
+            # Filter departments by organization (when Department model has organization_id)
+            dept_choices = [(0, 'Select Department')] + [(-1, 'My department isn\'t listed - Contact Admin')]
+        else:
+            # For new organizations, show basic options
+            dept_choices = [(0, 'Select Department')] + [(-1, 'My department isn\'t listed - Contact Admin')]
+        
+        self.department_id.choices = dept_choices
+        
+        # Populate reports_to choices - filter by organization if available  
+        if organization_id:
+            # Only show users from the same organization
+            managers = User.query.filter_by(organization_id=organization_id).all()
+            self.reports_to.choices = [(0, 'No Manager')] + [(u.id, u.name) for u in managers]
+        else:
+            # For new organizations, no existing managers
+            self.reports_to.choices = [(0, 'No Manager')]
 
     def validate_email(self, email):
         """Check if email is already registered"""
@@ -96,8 +122,15 @@ class ProfileForm(FlaskForm):
     def __init__(self, original_email=None, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.original_email = original_email
-        self.department_id.choices = [(0, 'Select Department')] + [(d.id, d.name) for d in Department.query.all()]
-        self.reports_to.choices = [(0, 'No Manager')] + [(u.id, u.name) for u in User.query.all()]
+        # Filter departments and users by organization for existing users
+        if current_user.is_authenticated and hasattr(current_user, 'organization_id'):
+            org_id = current_user.organization_id
+            self.department_id.choices = [(0, 'Select Department')] + [(d.id, d.name) for d in Department.query.filter_by(organization_id=org_id).all()]
+            self.reports_to.choices = [(0, 'No Manager')] + [(u.id, u.name) for u in User.query.filter_by(organization_id=org_id).all()]
+        else:
+            # For unauthenticated users or users without org, show empty lists
+            self.department_id.choices = [(0, 'Select Department')]
+            self.reports_to.choices = [(0, 'No Manager')]
         
         # Populate timezone choices
         self.timezone.choices = self.get_timezone_choices()

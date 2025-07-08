@@ -73,7 +73,12 @@ def register():
     if request.method == 'GET':
         session.pop('_flashes', None)
     
-    form = RegistrationForm()
+    # Get email domain to determine organization
+    email_domain = None
+    if request.method == 'POST':
+        email_domain = request.form.get('email', '').split('@')[1].lower() if '@' in request.form.get('email', '') else None
+    
+    form = RegistrationForm(email_domain=email_domain)
     if form.validate_on_submit():
         # Check Terms of Use and Privacy Policy acceptance
         if 'agree_terms' not in request.form:

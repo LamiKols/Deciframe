@@ -826,6 +826,7 @@ class OrgUnit(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('org_units.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -840,6 +841,9 @@ class OrgUnit(db.Model):
     
     # Manager relationship
     manager = db.relationship('User', foreign_keys=[manager_id])
+    
+    # Organization relationship
+    organization = db.relationship('Organization', foreign_keys=[organization_id])
     
     def __repr__(self):
         return f'<OrgUnit {self.name}>'
