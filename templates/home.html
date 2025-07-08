@@ -26,25 +26,25 @@
         {% if user.role.value in ['Director', 'CEO', 'Admin'] %}
         <!-- Executive Actions -->
         <div class="col-md-3">
-          <a href="{{ url_for('dashboards.executive_dashboard') }}" class="btn btn-primary w-100 py-3">
+          <a href="{{ url_for('dashboards.executive_dashboard') }}" class="btn btn-primary w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-bar-chart fs-4 d-block mb-2"></i>
             Executive Dashboard
           </a>
         </div>
         <div class="col-md-3">
-          <a href="/admin/organization-settings" class="btn btn-outline-primary w-100 py-3">
+          <a href="/admin/organization-settings" class="btn btn-outline-primary w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-gear fs-4 d-block mb-2"></i>
             Organization Settings
           </a>
         </div>
         <div class="col-md-3">
-          <a href="/admin/workflows" class="btn btn-outline-primary w-100 py-3">
+          <a href="/admin/workflows" class="btn btn-outline-primary w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-diagram-3 fs-4 d-block mb-2"></i>
             Workflow Management
           </a>
         </div>
         <div class="col-md-3">
-          <a href="/admin/users" class="btn btn-outline-primary w-100 py-3">
+          <a href="/admin/users" class="btn btn-outline-primary w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-people fs-4 d-block mb-2"></i>
             User Management
           </a>
@@ -53,25 +53,25 @@
 
         <!-- Common Actions for All Users -->
         <div class="col-md-3">
-          <a href="{{ url_for('dashboards.dashboard_home') }}" class="btn btn-info w-100 py-3">
+          <a href="{{ url_for('dashboards.dashboard_home') }}" class="btn btn-info w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-speedometer2 fs-4 d-block mb-2"></i>
             My Dashboard
           </a>
         </div>
         <div class="col-md-3">
-          <a href="/problems" class="btn btn-outline-info w-100 py-3">
+          <a href="/problems" class="btn btn-outline-info w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-exclamation-triangle fs-4 d-block mb-2"></i>
             Problems
           </a>
         </div>
         <div class="col-md-3">
-          <a href="/business" class="btn btn-outline-info w-100 py-3">
+          <a href="/business" class="btn btn-outline-info w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-briefcase fs-4 d-block mb-2"></i>
             Business Cases
           </a>
         </div>
         <div class="col-md-3">
-          <a href="/projects" class="btn btn-outline-info w-100 py-3">
+          <a href="/projects" class="btn btn-outline-info w-100" style="min-height: 100px; padding: 15px;">
             <i class="bi bi-kanban fs-4 d-block mb-2"></i>
             Projects
           </a>
