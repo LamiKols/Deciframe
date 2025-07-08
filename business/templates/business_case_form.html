@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if action == 'Edit' %}Edit Business Case{% else %}New Business Case{% endif %} - DeciFrame
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        {% if action == 'Edit' %}
+                            Edit Business Case
+                            {% if business_case %}
+                                <span class="text-muted">- {{ business_case.code }}</span>
+                            {% endif %}
+                        {% else %}
+                            New Business Case
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.problem.label(class="form-label") }}
+                            {{ form.problem(class="form-select" + (" is-invalid" if form.problem.errors else "")) }}
+                            {% if form.problem.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.problem.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="4") }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.cost_estimate.label(class="form-label") }}
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ org_settings.get_currency_symbol() }}</span>
+                                    {{ form.cost_estimate(class="form-control" + (" is-invalid" if form.cost_estimate.errors else ""), step="0.01") }}
+                                    {% if form.cost_estimate.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.cost_estimate.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.benefit_estimate.label(class="form-label") }}
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ org_settings.get_currency_symbol() }}</span>
+                                    {{ form.benefit_estimate(class="form-control" + (" is-invalid" if form.benefit_estimate.errors else ""), step="0.01") }}
+                                    {% if form.benefit_estimate.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.benefit_estimate.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('business_cases.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
+                                Back to Business Cases
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

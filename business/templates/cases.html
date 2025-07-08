@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Business Cases - DeciFrame{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Business Cases</h2>
+            <a href="{{ url_for('business.new_case', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                Create New Business Case
+            </a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Department Filter Dropdown -->
+        <form method="get" class="mb-3">
+            <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+            <input type="hidden" name="q" value="{{ request.args.q or '' }}">
+            <input type="hidden" name="status" value="{{ request.args.status or '' }}">
+            <select name="dept" onchange="this.form.submit()" class="form-select w-auto d-inline">
+                <option value="">All My Departments</option>
+                {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if dept.id == (request.args.get('dept')|int if request.args.get('dept') else None) %}selected{% endif %}>
+                        {{ dept.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit" class="btn btn-secondary">Filter</button></noscript>
+        </form>
+
+        <!-- Search and Filter Form -->
+        <form method="get" class="row g-2 mb-4">
+            <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+            <input type="hidden" name="dept" value="{{ request.args.get('dept') or '' }}">
+            
+            <div class="col-sm">
+                <input type="text" name="q" value="{{ request.args.q or '' }}" class="form-control" placeholder="Search business cases...">
+            </div>
+            <div class="col-sm">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    {% for s in StatusEnum %}
+                    <option value="{{ s.name }}" {% if request.args.get('status') == s.name %}selected{% endif %}>{{ s.value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm">
+                <select name="assigned" class="form-select">
+                    <option value="">All Assignments</option>
+                    <option value="true" {% if request.args.get('assigned') == 'true' %}selected{% endif %}>Assigned to BA</option>
+                    <option value="false" {% if request.args.get('assigned') == 'false' %}selected{% endif %}>Unassigned</option>
+                </select>
+            </div>
+            <div class="col-sm-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+            <div class="col-sm-auto">
+                <a href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token')) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Clear
+                </a>
+            </div>
+        </form>
+
+        {% if cases %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Type</th>
+                                    <th>Title</th>
+                                    <th>Problem/Initiative</th>
+                                    <th>Cost Estimate</th>
+                                    <th>Benefit Estimate</th>
+                                    <th>ROI</th>
+                                    <th>Status</th>
+                                    <th>Assigned BA</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for case in cases %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ case.code }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ 'primary' if case.case_type.value == 'Reactive' else 'info' }}">
+                                                {{ case.case_type.value }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('business.view_case', id=case.id, auth_token=request.args.get('auth_token')) }}" class="text-decoration-none">
+                                                {{ case.title }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if case.case_type.value == 'Reactive' and case.problem %}
+                                                <small class="text-muted">{{ case.problem.code }}</small><br>
+                                                {{ case.problem.title }}
+                                            {% elif case.case_type.value == 'Proactive' and case.initiative_name %}
+                                                <strong>Initiative:</strong> {{ case.initiative_name }}
+                                            {% else %}
+                                                <span class="text-muted">No link specified</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-warning">{{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(case.cost_estimate) }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success">{{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(case.benefit_estimate) }}</span>
+                                        </td>
+                                        <td>
+                                            {% if case.roi %}
+                                                <span class="badge bg-{{ 'success' if case.roi > 0 else 'danger' }}">
+                                                    {{ "{:.1f}".format(case.roi) }}%
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ 'primary' if case.status.value == 'Open' else 'secondary' }}">
+                                                {{ case.status.value }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if case.assigned_ba %}
+                                                <span class="badge bg-info">{{ case.assigned_ba.name }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Unassigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {% if case.created_at %}
+                                                    {{ case.created_at | format_org_date }}
+                                                {% else %}
+                                                    Not specified
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ url_for('business.view_case', id=case.id, auth_token=request.args.get('auth_token')) }}" 
+                                                   class="btn btn-outline-primary btn-sm" title="View">
+                                                    View
+                                                </a>
+                                                <a href="{{ url_for('business.edit_case', id=case.id, auth_token=request.args.get('auth_token')) }}" 
+                                                   class="btn btn-outline-secondary btn-sm" title="Edit">
+                                                    Edit
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if pagination and pagination.pages > 1 %}
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Business cases pagination">
+                        <ul class="pagination">
+                            {% if pagination.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token'), q=request.args.get('q'), department=request.args.get('department'), status=request.args.get('status'), assigned=request.args.get('assigned'), page=pagination.prev_num) }}">&laquo; Prev</a>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="page-item disabled">
+                                <span class="page-link">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+                            </li>
+                            
+                            {% if pagination.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token'), q=request.args.get('q'), department=request.args.get('department'), status=request.args.get('status'), assigned=request.args.get('assigned'), page=pagination.next_num) }}">Next &raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <h5 class="text-muted">No Business Cases Found</h5>
+                    {% if request.args.get('q') or request.args.get('department') or request.args.get('status') or request.args.get('assigned') %}
+                        <p class="text-muted">No business cases match your current filter criteria.</p>
+                        <a href="{{ url_for('business.list_cases', auth_token=request.args.get('auth_token')) }}" class="btn btn-outline-primary">
+                            Clear filters
+                        </a>
+                    {% else %}
+                        <p class="text-muted">Create your first business case to get started with financial analysis.</p>
+                        <a href="{{ url_for('business.new_case', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                            Create First Business Case
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="mt-4">
+            <a href="{{ url_for('index', auth_token=request.args.get('auth_token')) }}" class="btn btn-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+{% endblock %}

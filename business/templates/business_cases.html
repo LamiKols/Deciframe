@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Business Cases - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Business Case Management</h2>
+                <a href="{{ url_for('business_cases.create', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Business Case
+                </a>
+            </div>
+
+            <!-- Filter Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <input type="hidden" name="auth_token" value="{{ request.args.get('auth_token') }}">
+                        <div class="col-md-4">
+                            {{ filter_form.status.label(class="form-label") }}
+                            {{ filter_form.status(class="form-select") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ filter_form.problem_id.label(class="form-label") }}
+                            {{ filter_form.problem_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            {{ filter_form.submit(class="btn btn-outline-secondary") }}
+                            <a href="{{ url_for('business_cases.index', auth_token=request.args.get('auth_token')) }}" class="btn btn-outline-secondary ms-2">Clear</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if business_cases %}
+            <!-- Business Cases Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Title</th>
+                                    <th>Related Problem</th>
+                                    <th>Organizational Unit</th>
+                                    <th>Cost Estimate</th>
+                                    <th>Benefit Estimate</th>
+                                    <th>ROI</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for case in business_cases %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ case.code }}</strong>
+                                    </td>
+                                    <td>{{ case.title }}</td>
+                                    <td>
+                                        <small class="text-muted">{{ case.problem.code if case.problem else 'N/A' }}: {{ case.problem.title[:50] if case.problem else 'N/A' }}{{ '...' if case.problem and case.problem.title|length > 50 else '' }}</small>
+                                    </td>
+                                    <td>
+                                        {% if case.org_unit %}
+                                            {{ case.org_unit.name }}
+                                        {% else %}
+                                            <span class="text-muted">Not assigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(case.cost_estimate) }}</td>
+                                    <td>{{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(case.benefit_estimate) }}</td>
+                                    <td>
+                                        <span class="badge {% if case.roi > 0 %}bg-success{% elif case.roi == 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ "{:.1f}".format(case.roi) if case.roi else '0.0' }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if case.status.value == 'Open' %}bg-primary{% elif case.status.value == 'In Progress' %}bg-info{% elif case.status.value == 'Resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ case.status.value }}
+                                        </span>
+                                    </td>
+                                    <td>{{ case.created_at | format_org_date }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('business_cases.view', id=case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('business_cases.edit', id=case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" action="{{ url_for('business_cases.delete', id=case.id, auth_token=request.args.get('auth_token')) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete business case {{ case.code }}?');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No business cases found</h5>
+                <p class="text-muted">Get started by creating your first business case.</p>
+                <a href="{{ url_for('business_cases.create', auth_token=request.args.get('auth_token')) }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Business Case
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

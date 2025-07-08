@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Business Case {{ business_case.code }} - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-briefcase text-primary me-2"></i>
+                    Business Case {{ business_case.code }}
+                </h2>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('business_cases.edit', id=business_case.id, auth_token=request.args.get('auth_token')) }}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{{ url_for('business_cases.index', auth_token=request.args.get('auth_token')) }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Business Case Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">{{ business_case.title }}</h4>
+                            <p class="card-text">{{ business_case.description }}</p>
+                            
+                            {% if business_case.problem %}
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-link"></i> Related Problem</h6>
+                                <strong>{{ business_case.problem.code }}: {{ business_case.problem.title }}</strong>
+                                <p class="mb-0 mt-2">{{ business_case.problem.description[:200] }}{{ '...' if business_case.problem.description|length > 200 else '' }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <!-- Financial Information -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Financial Analysis</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Cost Estimate:</strong>
+                                <div class="text-danger fs-5">{{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(business_case.cost_estimate) }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Benefit Estimate:</strong>
+                                <div class="text-success fs-5">{{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(business_case.benefit_estimate) }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Net Benefit:</strong>
+                                <div class="{% if business_case.benefit_estimate - business_case.cost_estimate > 0 %}text-success{% else %}text-danger{% endif %} fs-5">
+                                    {{ org_settings.get_currency_symbol() }}{{ "{:,.2f}".format(business_case.benefit_estimate - business_case.cost_estimate) }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>ROI:</strong>
+                                <span class="badge fs-6 {% if business_case.roi > 0 %}bg-success{% elif business_case.roi == 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ "{:.1f}".format(business_case.roi) if business_case.roi else '0.0' }}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Case Information -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Case Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Code:</strong>
+                                <span class="text-primary">{{ business_case.code }}</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Status:</strong>
+                                <span class="badge {% if business_case.status.value == 'Open' %}bg-primary{% elif business_case.status.value == 'In Progress' %}bg-info{% elif business_case.status.value == 'Resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ business_case.status.value }}
+                                </span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Created By:</strong>
+                                <div class="text-muted">{{ business_case.creator.name if business_case.creator else 'N/A' }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Created At:</strong>
+                                <div class="text-muted">{{ business_case.created_at | format_org_datetime }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('business_cases.edit', id=business_case.id, auth_token=request.args.get('auth_token')) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Edit Business Case
+                                </a>
+                                
+                                <form method="POST" action="{{ url_for('business_cases.delete', id=business_case.id, auth_token=request.args.get('auth_token')) }}" 
+                                      onsubmit="return confirm('Are you sure you want to delete this business case? This action cannot be undone.');">
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        <i class="fas fa-trash"></i> Delete Business Case
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
