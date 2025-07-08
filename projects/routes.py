@@ -349,6 +349,7 @@ def new_milestone(project_id):
             description=form.description.data,
             due_date=form.due_date.data,
             owner_id=form.owner_id.data,
+            organization_id=current_user.organization_id,
             completed=form.completed.data,
             completion_date=form.completion_date.data if form.completed.data else None,
             completion_notes=form.completion_notes.data if form.completed.data else None
