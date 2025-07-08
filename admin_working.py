@@ -791,13 +791,18 @@ def init_admin_routes(app):
                              workflow=workflow, 
                              config=config)
 
-    @app.route('/admin/workflows/<int:workflow_id>/edit', methods=['POST'])
+    @app.route('/admin/workflows/<int:workflow_id>/edit', methods=['GET', 'POST'])
     @login_required
     @admin_required
     def edit_workflow(workflow_id):
         """Edit existing workflow template"""
         workflow = WorkflowTemplate.query.filter_by(id=workflow_id, organization_id=current_user.organization_id).first_or_404()
         
+        if request.method == 'GET':
+            # Show edit form - redirect to configure workflow for now (Tier 1 implementation)
+            return redirect(url_for('configure_workflow', workflow_id=workflow_id))
+        
+        # Handle POST request - update workflow
         workflow.name = request.form.get('name')
         workflow.description = request.form.get('description')
         workflow.is_active = 'is_active' in request.form
