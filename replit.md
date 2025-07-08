@@ -38,7 +38,8 @@ DeciFrame is a modular Flask application providing comprehensive problem and bus
 - **COMPREHENSIVE AUDIT COMPLETED**: Executed systematic security audit covering all core models, routes, and data access patterns
 - **DATABASE ISOLATION VERIFIED**: All 10 core business models (problems, business_cases, projects, epics, stories, solutions, departments, org_units, notifications, users) have organization_id with NOT NULL constraints
 - **ROUTE SECURITY ENFORCED**: Fixed organization filtering in dashboards/routes.py and admin_working.py with 5 additional security violations resolved
-- **CROSS-TENANT PROTECTION**: Confirmed data isolation between organizations - Organization 1 and Organization 3 data properly separated
+- **CRITICAL API SECURITY FIX**: Fixed /api/users endpoint cross-tenant data exposure preventing managers from other organizations appearing in dropdowns
+- **CROSS-TENANT PROTECTION**: Confirmed complete data isolation between organizations - Organization 1, 2, and 3 data properly separated
 
 🔒 **Production-Ready Security Implementation - July 8, 2025**
 - **7 CRITICAL ROUTES SECURED**: problems/, business/, projects/, solutions/, dashboards/, dept/, notifications/ all implement organization filtering

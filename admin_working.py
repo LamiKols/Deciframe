@@ -1585,10 +1585,11 @@ def init_admin_routes(app):
     @app.route('/api/users', methods=['GET'])
     @login_required
     def api_users():
-        """API endpoint to get users for dropdowns"""
+        """API endpoint to get users for dropdowns - ORGANIZATION FILTERED"""
         try:
             from models import User
-            users = User.query.all()
+            # CRITICAL SECURITY FIX: Filter users by organization_id
+            users = User.query.filter_by(organization_id=current_user.organization_id).all()
             users_data = []
             for user in users:
                 # Use actual User model structure: name, email, role
