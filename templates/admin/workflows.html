@@ -4,6 +4,24 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/workflow-button-fix.css') }}?v={{ range(1000, 9999) | random }}&t=20250708152500">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button-text-emergency-fix.css') }}?v={{ range(1000, 9999) | random }}&emergency=true">
+<style>
+/* Inline emergency button fix */
+.workflow-add-btn, .table .btn {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    background: #0d6efd !important;
+    border: 2px solid #0d6efd !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    padding: 12px 24px !important;
+    text-shadow: none !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+.btn-outline-info { color: #0dcaf0 !important; -webkit-text-fill-color: #0dcaf0 !important; }
+.btn-outline-warning { color: #ffc107 !important; -webkit-text-fill-color: #ffc107 !important; }
+.btn-outline-danger { color: #dc3545 !important; -webkit-text-fill-color: #dc3545 !important; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -28,8 +46,8 @@
                         <div class="d-flex align-items-center gap-3">
                             <small class="text-muted">Manage your workflow templates</small>
                             <button type="button" class="btn btn-primary workflow-add-btn" data-bs-toggle="modal" data-bs-target="#addWorkflowModal" 
-                                    style="display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
-                                <i class="fas fa-plus me-1"></i>Add New Workflow
+                                    style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; color: white !important; -webkit-text-fill-color: white !important; background: #0d6efd !important; font-weight: bold !important; font-size: 16px !important; padding: 12px 24px !important; border: 2px solid #0d6efd !important;">
+                                <i class="fas fa-plus me-1" style="color: white !important;"></i><span style="color: white !important; -webkit-text-fill-color: white !important;">Add New Workflow</span>
                             </button>
                         </div>
                     </div>
