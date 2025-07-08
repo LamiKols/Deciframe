@@ -562,11 +562,8 @@ def init_admin_routes(app):
             except:
                 library_workflows = []
             
-            # Don't log action if it might cause transaction issues
-            try:
-                log_action("Viewed workflow templates")
-            except:
-                pass  # Skip logging if it fails
+            # Skip audit logging to avoid transaction issues
+            print(f"🔧 Successfully loaded {len(workflows)} workflows for org {current_user.organization_id}")
             
             return render_template('admin/workflows.html', workflows=workflows, library_workflows=library_workflows)
             
