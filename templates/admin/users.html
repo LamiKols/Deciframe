@@ -3,6 +3,10 @@
 
 {% block title %}User Management - DeciFrame{% endblock %}
 
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/admin-button-fix.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid mt-4">
     <div class="row">
@@ -146,19 +150,16 @@
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a href="{{ url_for('admin_edit_user', id=user.id) }}" 
                                                class="btn btn-sm btn-primary" 
-                                               title="Edit User"
-                                               style="color: white !important;">
-                                                <i class="fas fa-edit" style="color: white !important; font-size: 14px;"></i>
+                                               title="Edit User">
+                                                <i class="fas fa-edit"></i>
                                             </a>
                                             <form method="post" action="{{ url_for('admin_toggle_user_status', id=user.id) }}" 
                                                   class="d-inline">
                                                 <button type="submit" 
                                                         class="btn btn-sm btn-{{ 'warning' if user.is_active else 'success' }}"
                                                         title="{{ 'Deactivate' if user.is_active else 'Activate' }} User"
-                                                        style="color: {{ '#000' if user.is_active else '#fff' }} !important;"
                                                         onclick="return confirm('Are you sure you want to {{ 'deactivate' if user.is_active else 'activate' }} this user?')">
-                                                    <i class="fas fa-{{ 'pause' if user.is_active else 'play' }}" 
-                                                       style="color: {{ '#000' if user.is_active else '#fff' }} !important; font-size: 14px;"></i>
+                                                    <i class="fas fa-{{ 'pause' if user.is_active else 'play' }}"></i>
                                                 </button>
                                             </form>
                                         </div>

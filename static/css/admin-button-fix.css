@@ -1,0 +1,139 @@
+/* Admin Button Text Visibility and Sizing Fixes */
+
+/* Universal button text visibility - nuclear option */
+.btn, button, input[type="submit"], input[type="button"] {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: 1px solid !important;
+    min-height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+}
+
+/* Small button standardization */
+.btn-sm {
+    min-width: 38px !important;
+    min-height: 32px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+}
+
+/* Button group spacing */
+.btn-group .btn {
+    margin-right: 2px !important;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0 !important;
+}
+
+/* Primary button fixes */
+.btn-primary, .btn-sm.btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Secondary button fixes */
+.btn-secondary, .btn-sm.btn-secondary {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Success button fixes */
+.btn-success, .btn-sm.btn-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Warning button fixes */
+.btn-warning, .btn-sm.btn-warning {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Danger button fixes */
+.btn-danger, .btn-sm.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Info button fixes */
+.btn-info, .btn-sm.btn-info {
+    background-color: #0dcaf0 !important;
+    border-color: #0dcaf0 !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Icon styling inside buttons */
+.btn i, .btn-sm i {
+    color: inherit !important;
+    font-size: 14px !important;
+    vertical-align: middle !important;
+}
+
+/* Outline button fixes */
+.btn-outline-secondary {
+    background-color: transparent !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+    -webkit-text-fill-color: #6c757d !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+.btn-outline-primary {
+    background-color: transparent !important;
+    border-color: #0d6efd !important;
+    color: #0d6efd !important;
+    -webkit-text-fill-color: #0d6efd !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Force table action buttons to be consistent */
+.table .btn-group .btn {
+    min-width: 36px !important;
+    min-height: 32px !important;
+    padding: 6px 10px !important;
+}
+
+/* Override any inline styles that might interfere */
+.btn[style*="color"] {
+    color: inherit !important;
+}
+
+/* Admin table specific fixes */
+.table tbody .btn-group {
+    white-space: nowrap !important;
+}
+
+.table tbody .btn-group .btn {
+    margin-right: 2px !important;
+    vertical-align: middle !important;
+}
