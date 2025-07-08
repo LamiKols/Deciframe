@@ -125,6 +125,28 @@ def new_case():
                 flash(f"Full case requires all sections to be completed. Missing: {', '.join(missing_fields)}", "danger")
                 return render_template('case_form.html', form=form)
 
+        # Determine department assignment
+        dept_id = user.dept_id
+        if not dept_id:
+            # If user has no department, try to find or create a default department
+            from models import Department
+            default_dept = Department.query.filter_by(
+                organization_id=user.organization_id,
+                name='General'
+            ).first()
+            
+            if not default_dept:
+                # Create a default "General" department for organization
+                default_dept = Department(
+                    name='General',
+                    description='Default department for users without specific department assignment',
+                    organization_id=user.organization_id
+                )
+                db.session.add(default_dept)
+                db.session.flush()  # Get the ID
+            
+            dept_id = default_dept.id
+
         # Create BusinessCase
         bc = BusinessCase(
             problem_id=(form.problem.data if ct is CaseTypeEnum.Reactive else None),
@@ -135,7 +157,7 @@ def new_case():
             cost_estimate=cost,
             benefit_estimate=float(form.benefit_estimate.data) if form.benefit_estimate.data else 0.0,
             created_by=user.id,
-            dept_id=user.dept_id,  # Automatically assign user's department
+            dept_id=dept_id,  # Use determined department (user's or default)
             organization_id=user.organization_id,  # Critical: enforce multi-tenant isolation
             case_type=ct,
             case_depth=cd,
