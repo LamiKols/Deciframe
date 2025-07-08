@@ -132,7 +132,8 @@ def init_admin_routes(app):
         role_filter = request.args.get('role', '')
         
         # Build query with department scoping
-        query = User.query
+        # CRITICAL: Filter by organization to ensure data isolation
+        query = User.query.filter(User.organization_id == current_user.organization_id)
         
         # Department scoping for non-Admin users (Directors can only manage their department hierarchy)
         if current_user.role.value != 'Admin':
@@ -155,11 +156,13 @@ def init_admin_routes(app):
         users = query.all()
         
         # Also scope departments dropdown for non-Admin users
+        # CRITICAL: Always filter departments by organization
+        departments_query = Department.query.filter(Department.organization_id == current_user.organization_id)
         if current_user.role.value != 'Admin' and current_user.dept_id:
             allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
-            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
+            departments = departments_query.filter(Department.id.in_(allowed_dept_ids)).all()
         else:
-            departments = Department.query.all()
+            departments = departments_query.all()
         
         return render_template('admin/users.html', 
                              users=users, 

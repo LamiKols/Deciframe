@@ -197,11 +197,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // For business domains, check if it's a new organization
         // (In a real implementation, this would be an AJAX call to check the backend)
         // For now, we'll show organization fields for non-personal domains
+        const csrfToken = document.querySelector('input[name="csrf_token"]');
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            return;
+        }
+        
         fetch('/auth/check-domain', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                'X-CSRFToken': csrfToken.value
             },
             body: JSON.stringify({domain: domain})
         })
