@@ -1,0 +1,478 @@
+<!-- Floating Help Widget -->
+<div id="helpWidget" class="help-widget">
+    <div class="help-widget-trigger" onclick="toggleHelpWidget()">
+        <i class="fas fa-question-circle"></i>
+        <span class="help-widget-badge" id="helpBadge" style="display: none;">!</span>
+    </div>
+    
+    <div class="help-widget-panel" id="helpPanel" style="display: none;">
+        <div class="help-widget-header">
+            <h6 class="mb-0">
+                <i class="fas fa-life-ring me-2"></i>Need Help?
+            </h6>
+            <button class="btn-close" onclick="closeHelpWidget()" aria-label="Close"></button>
+        </div>
+        
+        <div class="help-widget-body">
+            <!-- Quick Help Search -->
+            <div class="mb-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="widgetSearch" 
+                           placeholder="Search help articles..." onkeyup="quickSearch()" autocomplete="off">
+                </div>
+                <div id="quickResults" class="quick-results mt-2" style="display: none;"></div>
+            </div>
+            
+            <!-- Contextual Help -->
+            <div class="mb-3" id="contextualHelp">
+                <h6 class="small fw-bold text-muted mb-2">Current Page Help</h6>
+                <div id="pageHelp">
+                    <div class="help-item" onclick="showPageHelp()">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="pageHelpTitle">Page Overview</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="mb-3">
+                <h6 class="small fw-bold text-muted mb-2">Quick Actions</h6>
+                <div class="help-actions">
+                    <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="openHelpCenter()">
+                        <i class="fas fa-book me-2"></i>Browse Help Center
+                    </button>
+                    <button class="btn btn-sm btn-outline-info w-100 mb-2" onclick="openChatAssistant()">
+                        <i class="fas fa-comments me-2"></i>Ask AI Assistant
+                    </button>
+                    <button class="btn btn-sm btn-outline-success w-100" onclick="reportIssue()">
+                        <i class="fas fa-bug me-2"></i>Report Issue
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Popular Articles -->
+            <div id="popularArticles">
+                <h6 class="small fw-bold text-muted mb-2">Popular Articles</h6>
+                <div class="popular-list" id="popularList">
+                    <div class="help-item" onclick="openArticle('getting-started')">
+                        <i class="fas fa-play-circle me-2"></i>Getting Started
+                    </div>
+                    <div class="help-item" onclick="openArticle('user-management')">
+                        <i class="fas fa-users me-2"></i>User Management
+                    </div>
+                    <div class="help-item" onclick="openArticle('business-cases')">
+                        <i class="fas fa-briefcase me-2"></i>Business Cases
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-widget-footer">
+            <small class="text-muted">
+                <i class="fas fa-keyboard me-1"></i>Press <kbd>?</kbd> for quick help
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+.help-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: inherit;
+}
+
+.help-widget-trigger {
+    width: 60px;
+    height: 60px;
+    background: var(--bs-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.help-widget-trigger:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.help-widget-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--bs-danger);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.help-widget-panel {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 320px;
+    max-height: 500px;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.help-widget-header {
+    padding: 15px;
+    background: var(--bs-primary);
+    color: white;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.help-widget-header .btn-close {
+    filter: invert(1);
+    font-size: 12px;
+}
+
+.help-widget-body {
+    padding: 15px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.help-widget-footer {
+    padding: 10px 15px;
+    background: var(--bs-light);
+    border-top: 1px solid var(--bs-border-color);
+    text-align: center;
+}
+
+.help-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.help-item:hover {
+    background: var(--bs-secondary-bg);
+}
+
+.quick-results {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 6px;
+    background: var(--bs-body-bg);
+}
+
+.quick-results .help-item {
+    border-bottom: 1px solid var(--bs-border-color);
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+.quick-results .help-item:last-child {
+    border-bottom: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .help-widget {
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    .help-widget-panel {
+        width: 280px;
+    }
+    
+    .help-widget-trigger {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+}
+
+/* Dark theme adjustments */
+[data-bs-theme="dark"] .help-widget-footer {
+    background: var(--bs-dark);
+    color: var(--bs-light);
+}
+
+[data-bs-theme="dark"] .quick-results {
+    background: var(--bs-dark);
+    border-color: var(--bs-secondary);
+}
+</style>
+
+<script>
+// Floating Help Widget JavaScript
+let helpWidgetOpen = false;
+let searchTimeout = null;
+
+// Initialize widget on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeHelpWidget();
+    setupKeyboardShortcuts();
+    detectPageContext();
+});
+
+function initializeHelpWidget() {
+    // Load popular articles
+    loadPopularArticles();
+    
+    // Set up search
+    const searchInput = document.getElementById('widgetSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(quickSearch, 300);
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                document.getElementById('quickResults').style.display = 'none';
+            }, 200);
+        });
+    }
+}
+
+function toggleHelpWidget() {
+    const panel = document.getElementById('helpPanel');
+    const trigger = document.querySelector('.help-widget-trigger');
+    
+    if (helpWidgetOpen) {
+        closeHelpWidget();
+    } else {
+        panel.style.display = 'block';
+        trigger.style.transform = 'rotate(45deg)';
+        helpWidgetOpen = true;
+        
+        // Focus search input
+        setTimeout(() => {
+            document.getElementById('widgetSearch')?.focus();
+        }, 100);
+    }
+}
+
+function closeHelpWidget() {
+    const panel = document.getElementById('helpPanel');
+    const trigger = document.querySelector('.help-widget-trigger');
+    
+    panel.style.display = 'none';
+    trigger.style.transform = 'rotate(0deg)';
+    helpWidgetOpen = false;
+    
+    // Clear search
+    document.getElementById('widgetSearch').value = '';
+    document.getElementById('quickResults').style.display = 'none';
+}
+
+async function quickSearch() {
+    const query = document.getElementById('widgetSearch').value.trim();
+    const resultsContainer = document.getElementById('quickResults');
+    
+    if (query.length < 2) {
+        resultsContainer.style.display = 'none';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/help-articles?search=${encodeURIComponent(query)}&limit=5`);
+        const data = await response.json();
+        
+        if (data.articles && data.articles.length > 0) {
+            let html = '';
+            data.articles.forEach(article => {
+                html += `
+                    <div class="help-item" onclick="openArticleFromWidget('${article.slug}')">
+                        <i class="fas fa-file-alt me-2"></i>
+                        <span>${article.title}</span>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+            resultsContainer.style.display = 'block';
+        } else {
+            resultsContainer.innerHTML = '<div class="help-item text-muted">No results found</div>';
+            resultsContainer.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Search error:', error);
+        resultsContainer.style.display = 'none';
+    }
+}
+
+function detectPageContext() {
+    // Detect current page and set contextual help
+    const path = window.location.pathname;
+    const pageHelpTitle = document.getElementById('pageHelpTitle');
+    
+    if (path.includes('/admin/')) {
+        pageHelpTitle.textContent = 'Admin Dashboard Help';
+    } else if (path.includes('/business/')) {
+        pageHelpTitle.textContent = 'Business Cases Help';
+    } else if (path.includes('/projects/')) {
+        pageHelpTitle.textContent = 'Project Management Help';
+    } else if (path.includes('/problems/')) {
+        pageHelpTitle.textContent = 'Problem Tracking Help';
+    } else {
+        pageHelpTitle.textContent = 'Page Overview';
+    }
+}
+
+function showPageHelp() {
+    // Show contextual help based on current page
+    const path = window.location.pathname;
+    let module = 'General';
+    let section = 'overview';
+    
+    if (path.includes('/admin/')) {
+        module = 'Admin';
+        section = 'overview';
+    } else if (path.includes('/business/')) {
+        module = 'Business';
+        section = 'cases';
+    } else if (path.includes('/projects/')) {
+        module = 'Projects';
+        section = 'management';
+    } else if (path.includes('/problems/')) {
+        module = 'Problems';
+        section = 'management';
+    }
+    
+    // Use existing contextual help system
+    if (window.ContextualHelp) {
+        const helpInstance = new window.ContextualHelp();
+        helpInstance.loadHelpContentFromUrl(`/help/?module=${module}&section=${section}`);
+    } else {
+        // Fallback to direct navigation
+        window.open(`/help/?module=${module}&section=${section}`, '_blank');
+    }
+    
+    closeHelpWidget();
+}
+
+function openHelpCenter() {
+    window.open('/help', '_blank');
+    closeHelpWidget();
+}
+
+function openChatAssistant() {
+    // If chat assistant exists, open it
+    if (typeof openChatWidget === 'function') {
+        openChatWidget();
+    } else {
+        window.open('/help', '_blank');
+    }
+    closeHelpWidget();
+}
+
+function reportIssue() {
+    // Open feedback form or issue reporting
+    const subject = encodeURIComponent('Issue Report from ' + window.location.pathname);
+    const body = encodeURIComponent('Please describe the issue you encountered:\n\nPage: ' + window.location.href + '\nTime: ' + new Date().toISOString());
+    window.open(`mailto:support@deciframe.com?subject=${subject}&body=${body}`, '_blank');
+    closeHelpWidget();
+}
+
+function openArticleFromWidget(slug) {
+    window.open(`/help/${slug}`, '_blank');
+    closeHelpWidget();
+}
+
+function openArticle(slug) {
+    window.open(`/help/${slug}`, '_blank');
+    closeHelpWidget();
+}
+
+async function loadPopularArticles() {
+    try {
+        const response = await fetch('/api/help-articles?limit=3&sort=popular');
+        const data = await response.json();
+        
+        if (data.articles && data.articles.length > 0) {
+            const popularList = document.getElementById('popularList');
+            let html = '';
+            
+            data.articles.forEach(article => {
+                html += `
+                    <div class="help-item" onclick="openArticleFromWidget('${article.slug}')">
+                        <i class="fas fa-star me-2"></i>
+                        <span>${article.title}</span>
+                    </div>
+                `;
+            });
+            
+            popularList.innerHTML = html;
+        }
+    } catch (error) {
+        console.error('Error loading popular articles:', error);
+    }
+}
+
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        // Press '?' to toggle help widget
+        if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            // Only if not in an input field
+            if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+                e.preventDefault();
+                toggleHelpWidget();
+            }
+        }
+        
+        // Press Escape to close help widget
+        if (e.key === 'Escape' && helpWidgetOpen) {
+            closeHelpWidget();
+        }
+    });
+}
+
+// Show notification badge for new features or help updates
+function showHelpBadge() {
+    document.getElementById('helpBadge').style.display = 'block';
+}
+
+function hideHelpBadge() {
+    document.getElementById('helpBadge').style.display = 'none';
+}
+
+// Auto-hide badge after interaction
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.help-widget')) {
+        hideHelpBadge();
+    }
+});
+</script>

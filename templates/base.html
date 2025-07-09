@@ -69,11 +69,15 @@
     
     <!-- Contextual Help JS -->
     <script src="{{ url_for('static', filename='js/contextual_help.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/help_buttons.js') }}"></script>
     <script>
         // Initialize contextual help when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             new ContextualHelp();
         });
     </script>
+    
+    <!-- Floating Help Widget -->
+    {% include 'help/floating_widget.html' %}
 </body>
 </html>

@@ -6,7 +6,7 @@ help_bp = Blueprint('help', __name__, url_prefix='/help')
 
 @help_bp.route('/')
 def index():
-    """Help Center main page with category listing and contextual help handling"""
+    """Enhanced Help Center main page with search, filtering, and contextual help handling"""
     # Check if this is a contextual help request
     module = request.args.get('module')
     section = request.args.get('section')
@@ -15,14 +15,51 @@ def index():
         # Handle contextual help request
         return render_template('help/contextual_content.html', module=module, section=section)
     
-    # Regular help center index
+    # Enhanced help center with search and filtering
+    search_query = request.args.get('search', '').strip()
+    module_filter = request.args.get('module', '')
+    role_filter = request.args.get('role', '')
+    
+    # Get all categories and articles
     categories = HelpCategory.query.order_by(HelpCategory.sort_order, HelpCategory.name).all()
+    articles_query = HelpArticle.query.join(HelpCategory).order_by(HelpCategory.sort_order, HelpArticle.sort_order, HelpArticle.title)
+    
+    # Apply filters
+    if search_query:
+        articles_query = articles_query.filter(
+            HelpArticle.title.ilike(f'%{search_query}%') |
+            HelpArticle.content.ilike(f'%{search_query}%') |
+            HelpArticle.tags.ilike(f'%{search_query}%')
+        )
+    
+    if module_filter:
+        articles_query = articles_query.filter(HelpArticle.module_name == module_filter)
+    
+    if role_filter:
+        articles_query = articles_query.filter(HelpArticle.role == role_filter)
+    
+    articles = articles_query.all()
+    
+    # Get unique modules for filter dropdown
+    modules = list(set([a.module_name for a in HelpArticle.query.all() if a.module_name]))
+    modules.sort()
     
     # Add article count to each category
     for category in categories:
         category.article_count = len([a for a in category.articles])
     
-    return render_template('help/index.html', categories=categories)
+    # Check if filters are applied
+    has_filters = bool(search_query or module_filter or role_filter)
+    
+    return render_template('help/enhanced_index.html', 
+                         categories=categories, 
+                         articles=articles,
+                         modules=modules,
+                         total_articles=len(articles),
+                         search_query=search_query,
+                         module_filter=module_filter,
+                         role_filter=role_filter,
+                         has_filters=has_filters)
 
 @help_bp.route('/<slug>')
 def article(slug):
