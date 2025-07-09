@@ -103,6 +103,122 @@
                     </div>
                 </div>
 
+            {% elif module == 'Admin' and section == 'departments' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-building me-2"></i>Department Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Organizational Structure</h5>
+                        <p>Departments in DeciFrame support up to 5 hierarchical levels for complex organizational structures:</p>
+                        <ul>
+                            <li><strong>Parent-Child Relationships:</strong> Create nested department structures</li>
+                            <li><strong>Department Heads:</strong> Assign managers to oversee department operations</li>
+                            <li><strong>User Assignment:</strong> Associate users with their appropriate departments</li>
+                            <li><strong>Reporting Hierarchy:</strong> Enable role-based dashboards and filtering</li>
+                        </ul>
+                        
+                        <h5>Creating Departments</h5>
+                        <ol>
+                            <li>Navigate to Admin → Organization Structure</li>
+                            <li>Click "Add Department" button</li>
+                            <li>Enter department name and description</li>
+                            <li>Select parent department (if applicable)</li>
+                            <li>Assign department head (Manager or Director role)</li>
+                        </ol>
+                        
+                        <div class="alert alert-info">
+                            <strong>Best Practice:</strong> Keep department structures logical and aligned with your organization's actual hierarchy for optimal workflow management.
+                        </div>
+                    </div>
+                </div>
+
+            {% elif module == 'Business' and section == 'cases' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-briefcase me-2"></i>Business Case Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Business Case Types</h5>
+                        <p>DeciFrame supports both Reactive and Proactive business cases:</p>
+                        <ul>
+                            <li><strong>Reactive Cases:</strong> Created from identified problems requiring solutions</li>
+                            <li><strong>Proactive Cases:</strong> Initiative-driven improvements and innovations</li>
+                            <li><strong>Light Cases:</strong> Quick assessment for smaller investments (&lt; $25,000)</li>
+                            <li><strong>Full Cases:</strong> Comprehensive analysis for major investments</li>
+                        </ul>
+                        
+                        <h5>Business Case Workflow</h5>
+                        <ol>
+                            <li><strong>Submission:</strong> Staff submit business case requests</li>
+                            <li><strong>BA Assignment:</strong> Business Analysts are automatically assigned</li>
+                            <li><strong>Development:</strong> BAs develop comprehensive business cases with ROI calculations</li>
+                            <li><strong>Director Approval:</strong> Directors review and approve/reject cases</li>
+                            <li><strong>Project Conversion:</strong> Approved cases convert to managed projects</li>
+                        </ol>
+                    </div>
+                </div>
+
+            {% elif module == 'Projects' and section == 'management' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Project Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Project Lifecycle</h5>
+                        <p>Projects in DeciFrame progress through structured phases:</p>
+                        <ul>
+                            <li><strong>Initiation:</strong> Projects created from approved business cases</li>
+                            <li><strong>Planning:</strong> Project Managers define milestones and timelines</li>
+                            <li><strong>Execution:</strong> Teams work towards milestone completion</li>
+                            <li><strong>Monitoring:</strong> ML-powered success prediction and risk assessment</li>
+                            <li><strong>Closure:</strong> Project completion and lessons learned</li>
+                        </ul>
+                        
+                        <h5>Milestone Management</h5>
+                        <ol>
+                            <li>Break projects into measurable milestones</li>
+                            <li>Set realistic due dates and assign resources</li>
+                            <li>Track progress with regular updates</li>
+                            <li>Use predictive analytics for risk identification</li>
+                        </ol>
+                        
+                        <div class="alert alert-success">
+                            <strong>AI Enhancement:</strong> DeciFrame uses machine learning to predict project success and identify potential risks before they become critical.
+                        </div>
+                    </div>
+                </div>
+
+            {% elif module == 'Admin' and section == 'triage' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-cogs me-2"></i>Triage Rules Configuration</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Automated Business Process Rules</h5>
+                        <p>Triage rules automate workflow decisions based on configurable criteria:</p>
+                        <ul>
+                            <li><strong>Assignment Rules:</strong> Automatically assign business cases to appropriate BAs</li>
+                            <li><strong>Escalation Rules:</strong> Escalate overdue items to managers or directors</li>
+                            <li><strong>Notification Rules:</strong> Send alerts based on priority and timeframes</li>
+                            <li><strong>Approval Routing:</strong> Route cases to appropriate approval levels</li>
+                        </ul>
+                        
+                        <h5>Rule Configuration</h5>
+                        <ol>
+                            <li>Navigate to Admin → Triage Rules</li>
+                            <li>Click "Create Rule" button</li>
+                            <li>Define trigger conditions (priority, value, department)</li>
+                            <li>Set actions (assign, escalate, notify)</li>
+                            <li>Test rule with dry run before activation</li>
+                        </ol>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Important:</strong> Test triage rules carefully in development before applying to production workflows to avoid unintended automation.
+                        </div>
+                    </div>
+                </div>
+
             {% elif module == 'Admin' and section == 'quick-actions' %}
                 <div class="card">
                     <div class="card-header">

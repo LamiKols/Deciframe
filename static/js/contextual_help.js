@@ -61,21 +61,21 @@ class ContextualHelp {
                 const helpIcon = e.target.classList.contains('contextual-help-icon') ? 
                     e.target : e.target.closest('.contextual-help-icon');
                 
-                const helpSlug = helpIcon.getAttribute('data-help-slug');
-                if (helpSlug) {
-                    this.loadHelpContent(helpSlug);
+                const helpUrl = helpIcon.getAttribute('data-help-url');
+                if (helpUrl) {
+                    this.loadHelpContentFromUrl(helpUrl);
                 }
             }
         });
     }
 
-    async loadHelpContent(slug) {
+    async loadHelpContentFromUrl(helpUrl) {
         try {
             // Show modal with loading spinner
             this.showModal('Help', '<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
             
-            // Fetch help content via AJAX
-            const response = await fetch(`/help/${slug}?partial=1`, {
+            // Fetch help content directly from the URL
+            const response = await fetch(helpUrl, {
                 credentials: 'same-origin',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -86,10 +86,23 @@ class ContextualHelp {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
-            const data = await response.json();
+            const html = await response.text();
             
-            // Update modal with content
-            this.showModal(data.title, data.content);
+            // Extract content from the response HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const content = doc.querySelector('.container .card') || doc.querySelector('.container');
+            
+            if (content) {
+                // Extract title from the card header or first h3
+                const titleElement = content.querySelector('.card-header h3') || content.querySelector('h3') || content.querySelector('h2');
+                const title = titleElement ? titleElement.textContent.trim() : 'Help';
+                
+                // Update modal with content
+                this.showModal(title, content.innerHTML);
+            } else {
+                throw new Error('No content found in response');
+            }
             
         } catch (error) {
             console.error('Error loading help content:', error);
@@ -100,6 +113,12 @@ class ContextualHelp {
                 '</div>'
             );
         }
+    }
+
+    // Keep the old method for backward compatibility
+    async loadHelpContent(slug) {
+        const helpUrl = `/help/${slug}`;
+        return this.loadHelpContentFromUrl(helpUrl);
     }
 
     showModal(title, content) {
