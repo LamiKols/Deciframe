@@ -120,7 +120,6 @@ def create():
                 return redirect(url_for('problems.index'))
     
     if form.validate_on_submit():
-        org_unit_id = form.org_unit_id.data if form.org_unit_id.data != 0 else None
         issue_type = request.form.get('issue_type', 'PROCESS')
         
         # Try to get AI confidence from form if available
