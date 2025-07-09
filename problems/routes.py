@@ -28,8 +28,8 @@ def index():
         # Admin users can see problems from ALL departments regardless of their assigned department
         allowed = [d.id for d in Department.query.filter_by(organization_id=current_user.organization_id).with_entities(Department.id).all()]
     else:
-        # Non-admin users: if they have an org_unit, show all departments; otherwise show all
-        # This simplifies the logic since org_units and departments are separate hierarchies
+        # Non-admin users: show all departments within their organization
+        # Unified Department hierarchy provides consistent access control
         allowed = [d.id for d in Department.query.filter_by(organization_id=current_user.organization_id).with_entities(Department.id).all()]
     
     # Add extra departments if user has any
@@ -46,7 +46,7 @@ def index():
     # Include problems with no department (NULL department_id) for admin users or when user has no department
     base_query = Problem.query.filter_by(organization_id=current_user.organization_id)
     
-    if user.role.value == 'Admin' or not user.org_unit_id:
+    if user.role.value == 'Admin' or not user.department_id:
         # Admin users or users without department can see all problems including unassigned ones
         query = base_query.filter(
             (Problem.department_id.in_(allowed)) | (Problem.department_id.is_(None))
@@ -104,7 +104,7 @@ def create():
     if user.role == 'Admin':
         form.department_id.choices = Department.get_hierarchical_choices(current_user.organization_id)
     else:
-        # For non-admin users, auto-assign to the General department since org_units != departments
+        # For non-admin users, auto-assign to the General department as default
         general_dept = Department.query.filter_by(name='General', organization_id=user.organization_id).first()
         if general_dept:
             form.department_id.choices = [(general_dept.id, general_dept.name)]
@@ -132,7 +132,7 @@ def create():
         
         # Enforce department assignment: non-admin users can only create for their department
         # For admin users, use the selected department_id from the form
-        # For non-admin users, use the General department as default since org_units != departments
+        # For non-admin users, use the General department as default
         if user.role.value == 'Admin':
             department_id = form.department_id.data
         else:
@@ -250,7 +250,7 @@ def edit(id):
     if user.role == 'Admin':
         form.department_id.choices = Department.get_hierarchical_choices(current_user.organization_id)
     else:
-        # For non-admin users, auto-assign to the General department since org_units != departments
+        # For non-admin users, auto-assign to the General department as default
         general_dept = Department.query.filter_by(name='General', organization_id=user.organization_id).first()
         if general_dept:
             form.department_id.choices = [(general_dept.id, general_dept.name)]
@@ -270,17 +270,14 @@ def edit(id):
         form.priority.data = problem.priority.name
         form.status.data = problem.status.name
         form.department_id.data = getattr(problem, 'department_id', None)
-        form.org_unit_id.data = getattr(problem, 'org_unit_id', 0) or 0
     
     if form.validate_on_submit():
         print(f"DEBUG: Form validation passed. Form data: {form.data}")
         print(f"DEBUG: Form errors: {form.errors}")
-        org_unit_id = form.org_unit_id.data if form.org_unit_id.data != 0 else None
         problem.title = form.title.data
         problem.description = form.description.data
         problem.priority = PriorityEnum[form.priority.data]
         problem.department_id = form.department_id.data
-        problem.org_unit_id = org_unit_id
         # Handle status enum conversion safely
         status_mapping = {
             'Open': StatusEnum.Open,
