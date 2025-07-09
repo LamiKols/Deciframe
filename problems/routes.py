@@ -28,14 +28,9 @@ def index():
         # Admin users can see problems from ALL departments regardless of their assigned department
         allowed = [d.id for d in Department.query.filter_by(organization_id=current_user.organization_id).with_entities(Department.id).all()]
     else:
-        # Non-admin users are restricted to their department hierarchy
-        own = user.department  # may be None for users without dept assignment
-        if own:
-            allowed = own.get_descendant_ids(include_self=True)
-        else:
-            # For users without department assignment (unassigned users)
-            # Show all departments in their organization
-            allowed = [d.id for d in Department.query.filter_by(organization_id=current_user.organization_id).with_entities(Department.id).all()]
+        # Non-admin users: if they have an org_unit, show all departments; otherwise show all
+        # This simplifies the logic since org_units and departments are separate hierarchies
+        allowed = [d.id for d in Department.query.filter_by(organization_id=current_user.organization_id).with_entities(Department.id).all()]
     
     # Add extra departments if user has any
     if hasattr(user, 'extra_departments') and user.extra_departments:
@@ -51,7 +46,7 @@ def index():
     # Include problems with no department (NULL department_id) for admin users or when user has no department
     base_query = Problem.query.filter_by(organization_id=current_user.organization_id)
     
-    if user.role.value == 'Admin' or not user.dept_id:
+    if user.role.value == 'Admin' or not user.org_unit_id:
         # Admin users or users without department can see all problems including unassigned ones
         query = base_query.filter(
             (Problem.department_id.in_(allowed)) | (Problem.department_id.is_(None))
@@ -248,9 +243,9 @@ def edit(id):
     if user.role == 'Admin':
         form.department_id.choices = Department.get_hierarchical_choices()
     else:
-        # Hide department field for non-admin users - auto-assign their department
-        form.department_id.choices = [(user.dept_id, user.department.name if user.department else 'Unknown Department')]
-        form.department_id.data = user.dept_id
+        # Hide department field for non-admin users - auto-assign their organizational unit
+        form.department_id.choices = [(user.org_unit_id, user.org_unit.name if user.org_unit else 'Unknown Unit')]
+        form.department_id.data = user.org_unit_id
     
     # Pre-populate form data
     if request.method == 'GET':
