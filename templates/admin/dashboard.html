@@ -46,7 +46,13 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="card-title text-primary">Total Users</h6>
+                            <h6 class="card-title text-primary d-flex align-items-center">
+                                Total Users
+                                <a href="/help?module=Admin&section=users" class="text-muted ms-2" 
+                                   title="Help with user management" data-bs-toggle="tooltip">
+                                    <i class="fas fa-question-circle" style="font-size: 0.75em;"></i>
+                                </a>
+                            </h6>
                             <h3 class="mb-0">{{ stats.users }}</h3>
                             <small class="text-muted">Active system users</small>
                         </div>
@@ -63,7 +69,13 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="card-title text-success">Departments</h6>
+                            <h6 class="card-title text-success d-flex align-items-center">
+                                Departments
+                                <a href="/help?module=Admin&section=departments" class="text-muted ms-2" 
+                                   title="Help with department management" data-bs-toggle="tooltip">
+                                    <i class="fas fa-question-circle" style="font-size: 0.75em;"></i>
+                                </a>
+                            </h6>
                             <h3 class="mb-0">{{ stats.departments }}</h3>
                             <small class="text-muted">Organizational units</small>
                         </div>
@@ -80,7 +92,13 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="card-title text-warning">Business Cases</h6>
+                            <h6 class="card-title text-warning d-flex align-items-center">
+                                Business Cases
+                                <a href="/help?module=Business&section=cases" class="text-muted ms-2" 
+                                   title="Help with business case management" data-bs-toggle="tooltip">
+                                    <i class="fas fa-question-circle" style="font-size: 0.75em;"></i>
+                                </a>
+                            </h6>
                             <h3 class="mb-0">{{ stats.business_cases }}</h3>
                             <small class="text-muted">Total cases</small>
                         </div>
@@ -97,7 +115,13 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="card-title text-info">Projects</h6>
+                            <h6 class="card-title text-info d-flex align-items-center">
+                                Projects
+                                <a href="/help?module=Projects&section=management" class="text-muted ms-2" 
+                                   title="Help with project management" data-bs-toggle="tooltip">
+                                    <i class="fas fa-question-circle" style="font-size: 0.75em;"></i>
+                                </a>
+                            </h6>
                             <h3 class="mb-0">{{ stats.projects }}</h3>
                             <small class="text-muted">Active projects</small>
                         </div>
@@ -131,7 +155,13 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="card-title">Triage Rules</h6>
+                            <h6 class="card-title d-flex align-items-center">
+                                Triage Rules
+                                <a href="/help?module=Admin&section=triage" class="text-muted ms-2" 
+                                   title="Help with triage configuration" data-bs-toggle="tooltip">
+                                    <i class="fas fa-info-circle" style="font-size: 0.75em;"></i>
+                                </a>
+                            </h6>
                             <h4 class="mb-0">{{ stats.active_triage_rules }}</h4>
                         </div>
                         <i class="fas fa-cogs fa-lg opacity-50"></i>
@@ -159,7 +189,13 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="card-title">Problems</h6>
+                            <h6 class="card-title d-flex align-items-center">
+                                Problems
+                                <a href="/help?module=Problems&section=management" class="text-muted ms-2" 
+                                   title="Help with problem tracking" data-bs-toggle="tooltip">
+                                    <i class="fas fa-info-circle" style="font-size: 0.75em;"></i>
+                                </a>
+                            </h6>
                             <h4 class="mb-0">{{ stats.problems }}</h4>
                         </div>
                         <i class="fas fa-exclamation-triangle fa-lg opacity-50"></i>
@@ -408,8 +444,12 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    <a href="/help?module=Admin&section=quick-actions" class="text-muted" 
+                       title="Help with admin quick actions" data-bs-toggle="tooltip">
+                        <i class="fas fa-question-circle" style="font-size: 0.8em;"></i>
+                    </a>
                 </div>
                 <div class="card-body">
                     <!-- Primary Admin Functions -->
@@ -531,6 +571,14 @@ function refreshDashboard() {
 
 // Auto-refresh every 5 minutes
 setInterval(refreshDashboard, 300000);
+
+// Initialize Bootstrap tooltips for help icons
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
 </script>
 
 {% endblock %}
