@@ -20,8 +20,8 @@
   <button onclick="location.href='/admin/org-structure/import'" class="btn btn-secondary">
     Import CSV
   </button>
-  <button onclick="createNewUnit()" class="btn btn-success ms-2">
-    Create New Unit
+  <button onclick="createDepartment()" class="btn btn-success ms-2">
+    Create New Department
   </button>
   <button onclick="exportOrgStructure()" class="btn btn-info ms-2">
     Export CSV
@@ -36,7 +36,7 @@
   {% if roots %}
     <ul style="list-style: none; padding: 0;">
       {% for root in roots %}
-        <li class="org-unit-item" 
+        <li class="department-item" 
             data-unit-id="{{ root.id }}" 
             data-unit-name="{{ root.name }}" 
             data-manager-id="{{ root.manager.id if root.manager else '' }}" 
@@ -52,14 +52,14 @@
               {% endif %}
             </span>
             <div>
-              <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editOrgUnit('{{ root.id }}', '{{ root.name }}', '{{ root.manager.id if root.manager else '' }}', '{{ root.parent_id if root.parent_id else '' }}')">Edit</button>
-              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteOrgUnit('{{ root.id }}', '{{ root.name }}')">Delete</button>
+              <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ root.id }}', '{{ root.name }}', '{{ root.manager.id if root.manager else '' }}', '{{ root.parent_id if root.parent_id else '' }}')">Edit</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteDepartment('{{ root.id }}', '{{ root.name }}')">Delete</button>
             </div>
           </div>
           {% if root.children %}
             <ul style="margin-left: 20px; margin-top: 8px; list-style: none;">
               {% for child in root.children %}
-                <li class="org-unit-item" 
+                <li class="department-item" 
                     data-unit-id="{{ child.id }}" 
                     data-unit-name="{{ child.name }}" 
                     data-manager-id="{{ child.manager.id if child.manager else '' }}" 
@@ -75,14 +75,14 @@
                       {% endif %}
                     </span>
                     <div>
-                      <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editOrgUnit('{{ child.id }}', '{{ child.name }}', '{{ child.manager.id if child.manager else '' }}', '{{ child.parent_id if child.parent_id else '' }}')">Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteOrgUnit('{{ child.id }}', '{{ child.name }}')">Delete</button>
+                      <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ child.id }}', '{{ child.name }}', '{{ child.manager.id if child.manager else '' }}', '{{ child.parent_id if child.parent_id else '' }}')">Edit</button>
+                      <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteDepartment('{{ child.id }}', '{{ child.name }}')">Delete</button>
                     </div>
                   </div>
                   {% if child.children %}
                     <ul style="margin-left: 20px; margin-top: 8px; list-style: none;">
                       {% for grandchild in child.children %}
-                        <li class="org-unit-item" 
+                        <li class="department-item" 
                             data-unit-id="{{ grandchild.id }}" 
                             data-unit-name="{{ grandchild.name }}" 
                             data-manager-id="{{ grandchild.manager.id if grandchild.manager else '' }}" 
@@ -98,8 +98,8 @@
                               {% endif %}
                             </span>
                             <div>
-                              <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editOrgUnit('{{ grandchild.id }}', '{{ grandchild.name }}', '{{ grandchild.manager.id if grandchild.manager else '' }}', '{{ grandchild.parent_id if grandchild.parent_id else '' }}')">Edit</button>
-                              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteOrgUnit('{{ grandchild.id }}', '{{ grandchild.name }}')">Delete</button>
+                              <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ grandchild.id }}', '{{ grandchild.name }}', '{{ grandchild.manager.id if grandchild.manager else '' }}', '{{ grandchild.parent_id if grandchild.parent_id else '' }}')">Edit</button>
+                              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteDepartment('{{ grandchild.id }}', '{{ grandchild.name }}')">Delete</button>
                             </div>
                           </div>
                         </li>
@@ -122,25 +122,25 @@
 
 <div class="mt-3">
   <small class="text-muted">
-    Total organizational units: {{ org_units|length }} | 
+    Total departments: {{ departments|length }} | 
     Root units: {{ roots|length }} | 
     Authentication: Active
   </small>
 </div>
 
-<!-- Edit Org Unit Modal -->
-<div class="modal fade" id="editOrgUnitModal" tabindex="-1">
+<!-- Edit Department Modal -->
+<div class="modal fade" id="editDepartmentModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Organizational Unit</h5>
+        <h5 class="modal-title">Edit Department</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <form id="editOrgUnitForm" method="POST">
+      <form id="editDepartmentForm" method="POST">
         <div class="modal-body">
           <input type="hidden" id="editUnitId" name="unit_id">
           <div class="mb-3">
-            <label for="editUnitName" class="form-label">Unit Name</label>
+            <label for="editUnitName" class="form-label">Department Name</label>
             <input type="text" class="form-control" id="editUnitName" name="name" required>
           </div>
           <div class="mb-3">
@@ -150,15 +150,15 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="editParentId" class="form-label">Parent Unit</label>
+            <label for="editParentId" class="form-label">Parent Department</label>
             <select class="form-select" id="editParentId" name="parent_id">
-              <option value="">Root unit (no parent)</option>
+              <option value="">Root department (no parent)</option>
             </select>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Update Unit</button>
+          <button type="submit" class="btn btn-primary">Update Department</button>
         </div>
       </form>
     </div>
@@ -206,10 +206,10 @@ async function loadUsers() {
   }
 }
 
-// Load organizational units for parent dropdown
+// Load departments for parent dropdown
 async function loadUnits() {
   try {
-    // Get org units via API instead of template data
+    // Get departments via API instead of template data
     const response = await fetch('/admin/org-structure', {
       headers: {
         'Accept': 'application/json'
@@ -223,8 +223,8 @@ async function loadUnits() {
     }
     
     const data = await response.json();
-    const orgUnits = data.org_units || [];
-    console.log('Loaded org units:', orgUnits.length);
+    const departments = data.departments || [];
+    console.log('Loaded departments:', departments.length);
     
     const select = document.getElementById('editParentId');
     // Clear existing options except first
@@ -232,20 +232,20 @@ async function loadUnits() {
       select.removeChild(select.lastChild);
     }
     
-    orgUnits.forEach(unit => {
+    departments.forEach(dept => {
       const option = document.createElement('option');
-      option.value = unit.id;
-      option.textContent = unit.name;
+      option.value = dept.id;
+      option.textContent = dept.name;
       select.appendChild(option);
     });
   } catch (error) {
-    console.error('Error loading units:', error);
+    console.error('Error loading departments:', error);
   }
 }
 
-// Edit organization unit function
-function editOrgUnit(id, name, managerId, parentId) {
-  console.log('editOrgUnit called with:', {id, name, managerId, parentId});
+// Edit department function
+function editDepartment(id, name, managerId, parentId) {
+  console.log('editDepartment called with:', {id, name, managerId, parentId});
   
   try {
     document.getElementById('editUnitId').value = id;
@@ -263,16 +263,16 @@ function editOrgUnit(id, name, managerId, parentId) {
       }
     });
     
-    const modal = new bootstrap.Modal(document.getElementById('editOrgUnitModal'));
+    const modal = new bootstrap.Modal(document.getElementById('editDepartmentModal'));
     modal.show();
   } catch (error) {
-    console.error('Error in editOrgUnit:', error);
+    console.error('Error in editDepartment:', error);
   }
 }
 
-// Add click event listeners to all org unit items
+// Add click event listeners to all department items
 function setupClickHandlers() {
-  document.querySelectorAll('.org-unit-item').forEach(item => {
+  document.querySelectorAll('.department-item').forEach(item => {
     item.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -283,14 +283,14 @@ function setupClickHandlers() {
       const parentId = this.dataset.parentId;
       
       console.log('Clicked unit:', {id, name, managerId, parentId});
-      editOrgUnit(id, name, managerId, parentId);
+      editDepartment(id, name, managerId, parentId);
     });
   });
 }
 
 // Handle form submission
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('editOrgUnitForm');
+  const form = document.getElementById('editDepartmentForm');
   if (form) {
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -330,8 +330,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Create new organizational unit
-function createNewUnit() {
+// Create new department 
+function createDepartment() {
   // Clear the form and set it for creation mode
   document.getElementById('editUnitId').value = '';
   document.getElementById('editUnitName').value = '';
@@ -339,17 +339,17 @@ function createNewUnit() {
   document.getElementById('editParentId').value = '';
   
   // Change modal title and button text
-  document.querySelector('#editOrgUnitModal .modal-title').textContent = 'Create New Organizational Unit';
-  document.querySelector('#editOrgUnitModal .btn-primary').textContent = 'Create Unit';
+  document.querySelector('#editDepartmentModal .modal-title').textContent = 'Create New Department';
+  document.querySelector('#editDepartmentModal .btn-primary').textContent = 'Create Department';
   
   // Show the modal
-  const modal = new bootstrap.Modal(document.getElementById('editOrgUnitModal'));
+  const modal = new bootstrap.Modal(document.getElementById('editDepartmentModal'));
   modal.show();
 }
 
-// Delete organizational unit
-async function deleteOrgUnit(unitId, unitName) {
-  if (!confirm(`Are you sure you want to delete "${unitName}"?\n\nThis will also delete all child units. This action cannot be undone.`)) {
+// Delete department
+async function deleteDepartment(unitId, unitName) {
+  if (!confirm(`Are you sure you want to delete "${unitName}"?\n\nThis will also delete all child departments. This action cannot be undone.`)) {
     return;
   }
   
@@ -366,11 +366,11 @@ async function deleteOrgUnit(unitId, unitName) {
       location.reload(); // Refresh to show changes
     } else {
       const error = await response.text();
-      alert(`Error deleting unit: ${error}`);
+      alert(`Error deleting department: ${error}`);
     }
   } catch (error) {
-    console.error('Error deleting unit:', error);
-    alert('Error deleting unit');
+    console.error('Error deleting department:', error);
+    alert('Error deleting department');
   }
 }
 

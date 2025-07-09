@@ -131,7 +131,7 @@ def create():
         except (ValueError, TypeError):
             ai_confidence = None
         
-        # Enforce department assignment: non-admin users can only create for their org unit
+        # Enforce department assignment: non-admin users can only create for their department
         # For admin users, use the selected department_id from the form
         # For non-admin users, use the General department as default since org_units != departments
         if user.role.value == 'Admin':
@@ -297,7 +297,7 @@ def edit(id):
             print(f"DEBUG: Status: {problem.status}")
             print(f"DEBUG: Priority: {problem.priority}")
             print(f"DEBUG: Department ID: {problem.department_id}")
-            print(f"DEBUG: Org Unit ID: {problem.org_unit_id}")
+            print(f"DEBUG: Department ID: {problem.department_id}")
             db.session.commit()
             flash(f'Problem {problem.code} updated successfully!', 'success')
             return redirect(url_for('problems.view', id=problem.id))
