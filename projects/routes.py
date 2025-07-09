@@ -172,7 +172,7 @@ def new_project():
 def view_project(id):
     """View a specific project with its milestones"""
     from flask_login import current_user
-    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
+    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Get milestones ordered by due date
     milestones = ProjectMilestone.query.filter_by(project_id=id).order_by(ProjectMilestone.due_date).all()
@@ -227,7 +227,7 @@ def view_project(id):
 @login_required
 def edit_project(id):
     """Edit an existing project"""
-    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
+    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     form = ProjectForm(obj=project)
     
     if form.validate_on_submit():
@@ -288,7 +288,7 @@ def edit_project(id):
 @login_required
 def delete_project(id):
     """Delete a project"""
-    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
+    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Delete associated milestones first
     ProjectMilestone.query.filter_by(project_id=id).delete()
@@ -305,7 +305,7 @@ def delete_project(id):
 @login_required
 def submit_for_review(id):
     """Submit a project for review"""
-    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
+    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Check if user has permission to submit this project
     if project.created_by != current_user.id and project.project_manager_id != current_user.id and current_user.role.value not in ['Admin', 'Manager', 'Director', 'CEO']:
@@ -339,7 +339,7 @@ def submit_for_review(id):
 @login_required
 def new_milestone(project_id):
     """Create a new milestone for a project"""
-    project = Project.query.filter_by(id=project_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
+    project = Project.query.filter_by(id=project_id, organization_id=current_user.organization_id).first_or_404()
     form = MilestoneForm(project_id=project_id)
     
     if form.validate_on_submit():
@@ -539,7 +539,7 @@ def delete_milestone(id):
 def project_backlog(id):
     """Project Backlog - View and refine epics and stories for Business Analysts"""
     from flask_login import current_user
-    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
+    project = Project.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
     
     # Get all epics linked to this project
     from models import Epic, Story

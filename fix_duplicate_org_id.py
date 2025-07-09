@@ -1,71 +1,82 @@
 #!/usr/bin/env python3
 """
-Fix duplicate organization_id parameters in queries
+Fix duplicate organization_id parameters created by automatic security fixes
 """
 
-import re
 import os
+import re
 
-def fix_duplicate_org_id_in_file(file_path):
-    """Fix duplicate organization_id parameters in a file"""
-    if not os.path.exists(file_path):
-        return 0
+def fix_duplicate_org_id():
+    """Fix duplicate organization_id parameters in route files"""
     
-    try:
-        with open(file_path, 'r') as f:
-            content = f.read()
-        
-        original_content = content
-        fixes = 0
-        
-        # Pattern to find duplicate organization_id parameters
-        pattern = r'(\.filter_by\([^)]*organization_id=current_user\.organization_id[^)]*), organization_id=current_user\.organization_id([^)]*\))'
-        
-        def fix_match(match):
-            nonlocal fixes
-            fixes += 1
-            # Remove the duplicate organization_id parameter
-            return match.group(1) + match.group(2)
-        
-        content = re.sub(pattern, fix_match, content)
-        
-        # Also fix cases where organization_id appears multiple times in the same filter_by
-        pattern2 = r'(organization_id=current_user\.organization_id[^,)]*),\s*organization_id=current_user\.organization_id'
-        content = re.sub(pattern2, r'\1', content)
-        
-        if content != original_content:
-            with open(file_path, 'w') as f:
-                f.write(content)
-            print(f"✅ Fixed {fixes} duplicate organization_id issues in {file_path}")
-            return fixes
-        else:
-            return 0
-            
-    except Exception as e:
-        print(f"❌ Error fixing {file_path}: {e}")
-        return 0
-
-def main():
-    """Fix all files with duplicate organization_id issues"""
-    files_to_fix = [
-        'admin_working.py',
-        'business/routes.py', 
-        'problems/routes.py',
-        'projects/routes.py',
+    route_files = [
+        'business/routes.py',
+        'projects/routes.py', 
         'solutions/routes.py',
-        'dept/routes.py',
-        'dashboards/routes.py',
-        'reports/routes.py',
-        'notifications/routes.py',
-        'predict/routes.py'
+        'dept/routes.py'
     ]
     
-    total_fixes = 0
-    for file_path in files_to_fix:
-        fixes = fix_duplicate_org_id_in_file(file_path)
-        total_fixes += fixes
+    fixes_applied = {}
     
-    print(f"\n🎉 Fixed {total_fixes} duplicate organization_id issues across all files")
+    for route_file in route_files:
+        if not os.path.exists(route_file):
+            continue
+            
+        print(f"🔧 Fixing {route_file}...")
+        
+        try:
+            with open(route_file, 'r') as f:
+                content = f.read()
+                
+            original_content = content
+            
+            # Fix the duplicate organization_id pattern
+            pattern = r'organization_id=current_user\.organization_id, organization_id=current_user\.organization_id'
+            replacement = r'organization_id=current_user.organization_id'
+            
+            content = re.sub(pattern, replacement, content)
+            
+            # Count fixes
+            fixes_count = len(re.findall(pattern, original_content))
+            
+            if content != original_content:
+                fixes_applied[route_file] = fixes_count
+                print(f"✅ {route_file}: {fixes_count} duplicate parameters fixed")
+                
+                # Write back the fixed content
+                with open(route_file, 'w') as f:
+                    f.write(content)
+            else:
+                print(f"ℹ️ {route_file}: No duplicates found")
+                
+        except Exception as e:
+            print(f"❌ Error processing {route_file}: {e}")
+            
+    return fixes_applied
+
+def main():
+    """Run duplicate organization_id fixes"""
+    print("🛠️ Fixing Duplicate organization_id Parameters")
+    print("="*60)
+    
+    fixes = fix_duplicate_org_id()
+    
+    print("\n" + "="*60)
+    print("📊 DUPLICATE FIX SUMMARY")
+    print("="*60)
+    
+    total_fixes = sum(fixes.values())
+    print(f"Total files processed: {len(fixes)}")
+    print(f"Total duplicate parameters fixed: {total_fixes}")
+    
+    for file, count in fixes.items():
+        print(f"  - {file}: {count} fixes")
+        
+    if total_fixes > 0:
+        print(f"\n✅ {total_fixes} duplicate parameters fixed!")
+        print("🔄 Application ready to restart")
+    else:
+        print("\n✅ No duplicate parameters found")
 
 if __name__ == "__main__":
     main()
