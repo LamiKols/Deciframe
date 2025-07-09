@@ -263,6 +263,8 @@ def edit(id):
         form.org_unit_id.data = getattr(problem, 'org_unit_id', 0) or 0
     
     if form.validate_on_submit():
+        print(f"DEBUG: Form validation passed. Form data: {form.data}")
+        print(f"DEBUG: Form errors: {form.errors}")
         org_unit_id = form.org_unit_id.data if form.org_unit_id.data != 0 else None
         problem.title = form.title.data
         problem.description = form.description.data
@@ -279,6 +281,12 @@ def edit(id):
         problem.status = status_mapping.get(form.status.data, StatusEnum.Open)
         
         try:
+            print(f"DEBUG: Attempting to update problem {problem.id}")
+            print(f"DEBUG: Title: {problem.title}")
+            print(f"DEBUG: Status: {problem.status}")
+            print(f"DEBUG: Priority: {problem.priority}")
+            print(f"DEBUG: Department ID: {problem.department_id}")
+            print(f"DEBUG: Org Unit ID: {problem.org_unit_id}")
             db.session.commit()
             flash(f'Problem {problem.code} updated successfully!', 'success')
             return redirect(url_for('problems.view', id=problem.id))
@@ -286,7 +294,10 @@ def edit(id):
             db.session.rollback()
             flash('Error updating problem. Please try again.', 'danger')
             print(f"Error updating problem: {e}")
+            import traceback
+            traceback.print_exc()
     
+    print(f"DEBUG: Form validation failed or GET request. Form errors: {form.errors}")
     return render_template('problem_form.html', form=form, problem=problem, user=user, action='Edit')
 
 @problems.route('/<int:id>/delete', methods=['POST'])
