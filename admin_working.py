@@ -51,6 +51,7 @@ def init_admin_routes(app):
         users_count = User.query.filter_by(organization_id=org_id).count()
         departments_count = OrgUnit.query.filter_by(organization_id=org_id).count()
         problems_count = Problem.query.filter_by(organization_id=org_id).count()
+        business_cases_count = BusinessCase.query.filter_by(organization_id=org_id).count()
         projects_count = Project.query.filter_by(organization_id=org_id).count()
         
         # Calculate pending review counts - ORGANIZATION FILTERED
@@ -67,6 +68,7 @@ def init_admin_routes(app):
             'users': users_count,
             'departments': departments_count,
             'problems': problems_count,
+            'business_cases': business_cases_count,
             'projects': projects_count,
             'pending_epics': pending_epics,
             'pending_cases': pending_cases,
