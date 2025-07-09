@@ -146,7 +146,8 @@ def register():
         elif form.department_id.data != 0:
             user.assign_department(form.department_id.data)
         else:
-            user.org_unit_id = None
+            # Department will be assigned via assign_department method above
+            pass
         
         try:
             db.session.add(user)
@@ -192,7 +193,9 @@ def profile():
         current_user.name = form.name.data
         current_user.email = form.email.data
         current_user.role = RoleEnum(form.role.data)
-        current_user.org_unit_id = form.org_unit_id.data if form.org_unit_id.data != 0 else None
+        # Handle department assignment via form
+        if hasattr(form, 'department_id') and form.department_id.data:
+            current_user.department_id = form.department_id.data if form.department_id.data != 0 else None
         current_user.reports_to = form.reports_to.data if form.reports_to.data != 0 else None
         current_user.timezone = form.timezone.data if form.timezone.data else None
         
@@ -210,7 +213,9 @@ def profile():
         form.name.data = current_user.name
         form.email.data = current_user.email
         form.role.data = current_user.role.value if current_user.role else None
-        form.org_unit_id.data = current_user.org_unit_id
+        # Pre-populate department if available
+        if hasattr(form, 'department_id'):
+            form.department_id.data = current_user.department_id
         form.timezone.data = current_user.timezone
         # reports_to field not available in current User model
     

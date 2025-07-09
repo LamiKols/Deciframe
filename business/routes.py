@@ -378,7 +378,7 @@ def approve_case(id):
         
         # 1) Create Project with all required fields
         # Ensure department assignment: use business case dept, or fallback to user's department
-        project_dept_id = business_case.dept_id or user.org_unit_id
+        project_dept_id = business_case.dept_id or user.department_id
         
         # Clean up project title by removing "Business Case for:" prefix
         project_title = business_case.title

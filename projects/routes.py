@@ -56,8 +56,8 @@ def index():
     if request.args.get('department_id') and int(request.args.get('department_id')) > 0:
         department_id = int(request.args.get('department_id'))
         # Verify the selected department is within user's allowed departments
-        if user.dept_id:
-            user_department = Department.query.get(user.dept_id)
+        if user.department_id:
+            user_department = Department.query.get(user.department_id)
             allowed_dept_ids = user_department.get_descendant_ids(include_self=True)
             if department_id in allowed_dept_ids:
                 query = query.filter(Project.department_id == department_id)
@@ -103,12 +103,12 @@ def new_project():
         form.department_id.choices = Department.get_hierarchical_choices()
     else:
         # Hide department field for non-admin users - auto-assign their department
-        form.department_id.choices = [(user.dept_id, user.department.name if user.department else 'Unknown Department')]
-        form.department_id.data = user.dept_id
+        form.department_id.choices = [(user.department_id, user.department.name if user.department else 'Unknown Department')]
+        form.department_id.data = user.department_id
     
     if form.validate_on_submit():
         # Enforce department assignment: non-admin users can only create for their department
-        department_id = user.dept_id if user.role.value != 'Admin' else form.department_id.data
+        department_id = user.department_id if user.role.value != 'Admin' else form.department_id.data
         
         project = Project(
             name=form.name.data,

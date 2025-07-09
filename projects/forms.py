@@ -34,7 +34,7 @@ class ProjectForm(FlaskForm):
     business_case_id = SelectField('Linked Business Case', coerce=safe_int_coerce, validators=[Optional()])
     project_manager_id = SelectField('Project Manager', validators=[DataRequired()], coerce=safe_int_coerce)
     department_id = SelectField('Department', validators=[DataRequired()], coerce=safe_int_coerce)
-    org_unit_id = SelectField('Organizational Unit', coerce=safe_int_coerce, validators=[Optional()])
+
 
     submit = SubmitField('Save Project')
     
@@ -58,11 +58,7 @@ class ProjectForm(FlaskForm):
         # Populate departments with hierarchy - will be restricted by route logic
         self.department_id.choices = Department.get_hierarchical_choices()
         
-        # Populate organizational units
-        org_units = OrgUnit.query.all()
-        self.org_unit_id.choices = [(0, 'No Organizational Unit')] + [
-            (unit.id, unit.name) for unit in org_units
-        ]
+
 
 
 
@@ -95,7 +91,7 @@ class MilestoneForm(FlaskForm):
         from flask_login import current_user
         users = User.query.filter_by(organization_id=current_user.organization_id).all()
         self.owner_id.choices = [
-            (user.id, f"{user.name} ({user.org_unit.name if user.org_unit else 'No Unit'})") 
+            (user.id, f"{user.name} ({user.department.name if user.department else 'No Department'})") 
             for user in users
         ]
 
