@@ -18,8 +18,35 @@ class ContextualHelp {
         // Initialize event listeners for help icons
         this.bindHelpIcons();
         
-        // Store modal reference
+        // Store modal reference and setup cleanup handlers
         this.modal = new bootstrap.Modal(document.getElementById('contextualHelpModal'));
+        this.setupModalCleanup();
+    }
+    
+    setupModalCleanup() {
+        const modalElement = document.getElementById('contextualHelpModal');
+        
+        // Clean up modal backdrop and body state when hidden
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            console.log('🔧 ContextualHelp: Modal hidden event fired, cleaning up');
+            
+            // Force remove any remaining backdrops
+            setTimeout(() => {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                console.log('🔧 ContextualHelp: Found', backdrops.length, 'backdrops to remove');
+                backdrops.forEach(backdrop => {
+                    console.log('🔧 ContextualHelp: Removing backdrop');
+                    backdrop.remove();
+                });
+                
+                // Restore body state
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+                document.body.style.removeProperty('overflow');
+                
+                console.log('🔧 ContextualHelp: Modal cleanup complete');
+            }, 50); // Small delay to ensure Bootstrap has finished
+        });
     }
 
     createModal() {
@@ -164,9 +191,28 @@ class ContextualHelp {
     }
 
     showModal(title, content) {
+        console.log('🔧 ContextualHelp: Showing modal with title:', title);
+        
+        // Update modal content
         document.getElementById('contextualHelpModalLabel').textContent = title;
         document.getElementById('contextualHelpContent').innerHTML = content;
+        
+        // Ensure any previous modal state is cleaned up
+        this.forceCleanup();
+        
+        // Show the modal
         this.modal.show();
+    }
+    
+    forceCleanup() {
+        // Remove any stray backdrops that might be left behind
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        
+        // Reset body state
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
+        document.body.style.removeProperty('overflow');
     }
 
     // Static method to create help icons
