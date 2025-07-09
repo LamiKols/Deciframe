@@ -91,10 +91,11 @@ class MilestoneForm(FlaskForm):
     def __init__(self, project_id=None, *args, **kwargs):
         super(MilestoneForm, self).__init__(*args, **kwargs)
         
-        # Populate milestone owners (all users)
-        users = User.query.all()
+        # Populate milestone owners (all users) - filter by organization
+        from flask_login import current_user
+        users = User.query.filter_by(organization_id=current_user.organization_id).all()
         self.owner_id.choices = [
-            (user.id, f"{user.name} ({user.department.name if user.department else 'No Dept'})") 
+            (user.id, f"{user.name} ({user.dept.name if user.dept else 'No Dept'})") 
             for user in users
         ]
 
