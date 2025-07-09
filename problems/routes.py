@@ -151,6 +151,14 @@ def create():
             flash('No valid department found. Please contact your administrator.', 'danger')
             return render_template('problem_form.html', form=form)
         
+        # Handle status enum conversion safely
+        status_mapping = {
+            'Open': StatusEnum.Open,
+            'In_Progress': StatusEnum.In_Progress,
+            'Resolved': StatusEnum.Resolved,
+            'On_Hold': StatusEnum.On_Hold
+        }
+        
         # Generate next available problem code
         def get_next_problem_code():
             from sqlalchemy import text
@@ -176,7 +184,7 @@ def create():
             description=form.description.data,
             priority=PriorityEnum[form.priority.data],
             department_id=department_id,
-            status=StatusEnum[form.status.data],
+            status=status_mapping.get(form.status.data, StatusEnum.Open),
             reported_by=user.id,
             created_by=user.id,
             organization_id=user.organization_id,  # Add organization_id for multi-tenant security
@@ -261,7 +269,14 @@ def edit(id):
         problem.priority = PriorityEnum[form.priority.data]
         problem.department_id = form.department_id.data
         problem.org_unit_id = org_unit_id
-        problem.status = StatusEnum[form.status.data]
+        # Handle status enum conversion safely
+        status_mapping = {
+            'Open': StatusEnum.Open,
+            'In_Progress': StatusEnum.In_Progress,
+            'Resolved': StatusEnum.Resolved,
+            'On_Hold': StatusEnum.On_Hold
+        }
+        problem.status = status_mapping.get(form.status.data, StatusEnum.Open)
         
         try:
             db.session.commit()
