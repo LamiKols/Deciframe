@@ -1220,7 +1220,7 @@ class HelpArticle(db.Model):
                 'id': self.category.id,
                 'name': self.category.name
             } if self.category else None,
-            'author': self.author.email if self.author else None,
+            'author': self.created_by_user.email if self.created_by_user else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

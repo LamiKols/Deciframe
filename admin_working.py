@@ -43,18 +43,21 @@ def init_admin_routes(app):
     @login_required
     @admin_required
     def admin_dashboard():
-        # Calculate comprehensive statistics
+        # Calculate comprehensive statistics - ORGANIZATION FILTERED
         from models import User, Department, OrgUnit, Problem, Project, Epic, BusinessCase
-        users_count = User.query.count()
-        departments_count = OrgUnit.query.count()
-        problems_count = Problem.query.count()
-        projects_count = Project.query.count()
         
-        # Calculate pending review counts
+        # Filter all queries by organization_id for proper multi-tenant isolation
+        org_id = current_user.organization_id
+        users_count = User.query.filter_by(organization_id=org_id).count()
+        departments_count = OrgUnit.query.filter_by(organization_id=org_id).count()
+        problems_count = Problem.query.filter_by(organization_id=org_id).count()
+        projects_count = Project.query.filter_by(organization_id=org_id).count()
+        
+        # Calculate pending review counts - ORGANIZATION FILTERED
         try:
-            pending_epics = Epic.query.filter_by(status='Submitted', organization_id=current_user.organization_id).count()
-            pending_cases = BusinessCase.query.filter_by(status='Submitted', organization_id=current_user.organization_id).count()
-            pending_projects = Project.query.filter_by(status='Submitted', organization_id=current_user.organization_id).count()
+            pending_epics = Epic.query.filter_by(status='Submitted', organization_id=org_id).count()
+            pending_cases = BusinessCase.query.filter_by(status='Submitted', organization_id=org_id).count()
+            pending_projects = Project.query.filter_by(status='Submitted', organization_id=org_id).count()
         except:
             pending_epics = 0
             pending_cases = 0
@@ -79,10 +82,10 @@ def init_admin_routes(app):
             'total_pending': pending_epics + pending_cases + pending_projects
         }
         
-        # Calculate role distribution
+        # Calculate role distribution - ORGANIZATION FILTERED
         try:
             from sqlalchemy import func
-            role_counts = db.session.query(User.role, func.count(User.role)).group_by(User.role).all()
+            role_counts = db.session.query(User.role, func.count(User.role)).filter_by(organization_id=org_id).group_by(User.role).all()
             role_distribution = {role.value: count for role, count in role_counts}
         except:
             role_distribution = {}
