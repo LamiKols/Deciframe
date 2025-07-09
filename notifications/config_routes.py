@@ -6,7 +6,7 @@ Admin-only configuration for notification settings per event
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from app import db
-from models import NotificationSetting, FrequencyEnum, RoleEnum
+from models import NotificationSetting, FrequencyEnum, RoleEnum, User
 from sqlalchemy.exc import IntegrityError
 from functools import wraps
 import logging
@@ -18,7 +18,13 @@ def admin_required(f):
     @wraps(f)
     @login_required
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != RoleEnum.Admin:
+        # Also check for unrestricted admin access (first user in org)
+        is_unrestricted_admin = (current_user.is_authenticated and 
+                               current_user.role == RoleEnum.Admin and 
+                               hasattr(current_user, 'organization_id') and
+                               User.query.filter_by(organization_id=current_user.organization_id).count() == 1)
+        
+        if not current_user.is_authenticated or (current_user.role != RoleEnum.Admin and not is_unrestricted_admin):
             flash('Access denied. Admin privileges required.', 'danger')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
@@ -93,8 +99,11 @@ DEFAULT_NOTIFICATION_EVENTS = [
 def notification_settings():
     """Main notification settings page"""
     try:
+        print(f"🔧 Notifications Config: Loading for user {current_user.email} (org: {current_user.organization_id})")
+        
         # Get all notification settings for current organization
         settings = NotificationSetting.query.filter_by(organization_id=current_user.organization_id).all()
+        print(f"🔧 Notifications Config: Found {len(settings)} existing settings")
         settings_dict = {setting.event_name: setting for setting in settings}
         
         # Ensure all default events have settings
@@ -102,6 +111,7 @@ def notification_settings():
         
         # Refresh after ensuring defaults
         settings = NotificationSetting.query.filter_by(organization_id=current_user.organization_id).all()
+        print(f"🔧 Notifications Config: After ensuring defaults, found {len(settings)} settings")
         settings_dict = {setting.event_name: setting for setting in settings}
         
         # Prepare display data
@@ -109,7 +119,7 @@ def notification_settings():
         for event in DEFAULT_NOTIFICATION_EVENTS:
             setting = settings_dict.get(event['name'])
             if setting:
-                notification_configs.append({
+                config = {
                     'id': setting.id,
                     'event_name': setting.event_name,
                     'display_name': event['display_name'],
@@ -120,7 +130,11 @@ def notification_settings():
                     'channel_in_app': setting.channel_in_app,
                     'channel_push': setting.channel_push,
                     'updated_at': setting.updated_at
-                })
+                }
+                notification_configs.append(config)
+                print(f"🔧 Config added: {event['name']} -> ID={setting.id}")
+        
+        print(f"🔧 Notifications Config: Total configs prepared: {len(notification_configs)}")
         
         return render_template('notifications/config/settings.html', 
                              notification_configs=notification_configs,
@@ -128,6 +142,7 @@ def notification_settings():
                              
     except Exception as e:
         logging.error(f"Error loading notification settings: {e}")
+        print(f"🚨 Notifications Config Error: {e}")
         flash('Error loading notification settings', 'danger')
         return redirect(url_for('admin_dashboard'))
 
@@ -334,3 +349,26 @@ def _create_default_settings():
             channel_push=False
         )
         db.session.add(setting)
+
+# Add a debug route to test data loading
+@notifications_config_bp.route('/debug-data')
+@admin_required
+def debug_data():
+    """Debug route to check notification data"""
+    settings = NotificationSetting.query.filter_by(organization_id=current_user.organization_id).all()
+    data = {
+        'user': current_user.email,
+        'organization_id': current_user.organization_id,
+        'settings_count': len(settings),
+        'settings': [
+            {
+                'id': s.id,
+                'event_name': s.event_name,
+                'frequency': s.frequency.value,
+                'email': s.channel_email,
+                'in_app': s.channel_in_app,
+                'push': s.channel_push
+            } for s in settings
+        ]
+    }
+    return jsonify(data)
