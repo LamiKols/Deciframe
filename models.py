@@ -301,6 +301,7 @@ class Problem(db.Model):
     reported_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     assigned_to = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    org_unit_id = db.Column(db.Integer, db.ForeignKey('org_units.id'), nullable=True)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -321,6 +322,7 @@ class Problem(db.Model):
     reporter = db.relationship('User', foreign_keys=[reported_by])
     assignee = db.relationship('User', foreign_keys=[assigned_to])
     department = db.relationship('Department')
+    org_unit = db.relationship('OrgUnit', foreign_keys=[org_unit_id])
     
     def __repr__(self):
         return f'<Problem {self.code}: {self.title}>'
