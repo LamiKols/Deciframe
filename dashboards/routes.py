@@ -387,12 +387,12 @@ def executive_dashboard():
                 departments = Department.query.filter_by(id=dept_id, organization_id=current_user.organization_id).all()
             else:
                 # Fallback if no department assigned
-                cases = BusinessCase.query
-                projects = Project.query
+                cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id)
+                projects = Project.query.filter_by(organization_id=current_user.organization_id)
                 departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
         else:
-            cases = BusinessCase.query
-            projects = Project.query
+            cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id)
+            projects = Project.query.filter_by(organization_id=current_user.organization_id)
             departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
 
         case_stats = []
@@ -418,8 +418,8 @@ def executive_dashboard():
     except Exception as e:
         # Fallback to empty data if database queries fail
         print(f"Database error in executive dashboard: {str(e)}")
-        cases = BusinessCase.query.filter_by(id=-1, organization_id=current_user.organization_id)  # Empty query
-        projects = Project.query.filter_by(id=-1, organization_id=current_user.organization_id)  # Empty query
+        cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id, id=-1)  # Empty query
+        projects = Project.query.filter_by(organization_id=current_user.organization_id, id=-1)  # Empty query
         case_stats = []
 
     # Calculate metrics with error handling
@@ -485,8 +485,8 @@ def export_exec_dashboard():
         projects = Project.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
         departments = Department.query.filter_by(id=dept_id, organization_id=current_user.organization_id).all()
     else:
-        cases = BusinessCase.query
-        projects = Project.query
+        cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id)
+        projects = Project.query.filter_by(organization_id=current_user.organization_id)
         departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
 
     case_stats = []
