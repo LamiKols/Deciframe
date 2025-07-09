@@ -169,7 +169,7 @@ class SolutionRecommendationEngine {
             console.log('Solution created successfully:', result);
             
             // Redirect directly to pre-populated business case form
-            window.location.href = `/cases/new?problem_id=${this.problemId}&solution_id=${result.id}`;
+            window.location.href = `/business/cases/new?problem_id=${this.problemId}&solution_id=${result.id}`;
 
         } catch (error) {
             console.error('Solution creation error:', error);
