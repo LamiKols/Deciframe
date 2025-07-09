@@ -88,7 +88,7 @@
                     <input type="hidden" name="status" value="{{ request.args.status or '' }}">
                     <input type="hidden" name="priority" value="{{ request.args.priority or '' }}">
                     <input type="hidden" name="project_manager_id" value="{{ request.args.project_manager_id or '' }}">
-                    <input type="hidden" name="org_unit_id" value="{{ request.args.org_unit_id or '' }}">
+                    <input type="hidden" name="department_id" value="{{ request.args.department_id or '' }}">
                     <div class="custom-dropdown d-inline-block">
                         <select name="dept" onchange="this.form.submit()" class="form-select w-auto d-inline">
                             <option value="">All My Departments</option>
@@ -175,7 +175,6 @@
                                             <th>Priority</th>
                                             <th>Project Manager</th>
                                             <th>Department</th>
-                                            <th>Department</th>
                                             <th>Budget</th>
                                             <th>Start Date</th>
                                             <th>Progress</th>
@@ -208,13 +207,7 @@
                                                 </td>
                                                 <td>{{ project.project_manager.name }}</td>
                                                 <td>{{ project.department.name }}</td>
-                                                <td>
-                                                    {% if project.org_unit %}
-                                                        {{ project.org_unit.name }}
-                                                    {% else %}
-                                                        <span class="text-muted">Not assigned</span>
-                                                    {% endif %}
-                                                </td>
+
                                                 <td>
                                                     {% if project.budget %}
                                                         {{ format_currency(project.budget) }}

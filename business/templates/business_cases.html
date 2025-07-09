@@ -65,8 +65,8 @@
                                         <small class="text-muted">{{ case.problem.code if case.problem else 'N/A' }}: {{ case.problem.title[:50] if case.problem else 'N/A' }}{{ '...' if case.problem and case.problem.title|length > 50 else '' }}</small>
                                     </td>
                                     <td>
-                                        {% if case.org_unit %}
-                                            {{ case.org_unit.name }}
+                                        {% if case.department %}
+                                            {{ case.department.name }}
                                         {% else %}
                                             <span class="text-muted">Not assigned</span>
                                         {% endif %}
