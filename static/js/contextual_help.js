@@ -58,12 +58,18 @@ class ContextualHelp {
                 e.target.closest('.contextual-help-icon')) {
                 e.preventDefault();
                 
+                console.log('🔧 ContextualHelp: Help icon clicked');
+                
                 const helpIcon = e.target.classList.contains('contextual-help-icon') ? 
                     e.target : e.target.closest('.contextual-help-icon');
                 
                 const helpUrl = helpIcon.getAttribute('data-help-url');
+                console.log('🔧 ContextualHelp: Help URL from icon:', helpUrl);
+                
                 if (helpUrl) {
                     this.loadHelpContentFromUrl(helpUrl);
+                } else {
+                    console.warn('🔧 ContextualHelp: No help URL found on icon');
                 }
             }
         });
@@ -71,6 +77,8 @@ class ContextualHelp {
 
     async loadHelpContentFromUrl(helpUrl) {
         try {
+            console.log('🔧 ContextualHelp: Loading content from URL:', helpUrl);
+            
             // Show modal with loading spinner
             this.showModal('Help', '<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
             
@@ -78,37 +86,71 @@ class ContextualHelp {
             const response = await fetch(helpUrl, {
                 credentials: 'same-origin',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
                 }
             });
+            
+            console.log('🔧 ContextualHelp: Response status:', response.status);
+            console.log('🔧 ContextualHelp: Response URL:', response.url);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
             const html = await response.text();
+            console.log('🔧 ContextualHelp: Response length:', html.length);
+            console.log('🔧 ContextualHelp: First 200 chars:', html.substring(0, 200));
             
             // Extract content from the response HTML
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const content = doc.querySelector('.container .card') || doc.querySelector('.container');
+            
+            // Try multiple selectors to find content
+            let content = doc.querySelector('.container .card');
+            if (!content) {
+                content = doc.querySelector('.card');
+            }
+            if (!content) {
+                content = doc.querySelector('.container');
+            }
+            if (!content) {
+                content = doc.querySelector('main');
+            }
+            
+            console.log('🔧 ContextualHelp: Found content element:', !!content);
             
             if (content) {
                 // Extract title from the card header or first h3
-                const titleElement = content.querySelector('.card-header h3') || content.querySelector('h3') || content.querySelector('h2');
+                const titleElement = content.querySelector('.card-header h3') || 
+                                  content.querySelector('h3') || 
+                                  content.querySelector('h2') ||
+                                  content.querySelector('h1');
                 const title = titleElement ? titleElement.textContent.trim() : 'Help';
+                
+                console.log('🔧 ContextualHelp: Extracted title:', title);
                 
                 // Update modal with content
                 this.showModal(title, content.innerHTML);
             } else {
-                throw new Error('No content found in response');
+                console.warn('🔧 ContextualHelp: No suitable content found, showing raw HTML sample');
+                this.showModal('Help Content', 
+                    '<div class="alert alert-info">' +
+                    '<h6>Content Preview</h6>' +
+                    '<pre style="max-height: 400px; overflow: auto;">' + 
+                    html.substring(0, 1000) + '...</pre>' +
+                    '</div>'
+                );
             }
             
         } catch (error) {
-            console.error('Error loading help content:', error);
+            console.error('🔧 ContextualHelp: Detailed error:', error);
+            console.error('🔧 ContextualHelp: Error stack:', error.stack);
+            
             this.showModal('Help Not Available', 
                 '<div class="alert alert-warning">' +
                 '<h6>Unable to load help content</h6>' +
+                '<p>Error: ' + error.message + '</p>' +
                 '<p>Please try again later or <a href="/help" class="alert-link">browse the help center</a>.</p>' +
                 '</div>'
             );

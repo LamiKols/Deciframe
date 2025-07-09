@@ -219,7 +219,106 @@
                     </div>
                 </div>
 
+            {% elif module == 'Problems' and section == 'management' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Problem Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Problem Identification & Tracking</h5>
+                        <p>Problems in DeciFrame are systematically tracked from identification to resolution:</p>
+                        <ul>
+                            <li><strong>Problem Reporting:</strong> Staff can submit problems they've identified</li>
+                            <li><strong>Automatic Coding:</strong> System assigns unique codes (P0001, P0002, etc.)</li>
+                            <li><strong>Priority Classification:</strong> Low, Medium, High, Critical priority levels</li>
+                            <li><strong>Status Tracking:</strong> Open, In Review, Being Addressed, Resolved</li>
+                        </ul>
+                        
+                        <h5>Problem-to-Business Case Workflow</h5>
+                        <ol>
+                            <li>Problem submitted by staff member</li>
+                            <li>Automatic triage based on priority and impact</li>
+                            <li>Manager or BA reviews problem details</li>
+                            <li>If solution requires investment, converts to business case</li>
+                            <li>Problem tracks business case progress through resolution</li>
+                        </ol>
+                        
+                        <div class="alert alert-info">
+                            <strong>Integration:</strong> Problems seamlessly link to business cases and projects, providing complete visibility from issue identification to resolution.
+                        </div>
+                    </div>
+                </div>
+
             {% elif module == 'Admin' and section == 'quick-actions' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-bolt me-2"></i>Admin Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>System Management</h5>
+                        <p>The Quick Actions panel provides direct access to core administrative functions:</p>
+                        <ul>
+                            <li><strong>Manage Users:</strong> Create, edit, and manage user accounts and roles</li>
+                            <li><strong>Triage Rules:</strong> Configure automated workflow rules and business process logic</li>
+                            <li><strong>Audit Trail:</strong> Review system activity logs and user actions</li>
+                            <li><strong>System Health:</strong> Monitor application performance and system status</li>
+                        </ul>
+                        
+                        <h5>Configuration</h5>
+                        <ul>
+                            <li><strong>Organization:</strong> Update organization settings, preferences, and themes</li>
+                            <li><strong>Notifications:</strong> Configure email alerts and notification templates</li>
+                            <li><strong>Permissions:</strong> Manage role-based access control and security settings</li>
+                            <li><strong>Workflows:</strong> Configure workflow templates and automation rules</li>
+                        </ul>
+                        
+                        <h5>Data Management</h5>
+                        <ul>
+                            <li><strong>Import Data:</strong> Bulk import users, departments, and organizational data</li>
+                            <li><strong>Export Data:</strong> Generate reports and export organizational information</li>
+                            <li><strong>Backup:</strong> Create data backups and manage data retention</li>
+                        </ul>
+                        
+                        <div class="alert alert-success">
+                            <strong>Pro Tip:</strong> Quick Actions are organized by function type - use System Management for daily operations, Configuration for setup, and Data Management for imports/exports.
+                        </div>
+                    </div>
+                </div>
+
+            {% elif module == 'Admin' and section == 'users' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-users me-2"></i>User Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>User Roles & Permissions</h5>
+                        <p>DeciFrame supports 6 distinct user roles with specific permissions:</p>
+                        <ul>
+                            <li><strong>Admin:</strong> Full system access and configuration</li>
+                            <li><strong>Director:</strong> Department oversight and business case approval</li>
+                            <li><strong>Manager:</strong> Team management and problem review</li>
+                            <li><strong>BA (Business Analyst):</strong> Business case development and analysis</li>
+                            <li><strong>PM (Project Manager):</strong> Project execution and milestone tracking</li>
+                            <li><strong>Staff:</strong> Problem reporting and basic system access</li>
+                        </ul>
+                        
+                        <h5>User Creation Process</h5>
+                        <ol>
+                            <li>Navigate to Admin → Manage Users</li>
+                            <li>Click "Create User" button</li>
+                            <li>Enter user details (name, email, role)</li>
+                            <li>Assign to appropriate department</li>
+                            <li>Set manager (if applicable)</li>
+                            <li>User receives welcome email with login instructions</li>
+                        </ol>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Security:</strong> Only business email addresses are accepted. Personal email domains (gmail, yahoo, etc.) are automatically blocked for security compliance.
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
                 <div class="card">
                     <div class="card-header">
                         <h3 class="mb-0"><i class="fas fa-bolt me-2"></i>Admin Quick Actions</h3>
