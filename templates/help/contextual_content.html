@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}{{ module }} Help - {{ section|title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/help">Help Center</a></li>
+                    <li class="breadcrumb-item"><a href="/help?module={{ module }}">{{ module }}</a></li>
+                    <li class="breadcrumb-item active">{{ section|title }}</li>
+                </ol>
+            </nav>
+
+            <!-- Dynamic Help Content -->
+            {% if module == 'Admin' and section == 'overview' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard Overview</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Dashboard Navigation</h5>
+                        <p>The Admin Dashboard provides a comprehensive overview of your DeciFrame system:</p>
+                        <ul>
+                            <li><strong>Key Metrics Cards:</strong> Monitor users, departments, business cases, and projects</li>
+                            <li><strong>Pending Reviews:</strong> Track items requiring admin attention</li>
+                            <li><strong>Quick Actions:</strong> Access frequently used admin functions</li>
+                            <li><strong>System Health:</strong> Monitor system performance and alerts</li>
+                        </ul>
+                        
+                        <h5>Getting Started</h5>
+                        <ol>
+                            <li>Review the key metrics to understand your organization's current state</li>
+                            <li>Check pending reviews for items requiring immediate attention</li>
+                            <li>Use Quick Actions for common administrative tasks</li>
+                            <li>Monitor system health indicators for any issues</li>
+                        </ol>
+                    </div>
+                </div>
+
+            {% elif module == 'Admin' and section == 'users' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-users me-2"></i>User Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>User Roles in DeciFrame</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Permissions</th>
+                                        <th>Key Responsibilities</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge bg-danger">Admin</span></td>
+                                        <td>Full system access</td>
+                                        <td>System configuration, user management, organization settings</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-warning">Director</span></td>
+                                        <td>Department oversight</td>
+                                        <td>Business case approval, departmental reporting</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-primary">Manager</span></td>
+                                        <td>Team management</td>
+                                        <td>Team oversight, problem escalation</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-success">BA</span></td>
+                                        <td>Business analysis</td>
+                                        <td>Business case development, requirements analysis</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-info">PM</span></td>
+                                        <td>Project management</td>
+                                        <td>Project execution, milestone tracking</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-secondary">Staff</span></td>
+                                        <td>Basic access</td>
+                                        <td>Problem reporting, task completion</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <h5>Creating New Users</h5>
+                        <ol>
+                            <li>Navigate to Admin → Manage Users</li>
+                            <li>Click "Create User" button</li>
+                            <li>Fill in user details (name, email, role)</li>
+                            <li>Assign to appropriate department</li>
+                            <li>Set initial password (user will be prompted to change)</li>
+                        </ol>
+                    </div>
+                </div>
+
+            {% elif module == 'Admin' and section == 'quick-actions' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-bolt me-2"></i>Admin Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>System Management Actions</h5>
+                        <ul>
+                            <li><strong>Manage Users:</strong> Create, edit, and manage user accounts</li>
+                            <li><strong>Triage Rules:</strong> Configure automated business process rules</li>
+                            <li><strong>Audit Trail:</strong> Review system activity and user actions</li>
+                            <li><strong>System Health:</strong> Monitor application performance</li>
+                        </ul>
+                        
+                        <h5>Configuration Actions</h5>
+                        <ul>
+                            <li><strong>Organization Settings:</strong> Currency, date formats, timezone</li>
+                            <li><strong>Notifications:</strong> Email and alert configuration</li>
+                            <li><strong>Permissions:</strong> Role-based access control</li>
+                            <li><strong>Workflows:</strong> Business process templates</li>
+                        </ul>
+                        
+                        <h5>Data Management Actions</h5>
+                        <ul>
+                            <li><strong>Import Data:</strong> Bulk upload users, departments, or projects</li>
+                            <li><strong>Data Export:</strong> Generate reports and data extracts</li>
+                            <li><strong>Help Center:</strong> Manage help articles and categories</li>
+                            <li><strong>Reports:</strong> Organizational analytics and insights</li>
+                        </ul>
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- Generic help content for unmatched sections -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">{{ module }} - {{ section|title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Help content for this section is being developed. Please check back soon or contact your administrator for assistance.</p>
+                        
+                        <div class="mt-4">
+                            <a href="/help" class="btn btn-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Help Center
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Quick Links -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6>Need More Help?</h6>
+                            <a href="/help" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-book me-1"></i>Browse All Articles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6>Can't Find What You Need?</h6>
+                            <button class="btn btn-outline-success btn-sm" onclick="alert('Contact feature coming soon!')">
+                                <i class="fas fa-envelope me-1"></i>Contact Support
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
