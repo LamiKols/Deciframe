@@ -109,14 +109,20 @@ def create():
     if user.role == 'Admin':
         form.department_id.choices = Department.get_hierarchical_choices()
     else:
-        # Hide department field for non-admin users - auto-assign their org unit
-        if user.org_unit_id and user.org_unit:
-            form.department_id.choices = [(user.org_unit_id, user.org_unit.name)]
-            form.department_id.data = user.org_unit_id
+        # For non-admin users, auto-assign to the General department since org_units != departments
+        general_dept = Department.query.filter_by(name='General', organization_id=user.organization_id).first()
+        if general_dept:
+            form.department_id.choices = [(general_dept.id, general_dept.name)]
+            form.department_id.data = general_dept.id
         else:
-            # User has no org unit assigned - redirect to profile to complete setup
-            flash('Please complete your profile by selecting a department before creating problems.', 'warning')
-            return redirect(url_for('auth.profile'))
+            # Fallback to any department in the organization
+            any_dept = Department.query.filter_by(organization_id=user.organization_id).first()
+            if any_dept:
+                form.department_id.choices = [(any_dept.id, any_dept.name)]
+                form.department_id.data = any_dept.id
+            else:
+                flash('No departments available. Please contact your administrator.', 'danger')
+                return redirect(url_for('problems.index'))
     
     if form.validate_on_submit():
         org_unit_id = form.org_unit_id.data if form.org_unit_id.data != 0 else None
@@ -131,11 +137,23 @@ def create():
             ai_confidence = None
         
         # Enforce department assignment: non-admin users can only create for their org unit
-        department_id = user.org_unit_id if user.role.value != 'Admin' else form.department_id.data
+        # For admin users, use the selected department_id from the form
+        # For non-admin users, use the General department as default since org_units != departments
+        if user.role.value == 'Admin':
+            department_id = form.department_id.data
+        else:
+            # Find the General department for this organization or use any available department
+            general_dept = Department.query.filter_by(name='General', organization_id=user.organization_id).first()
+            if general_dept:
+                department_id = general_dept.id
+            else:
+                # Fallback to any department in the organization
+                any_dept = Department.query.filter_by(organization_id=user.organization_id).first()
+                department_id = any_dept.id if any_dept else None
         
         # Validate department_id is not None or 0
         if not department_id or department_id == 0:
-            flash('Invalid department selection. Please select a valid department.', 'danger')
+            flash('No valid department found. Please contact your administrator.', 'danger')
             return render_template('problem_form.html', form=form)
         
         # Generate next available problem code
