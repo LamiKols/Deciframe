@@ -199,18 +199,13 @@ def init_admin_routes(app):
         users = query.all()
         
         # Also scope departments dropdown for non-Admin users
-        # Note: Department model doesn't have organization_id, so we filter by users in the organization
-        if current_user.role.value != 'Admin' and current_user.org_unit_id:
-            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
-            departments = OrgUnit.query.filter(OrgUnit.id.in_(allowed_dept_ids)).all()
+        # Note: Department model has organization_id filtering
+        if current_user.role.value != 'Admin' and current_user.department_id:
+            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
+            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
         else:
-            # Get all departments, but only those used by users in this organization
-            dept_ids_in_org = db.session.query(User.org_unit_id).filter(
-                User.organization_id == current_user.organization_id,
-                User.org_unit_id.isnot(None)
-            ).distinct().all()
-            dept_ids = [dept_id[0] for dept_id in dept_ids_in_org]
-            departments = OrgUnit.query.filter(OrgUnit.id.in_(dept_ids)).all() if dept_ids else []
+            # Get all departments for this organization
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
         
         return render_template('admin/users.html', 
                              users=users, 
@@ -266,11 +261,11 @@ def init_admin_routes(app):
                 return redirect(url_for('admin_users'))
         
         # Scope departments for non-Admin users
-        if current_user.role.value != 'Admin' and current_user.org_unit_id:
-            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
-            departments = OrgUnit.query.filter(OrgUnit.id.in_(allowed_dept_ids)).all()
+        if current_user.role.value != 'Admin' and current_user.department_id:
+            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
+            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
         else:
-            departments = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
         roles = list(RoleEnum)
         return render_template('admin/user_form.html', 
                              departments=departments, 
@@ -285,9 +280,9 @@ def init_admin_routes(app):
         
         # Department access validation for non-Admin users
         if current_user.role.value != 'Admin':
-            if current_user.org_unit_id and user.org_unit_id:
-                allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
-                if user.org_unit_id not in allowed_dept_ids:
+            if current_user.department_id and user.department_id:
+                allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
+                if user.department_id not in allowed_dept_ids:
                     flash('You can only edit users in your department hierarchy', 'error')
                     return redirect(url_for('admin_users'))
         
@@ -303,15 +298,15 @@ def init_admin_routes(app):
                 
                 # Department access validation for non-Admin users
                 if current_user.role.value != 'Admin':
-                    if current_user.org_unit_id:
-                        allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
+                    if current_user.department_id:
+                        allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
                         if dept_id not in allowed_dept_ids:
                             flash('You can only assign users to departments in your hierarchy', 'error')
                             return redirect(url_for('admin_edit_user', id=id))
                 
-                user.org_unit_id = dept_id
+                user.department_id = dept_id
             else:
-                user.org_unit_id = None
+                user.department_id = None
             
             db.session.commit()
             log_action('UPDATE_USER', f'Updated user {user.email}')
@@ -319,17 +314,17 @@ def init_admin_routes(app):
             return redirect(url_for('admin_users'))
         
         # Scope departments for non-Admin users
-        if current_user.role.value != 'Admin' and current_user.org_unit_id:
-            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
-            departments = OrgUnit.query.filter(OrgUnit.id.in_(allowed_dept_ids)).all()
+        if current_user.role.value != 'Admin' and current_user.department_id:
+            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
+            departments = Department.query.filter(Department.id.in_(allowed_dept_ids)).all()
         else:
-            departments = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
         roles = list(RoleEnum)
         
         # Create proper form with user data
         form = UserForm()
         
-        # Set department choices manually since OrgUnit.get_hierarchical_choices() might not exist
+        # Set department choices manually since Department.get_hierarchical_choices() might not exist
         dept_choices = [(0, 'No Department')] + [(d.id, d.name) for d in departments]
         form.department.choices = dept_choices
         
@@ -337,7 +332,7 @@ def init_admin_routes(app):
             form.name.data = user.name
             form.email.data = user.email
             form.role.data = user.role.name if user.role else ''
-            form.department.data = user.org_unit_id
+            form.department.data = user.department_id
             form.is_active.data = user.is_active
         
         return render_template('admin/user_form.html', 
@@ -1207,7 +1202,7 @@ def init_admin_routes(app):
                                      auth_token=request.args.get('auth_token'))
             
             # For POST requests, execute the import
-            from models import ImportJob, Problem, BusinessCase, Project, User, Department, OrgUnit
+            from models import ImportJob, Problem, BusinessCase, Project, User, Department
             import pandas as pd
             
             job = ImportJob.query.get(int(job_id))
@@ -1280,7 +1275,7 @@ def init_admin_routes(app):
                             elif 'department_name' in csv_field:
                                 dept_id = _lookup_department_id(value)
                                 if dept_id:
-                                    data['org_unit_id'] = dept_id
+                                    data['department_id'] = dept_id
                             elif model_field == 'problem_id':
                                 problem_id = _lookup_problem_id(value)
                                 if problem_id:
@@ -1302,14 +1297,14 @@ def init_admin_routes(app):
                         # Add default values for required fields if not provided
                         if 'reported_by' not in data:
                             data['reported_by'] = current_user.id
-                        if 'org_unit_id' not in data:
+                        if 'department_id' not in data:
                             # Use current user's department or first available department
-                            if current_user.org_unit_id:
-                                data['org_unit_id'] = current_user.org_unit_id
+                            if current_user.department_id:
+                                data['department_id'] = current_user.department_id
                             else:
-                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
-                                    data['org_unit_id'] = first_dept.id
+                                    data['department_id'] = first_dept.id
                         
                         # Handle enum fields properly with proper casting
                         if 'priority' in data:
@@ -1364,13 +1359,13 @@ def init_admin_routes(app):
                         # Add default values for business case required fields
                         if 'submitted_by' not in data:
                             data['submitted_by'] = current_user.id
-                        if 'org_unit_id' not in data:
-                            if current_user.org_unit_id:
-                                data['org_unit_id'] = current_user.org_unit_id
+                        if 'department_id' not in data:
+                            if current_user.department_id:
+                                data['department_id'] = current_user.department_id
                             else:
-                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
-                                    data['org_unit_id'] = first_dept.id
+                                    data['department_id'] = first_dept.id
                         
                         # Handle enum fields for business case
                         if 'case_type' in data:
@@ -1424,11 +1419,11 @@ def init_admin_routes(app):
                         # Department can be updated later via problem editing
                         if not data.get('department_id'):
                             # Try current user's department first
-                            if current_user.org_unit_id:
-                                data['department_id'] = current_user.org_unit_id
+                            if current_user.department_id:
+                                data['department_id'] = current_user.department_id
                             else:
                                 # Use first available department as fallback
-                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['department_id'] = first_dept.id
                                 else:
@@ -1439,7 +1434,7 @@ def init_admin_routes(app):
                                     })
                                     continue
                         
-                        # Remove any dept_id field to avoid conflicts (Problem model uses department_id)
+                        # Remove any old dept_id field to avoid conflicts (Problem model uses department_id)
                         if 'org_unit_id' in data:
                             del data['org_unit_id']
                         
@@ -1479,14 +1474,14 @@ def init_admin_routes(app):
                         if 'submitted_by' in data:
                             del data['submitted_by']
                         
-                        # Handle department assignment (BusinessCase uses dept_id, not department_id)
-                        if not data.get('org_unit_id'):
-                            if current_user.org_unit_id:
-                                data['org_unit_id'] = current_user.org_unit_id
+                        # Handle department assignment (BusinessCase uses department_id)
+                        if not data.get('department_id'):
+                            if current_user.department_id:
+                                data['department_id'] = current_user.department_id
                             else:
-                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
-                                    data['org_unit_id'] = first_dept.id
+                                    data['department_id'] = first_dept.id
                         
                         # Remove department_id field if present (BusinessCase uses dept_id)
                         if 'department_id' in data:
@@ -1515,19 +1510,19 @@ def init_admin_routes(app):
                         # Department can be updated later via project editing
                         if not data.get('department_id'):
                             # Try current user's department first
-                            if current_user.org_unit_id:
-                                data['department_id'] = current_user.org_unit_id
+                            if current_user.department_id:
+                                data['department_id'] = current_user.department_id
                             else:
                                 # Use first available department as fallback
-                                first_dept = OrgUnit.query.filter_by(organization_id=current_user.organization_id).first()
+                                first_dept = Department.query.filter_by(organization_id=current_user.organization_id).first()
                                 if first_dept:
                                     data['department_id'] = first_dept.id
                                 # If no departments exist, leave as None (nullable field)
                         
-                        # Remove any dept_id field to avoid conflicts
+                        # Remove any old dept_id field to avoid conflicts
                         if 'org_unit_id' in data:
                             del data['org_unit_id']
-                        data['department_id'] = data.get('department_id') or current_user.org_unit_id
+                        data['department_id'] = data.get('department_id') or current_user.department_id
                         
                         # Handle status mapping for Projects using StatusEnum
                         if 'status' in data:
@@ -1709,7 +1704,7 @@ def init_admin_routes(app):
         """Simple org chart import with GET/POST pattern"""
         if request.method == 'POST':
             try:
-                from models import OrgUnit, User
+                from models import Department, User
                 import pandas as pd
                 
                 file = request.files['file']
@@ -1728,10 +1723,10 @@ def init_admin_routes(app):
                 success_count = 0
                 for _, row in df.iterrows():
                     try:
-                        unit = OrgUnit.query.filter_by(name=row['name']).first() or OrgUnit(name=row['name'])
+                        unit = Department.query.filter_by(name=row['name']).first() or Department(name=row['name'])
                         
                         if pd.notna(row.get('parent_name')):
-                            parent = OrgUnit.query.filter_by(name=row['parent_name']).first()
+                            parent = Department.query.filter_by(name=row['parent_name']).first()
                             if parent:
                                 unit.parent = parent
                         
@@ -1771,11 +1766,11 @@ def init_admin_routes(app):
     @login_required
     @admin_required
     def edit_org_unit(id):
-        """Edit an organizational unit"""
+        """Edit a department"""
         try:
-            from models import OrgUnit, User
+            from models import Department, User
             
-            unit = OrgUnit.query.get_or_404(id)
+            unit = Department.query.get_or_404(id)
             
             # Get form data
             name = request.form.get('name', '').strip()
@@ -1802,7 +1797,7 @@ def init_admin_routes(app):
             
             # Set parent (with circular reference check)
             if parent_id and parent_id != '':
-                parent = OrgUnit.query.get(int(parent_id))
+                parent = Department.query.get(int(parent_id))
                 if parent and parent.id != unit.id:
                     # Check for circular reference
                     current = parent
@@ -1980,10 +1975,10 @@ def init_admin_routes(app):
     def delete_org_unit(unit_id):
         """Delete organizational unit with cascade deletion of children"""
         try:
-            from models import OrgUnit, db
+            from models import Department, db
             
             # Find the unit to delete
-            unit = OrgUnit.query.get_or_404(unit_id)
+            unit = Department.query.get_or_404(unit_id)
             unit_name = unit.name
             
             # Delete the unit (cascade will handle children)
@@ -1991,7 +1986,7 @@ def init_admin_routes(app):
             db.session.commit()
             
             # Log the action
-            log_action(f"Deleted organizational unit: {unit_name} (ID: {unit_id})")
+            log_action(f"Deleted department: {unit_name} (ID: {unit_id})")
             
             return "Unit deleted successfully", 200
             
@@ -2004,7 +1999,7 @@ def init_admin_routes(app):
     def create_org_unit():
         """Create new organizational unit"""
         try:
-            from models import OrgUnit, User, db
+            from models import Department, User, db
             from flask import request
             
             name = request.form.get('name', '').strip()
@@ -2012,13 +2007,13 @@ def init_admin_routes(app):
             parent_id = request.form.get('parent_id')
             
             if not name:
-                return "Unit name is required", 400
+                return "Department name is required", 400
             
-            # Create new unit with organization_id
+            # Create new department with organization_id
             from flask_login import current_user
             org_id = current_user.organization_id if current_user.is_authenticated else None
             
-            new_unit = OrgUnit(name=name, organization_id=org_id)
+            new_unit = Department(name=name, organization_id=org_id)
             
             # Set manager if provided - ensure manager is from same organization
             if manager_id and manager_id.strip():
@@ -2028,7 +2023,7 @@ def init_admin_routes(app):
             
             # Set parent if provided - ensure parent is from same organization
             if parent_id and parent_id.strip():
-                parent = OrgUnit.query.filter_by(id=parent_id, organization_id=org_id).first()
+                parent = Department.query.filter_by(id=parent_id, organization_id=org_id).first()
                 if parent:
                     new_unit.parent_id = parent.id
             
@@ -2036,28 +2031,28 @@ def init_admin_routes(app):
             db.session.commit()
             
             # Log the action
-            log_action(f"Created organizational unit: {name}")
+            log_action(f"Created department: {name}")
             
             return redirect(url_for('view_org_chart'))
             
         except Exception as e:
             db.session.rollback()
-            return f"Error creating unit: {str(e)}", 500
+            return f"Error creating department: {str(e)}", 500
 
     @app.route('/admin/org-structure/export')
     @login_required
     def export_org_structure():
         """Export organizational structure to CSV"""
         try:
-            from models import OrgUnit
+            from models import Department
             from flask import Response
             import io
             import csv
             
             print(f"🔧 Export Debug: User {current_user.email} requesting org structure export")
             
-            # Get all organizational units for current organization
-            units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            # Get all departments for current organization
+            units = Department.query.filter_by(organization_id=current_user.organization_id).all()
             print(f"🔧 Export Debug: Found {len(units)} units for organization {current_user.organization_id}")
             
             # Create CSV content
@@ -2103,13 +2098,13 @@ def init_admin_routes(app):
     def admin_data_export():
         """Admin data export page with multiple export options"""
         try:
-            from models import OrgUnit, Problem, BusinessCase, Project
+            from models import Department, Problem, BusinessCase, Project
             
             # Get counts for current organization
             org_id = current_user.organization_id
             
             export_stats = {
-                'org_units': OrgUnit.query.filter_by(organization_id=org_id).count(),
+                'org_units': Department.query.filter_by(organization_id=org_id).count(),
                 'problems': Problem.query.filter_by(organization_id=org_id).count(),
                 'business_cases': BusinessCase.query.filter_by(organization_id=org_id).count(),
                 'projects': Project.query.filter_by(organization_id=org_id).count()
@@ -2127,10 +2122,10 @@ def init_admin_routes(app):
     def org_reports():
         """Organizational reports dashboard"""
         try:
-            from models import OrgUnit
+            from models import Department
             
-            # Get all organizational units
-            all_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            # Get all departments
+            all_units = Department.query.filter_by(organization_id=current_user.organization_id).all()
             
             # Calculate statistics
             total_units = len(all_units)
@@ -2178,12 +2173,12 @@ def init_admin_routes(app):
     def download_org_report(format):
         """Download organizational report in specified format"""
         try:
-            from models import OrgUnit
+            from models import Department
             from flask import Response, send_file, render_template
             import io
             import csv
             
-            all_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            all_units = Department.query.filter_by(organization_id=current_user.organization_id).all()
             
             if format == 'csv':
                 # Generate CSV report
@@ -2414,15 +2409,15 @@ def init_admin_routes(app):
             return f"Error generating chart: {str(e)}", 500
 
     def serialize_org_unit_tree():
-        """Serialize organizational units into tree structure for charts"""
-        from models import OrgUnit
+        """Serialize departments into tree structure for charts"""
+        from models import Department
         
-        # Get all root units (units without parents)
-        root_units = OrgUnit.query.filter_by(parent_id=None).all()
+        # Get all root departments (departments without parents)
+        root_units = Department.query.filter_by(parent_id=None).all()
         
         def serialize_unit(unit):
-            # Get children for this unit
-            children = OrgUnit.query.filter_by(parent_id=unit.id).all()
+            # Get children for this department
+            children = Department.query.filter_by(parent_id=unit.id).all()
             
             return {
                 'id': unit.id,
