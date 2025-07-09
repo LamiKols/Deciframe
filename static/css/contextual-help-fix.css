@@ -1,0 +1,82 @@
+/* Contextual Help Icons Visibility Fix */
+
+/* Ensure help icons are visible with high specificity */
+html[data-bs-theme="dark"] .text-muted a i.fas,
+html[data-bs-theme="light"] .text-muted a i.fas,
+.text-muted a i.fas,
+a.text-muted i.fas {
+    color: #6c757d !important;
+    opacity: 0.7 !important;
+    font-size: 0.75em !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Hover effect for help icons */
+html[data-bs-theme="dark"] .text-muted a:hover i.fas,
+html[data-bs-theme="light"] .text-muted a:hover i.fas,
+.text-muted a:hover i.fas,
+a.text-muted:hover i.fas {
+    color: #495057 !important;
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
+}
+
+/* Section header help icons */
+.card-header a.text-muted i.fas {
+    font-size: 0.8em !important;
+    color: #6c757d !important;
+    opacity: 0.8 !important;
+}
+
+.card-header a.text-muted:hover i.fas {
+    color: #495057 !important;
+    opacity: 1 !important;
+}
+
+/* Ensure icons don't inherit any problematic styles */
+.d-flex.align-items-center a i.fas {
+    display: inline-block !important;
+    visibility: visible !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Enhanced visibility for help icons */
+.help-icon-link {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    padding: 3px !important;
+    border-radius: 4px !important;
+    margin-left: 8px !important;
+    text-decoration: none !important;
+}
+
+.help-icon-link:hover {
+    background-color: rgba(0, 123, 255, 0.2) !important;
+    text-decoration: none !important;
+}
+
+.help-icon {
+    font-weight: bold !important;
+    display: inline-block !important;
+}
+
+/* Force FontAwesome to load properly */
+.fas.fa-question-circle,
+.fas.fa-info-circle {
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+}
+
+/* Fallback if FontAwesome doesn't load */
+.help-icon:before {
+    content: "?" !important;
+    font-family: Arial, sans-serif !important;
+    font-weight: bold !important;
+    font-size: 0.8em !important;
+    color: #6c757d !important;
+    border: 1px solid #6c757d !important;
+    border-radius: 50% !important;
+    padding: 1px 3px !important;
+}

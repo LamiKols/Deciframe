@@ -2,13 +2,22 @@
 
 {% block title %}Admin Dashboard{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/contextual-help-fix.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">Admin Dashboard</h2>
+                <h2 class="mb-0">Admin Dashboard 
+                    <a href="/help?module=Admin&section=overview" class="text-muted ms-2 help-icon-link" 
+                       title="Help with admin dashboard" data-bs-toggle="tooltip">
+                        <i class="fas fa-question-circle help-icon" style="font-size: 0.8em; color: #6c757d;"></i>
+                    </a>
+                </h2>
                 <div class="btn-group">
                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
                         <i class="fas fa-sync-alt me-1"></i>Refresh
@@ -48,9 +57,9 @@
                         <div>
                             <h6 class="card-title text-primary d-flex align-items-center">
                                 Total Users
-                                <a href="/help?module=Admin&section=users" class="text-muted ms-2" 
+                                <a href="/help?module=Admin&section=users" class="text-muted ms-2 help-icon-link" 
                                    title="Help with user management" data-bs-toggle="tooltip">
-                                    <i class="fas fa-question-circle" style="font-size: 0.75em;"></i>
+                                    <i class="fas fa-question-circle help-icon" style="font-size: 0.75em; color: #6c757d;"></i>
                                 </a>
                             </h6>
                             <h3 class="mb-0">{{ stats.users }}</h3>
@@ -71,9 +80,9 @@
                         <div>
                             <h6 class="card-title text-success d-flex align-items-center">
                                 Departments
-                                <a href="/help?module=Admin&section=departments" class="text-muted ms-2" 
+                                <a href="/help?module=Admin&section=departments" class="text-muted ms-2 help-icon-link" 
                                    title="Help with department management" data-bs-toggle="tooltip">
-                                    <i class="fas fa-question-circle" style="font-size: 0.75em;"></i>
+                                    <i class="fas fa-question-circle help-icon" style="font-size: 0.75em; color: #6c757d;"></i>
                                 </a>
                             </h6>
                             <h3 class="mb-0">{{ stats.departments }}</h3>
