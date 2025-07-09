@@ -21,7 +21,12 @@ class ProblemForm(FlaskForm):
     priority = SelectField('Priority', coerce=str, choices=[(p.name, p.value) for p in PriorityEnum])
     department_id = SelectField('Department', coerce=safe_int_coerce, choices=[])
     org_unit_id = SelectField('Organizational Unit', coerce=safe_int_coerce, choices=[])
-    status = SelectField('Status', coerce=str, choices=[(s.name, s.value) for s in StatusEnum])
+    status = SelectField('Status', coerce=str, choices=[
+        ('Open', 'Open'),
+        ('In_Progress', 'In Progress'),
+        ('Resolved', 'Resolved'),
+        ('On_Hold', 'On Hold')
+    ])
     issue_type = SelectField('Issue Type', coerce=str, choices=[
         ('PROCESS', 'Process Issue'),
         ('SYSTEM', 'System Issue'),
@@ -44,8 +49,13 @@ class ProblemFilterForm(FlaskForm):
     class Meta:
         csrf = False
     
-    status = SelectField('Filter by Status', choices=[('', 'All Statuses')] + 
-                        [(status.value, status.value) for status in StatusEnum])
+    status = SelectField('Filter by Status', choices=[
+        ('', 'All Statuses'),
+        ('Open', 'Open'),
+        ('In_Progress', 'In Progress'),
+        ('Resolved', 'Resolved'),
+        ('On_Hold', 'On Hold')
+    ])
     priority = SelectField('Filter by Priority', choices=[('', 'All Priorities')] + 
                           [(priority.value, priority.value) for priority in PriorityEnum])
     department_id = SelectField('Filter by Department', coerce=safe_int_coerce, choices=[])
