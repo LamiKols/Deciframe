@@ -109,9 +109,14 @@ def create():
     if user.role == 'Admin':
         form.department_id.choices = Department.get_hierarchical_choices()
     else:
-        # Hide department field for non-admin users - auto-assign their department
-        form.department_id.choices = [(user.dept_id, user.department.name if user.department else 'Unknown Department')]
-        form.department_id.data = user.dept_id
+        # Hide department field for non-admin users - auto-assign their org unit
+        if user.org_unit_id and user.org_unit:
+            form.department_id.choices = [(user.org_unit_id, user.org_unit.name)]
+            form.department_id.data = user.org_unit_id
+        else:
+            # User has no org unit assigned - show error or default option
+            form.department_id.choices = [(0, 'No Department Assigned')]
+            form.department_id.data = 0
     
     if form.validate_on_submit():
         org_unit_id = form.org_unit_id.data if form.org_unit_id.data != 0 else None
@@ -125,8 +130,8 @@ def create():
         except (ValueError, TypeError):
             ai_confidence = None
         
-        # Enforce department assignment: non-admin users can only create for their department
-        department_id = user.dept_id if user.role.value != 'Admin' else form.department_id.data
+        # Enforce department assignment: non-admin users can only create for their org unit
+        department_id = user.org_unit_id if user.role.value != 'Admin' else form.department_id.data
         
         # Generate next available problem code
         def get_next_problem_code():

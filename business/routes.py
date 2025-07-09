@@ -126,7 +126,7 @@ def new_case():
                 return render_template('case_form.html', form=form)
 
         # Determine department assignment
-        dept_id = user.dept_id
+        dept_id = user.org_unit_id
         if not dept_id:
             # If user has no department, try to find or create a default department
             from models import Department
@@ -380,7 +380,7 @@ def approve_case(id):
         
         # 1) Create Project with all required fields
         # Ensure department assignment: use business case dept, or fallback to user's department
-        project_dept_id = business_case.dept_id or user.dept_id
+        project_dept_id = business_case.department_id or user.org_unit_id
         
         # Clean up project title by removing "Business Case for:" prefix
         project_title = business_case.title
@@ -440,11 +440,11 @@ def approve_case(id):
                 'approved_by': business_case.approved_by,
                 'approved_at': business_case.approved_at.isoformat(),
                 'created_by': business_case.created_by,
-                'dept_id': business_case.dept_id,
+                'dept_id': business_case.department_id,
                 'roi_percentage': business_case.roi or 0
             },
             'user_id': user.id,
-            'department_id': business_case.dept_id,
+            'department_id': business_case.department_id,
             'project_id': project.id if project else None
         }
         enqueue_workflow_event('case_approved', case_context)
