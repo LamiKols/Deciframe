@@ -95,7 +95,7 @@ class MilestoneForm(FlaskForm):
         from flask_login import current_user
         users = User.query.filter_by(organization_id=current_user.organization_id).all()
         self.owner_id.choices = [
-            (user.id, f"{user.name} ({user.dept.name if user.dept else 'No Dept'})") 
+            (user.id, f"{user.name} ({user.org_unit.name if user.org_unit else 'No Unit'})") 
             for user in users
         ]
 
