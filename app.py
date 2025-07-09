@@ -711,5 +711,11 @@ def logout_demo():
     flash('You have been logged out successfully.', 'info')
     return redirect(url_for('index'))
 
+@app.route('/help/examples')
+def help_examples():
+    """Demo page showing contextual help button examples"""
+    from flask import render_template
+    return render_template('help/contextual_help_examples.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

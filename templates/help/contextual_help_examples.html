@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Contextual Help Button Examples{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2>Contextual Help Button Design Examples</h2>
+    <p class="text-muted mb-4">Various approaches for integrating help buttons without disrupting the interface:</p>
+
+    <!-- Example 1: Inline Help Icons -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Example 1: Inline Help Icons (Minimal)</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="d-flex align-items-center">
+                        User Management 
+                        <a href="/help?module=Admin&section=users" class="text-muted ms-2" 
+                           title="Get help with user management" data-bs-toggle="tooltip">
+                            <i class="fas fa-question-circle" style="font-size: 0.8em;"></i>
+                        </a>
+                    </h6>
+                    <p>Manage user accounts, roles, and permissions.</p>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="d-flex align-items-center">
+                        Workflow Configuration
+                        <a href="/help?module=Admin&section=workflows" class="text-muted ms-2" 
+                           title="Help with workflow setup" data-bs-toggle="tooltip">
+                            <i class="fas fa-info-circle" style="font-size: 0.8em;"></i>
+                        </a>
+                    </h6>
+                    <p>Configure business process workflows and automation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Example 2: Button Group with Help -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Example 2: Help in Button Groups</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6>System Health Monitoring</h6>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary btn-sm">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                    <a href="/help?module=Admin&section=health" class="btn btn-outline-secondary btn-sm" 
+                       title="Help with system monitoring" data-bs-toggle="tooltip">
+                        <i class="fas fa-question"></i>
+                    </a>
+                </div>
+            </div>
+            <p>Current system status and performance metrics.</p>
+        </div>
+    </div>
+
+    <!-- Example 3: Card Header Help -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Example 3: Card Header Help</h5>
+            <a href="/help?module=Business&section=cases" class="text-muted" 
+               title="Help with business cases" data-bs-toggle="tooltip">
+                <i class="fas fa-question-circle"></i>
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text-center p-3">
+                        <h3>23</h3>
+                        <small class="text-muted">Active Cases</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center p-3">
+                        <h3>8</h3>
+                        <small class="text-muted">Pending Approval</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center p-3">
+                        <h3>15</h3>
+                        <small class="text-muted">Approved</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Example 4: Form Field Help -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Example 4: Form Field Help</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="mb-3">
+                    <label for="roleSelect" class="form-label d-flex align-items-center">
+                        User Role
+                        <a href="/help?module=Admin&section=roles" class="text-muted ms-2" 
+                           title="Learn about user roles" data-bs-toggle="tooltip">
+                            <i class="fas fa-info-circle" style="font-size: 0.75em;"></i>
+                        </a>
+                    </label>
+                    <select class="form-select" id="roleSelect">
+                        <option value="">Select role...</option>
+                        <option value="admin">Administrator</option>
+                        <option value="manager">Manager</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="deptSelect" class="form-label d-flex align-items-center">
+                        Department
+                        <a href="/help?module=Admin&section=departments" class="text-muted ms-2" 
+                           title="Help with department structure" data-bs-toggle="tooltip">
+                            <i class="fas fa-question-circle" style="font-size: 0.75em;"></i>
+                        </a>
+                    </label>
+                    <select class="form-select" id="deptSelect">
+                        <option value="">Select department...</option>
+                        <option value="1">IT Department</option>
+                        <option value="2">Finance</option>
+                        <option value="3">Operations</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Example 5: Dropdown Help -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Example 5: Help in Dropdowns</h5>
+        </div>
+        <div class="card-body">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Admin Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/admin/users">Manage Users</a></li>
+                    <li><a class="dropdown-item" href="/admin/workflows">Configure Workflows</a></li>
+                    <li><a class="dropdown-item" href="/admin/settings">System Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-muted" href="/help?module=Admin">
+                            <i class="fas fa-question-circle me-2"></i>Admin Help
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Example 6: Table Header Help -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Example 6: Table Header Help</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            User 
+                            <a href="/help?module=Admin&section=users" class="text-muted ms-1" 
+                               title="User management help" data-bs-toggle="tooltip">
+                                <i class="fas fa-question-circle" style="font-size: 0.7em;"></i>
+                            </a>
+                        </th>
+                        <th>
+                            Role
+                            <a href="/help?module=Admin&section=roles" class="text-muted ms-1" 
+                               title="Role system help" data-bs-toggle="tooltip">
+                                <i class="fas fa-info-circle" style="font-size: 0.7em;"></i>
+                            </a>
+                        </th>
+                        <th>Department</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Doe</td>
+                        <td><span class="badge bg-primary">Admin</span></td>
+                        <td>IT Department</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">Edit</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Size Comparison -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Icon Size Comparison</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+                <span>Normal text</span>
+                <i class="fas fa-question-circle text-muted" style="font-size: 0.6em;" title="Tiny"></i>
+                <i class="fas fa-question-circle text-muted" style="font-size: 0.7em;" title="Very Small"></i>
+                <i class="fas fa-question-circle text-muted" style="font-size: 0.8em;" title="Small"></i>
+                <i class="fas fa-question-circle text-muted" style="font-size: 0.9em;" title="Medium"></i>
+                <i class="fas fa-question-circle text-muted" style="font-size: 1em;" title="Regular"></i>
+            </div>
+            <p class="mt-2 small text-muted">Recommended sizes: 0.7em-0.8em for most contexts</p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom help icon styles */
+.help-icon {
+    font-size: 0.8em;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.help-icon:hover {
+    opacity: 1;
+}
+
+/* Ensure help icons don't break layout */
+a[title] {
+    text-decoration: none;
+}
+
+a[title]:hover {
+    text-decoration: none;
+}
+</style>
+
+<script>
+// Initialize Bootstrap tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}
