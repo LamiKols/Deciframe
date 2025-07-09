@@ -114,9 +114,9 @@ def create():
             form.department_id.choices = [(user.org_unit_id, user.org_unit.name)]
             form.department_id.data = user.org_unit_id
         else:
-            # User has no org unit assigned - show error or default option
-            form.department_id.choices = [(0, 'No Department Assigned')]
-            form.department_id.data = 0
+            # User has no org unit assigned - redirect to profile to complete setup
+            flash('Please complete your profile by selecting a department before creating problems.', 'warning')
+            return redirect(url_for('auth.profile'))
     
     if form.validate_on_submit():
         org_unit_id = form.org_unit_id.data if form.org_unit_id.data != 0 else None
@@ -132,6 +132,11 @@ def create():
         
         # Enforce department assignment: non-admin users can only create for their org unit
         department_id = user.org_unit_id if user.role.value != 'Admin' else form.department_id.data
+        
+        # Validate department_id is not None or 0
+        if not department_id or department_id == 0:
+            flash('Invalid department selection. Please select a valid department.', 'danger')
+            return render_template('problem_form.html', form=form)
         
         # Generate next available problem code
         def get_next_problem_code():
