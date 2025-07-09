@@ -287,7 +287,7 @@ def list_cases():
 def view_case(id):
     """View a specific business case with BA assignment capability"""
     user = current_user
-    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     
     # Load associated epics and stories
     epics = Epic.query.filter_by(case_id=id, organization_id=current_user.organization_id).all()
@@ -362,7 +362,7 @@ def view_case(id):
 def approve_case(id):
     """Approve a business case and create linked project"""
     user = current_user
-    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     
     # Check if user has approval authority (Director role required)
     if user.role.value not in ['Director', 'CEO', 'Admin']:
@@ -476,7 +476,7 @@ def approve_case(id):
 @login_required
 def edit_case(id):
     """Edit an existing business case"""
-    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     form = BusinessCaseForm(obj=business_case)
     form.problem.choices = [(p.id, f"{p.code} – {p.title}") for p in Problem.query.filter_by(status=StatusEnum.Open, organization_id=current_user.organization_id).all()]
     
@@ -529,7 +529,7 @@ def edit_case(id):
 def request_full_case(id):
     """Request full case elaboration for a Light case"""
     user = current_user
-    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     
     # Only allow requesting full case for Light cases
     if business_case.case_depth != CaseDepthEnum.Light:
@@ -551,7 +551,7 @@ def request_full_case(id):
 def delete_case(id):
     """Delete a business case"""
     user = current_user
-    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     db.session.delete(business_case)
     db.session.commit()
     flash(f'Business Case {business_case.code} deleted successfully!', 'success')
@@ -573,7 +573,7 @@ def requirements(id):
         flash('Authentication required', 'error')
         return redirect(url_for('auth.login'))
     
-    case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     # Eager load epics and stories for display
     case.epics = Epic.query.filter_by(case_id=id, organization_id=current_user.organization_id).all()
     for epic in case.epics:
@@ -650,7 +650,7 @@ def save_requirements():
 def get_case_epics(case_id):
     """API endpoint to get epics and stories for a business case"""
     try:
-        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         # Refresh database connection to avoid SSL issues
         db.session.commit()
@@ -725,7 +725,7 @@ def create_epic():
             return jsonify({'success': False, 'error': 'Case ID and title are required'}), 400
         
         # Verify business case exists and user has access
-        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         epic = Epic(
             title=title,
@@ -774,7 +774,7 @@ def update_epic(epic_id):
         return jsonify({'success': False, 'error': 'Only BAs can update epics'}), 403
     
     try:
-        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         title = request.form.get('title')
         description = request.form.get('description', '')
@@ -809,7 +809,7 @@ def delete_epic(epic_id):
         return jsonify({'success': False, 'error': 'Only BAs can delete epics'}), 403
     
     try:
-        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         # Delete all stories in this epic first
         Story.query.filter_by(epic_id=epic_id, organization_id=current_user.organization_id).delete()
@@ -844,7 +844,7 @@ def create_story():
             return jsonify({'success': False, 'error': 'Epic ID and title are required'}), 400
         
         # Verify epic exists and check if it's editable
-        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         if epic.status == 'Approved':
             return jsonify({'success': False, 'error': 'Cannot add stories - Epic is already approved'}), 403
@@ -886,7 +886,7 @@ def update_story(story_id):
         return jsonify({'success': False, 'error': 'Only BAs can update stories'}), 403
     
     try:
-        story = Story.query.filter_by(id=story_id, organization_id=current_user.organization_id).first_or_404()
+        story = Story.query.filter_by(id=story_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         title = request.form.get('title')
         description = request.form.get('description', '')
@@ -930,7 +930,7 @@ def delete_story(story_id):
         return jsonify({'success': False, 'error': 'Only BAs can delete stories'}), 403
     
     try:
-        story = Story.query.filter_by(id=story_id, organization_id=current_user.organization_id).first_or_404()
+        story = Story.query.filter_by(id=story_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         db.session.delete(story)
         db.session.commit()
         
@@ -944,7 +944,7 @@ def delete_story(story_id):
 def refine_stories_page(id):
     """Story refinement UI page"""
     user = current_user
-    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     
     # Check if user is a Business Analyst
     if user.role.value != 'BA':
@@ -963,7 +963,7 @@ def refine_stories_page(id):
 def batch_refine_stories(id):
     """Batch update multiple stories (BA only)"""
     user = current_user
-    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    business_case = BusinessCase.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     
     # Check if user is a Business Analyst
     if user.role.value != 'BA':
@@ -1227,7 +1227,7 @@ def get_stories_v2():
 def submit_epic(epic_id):
     """Submit epic for review"""
     try:
-        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         # Debug logging
         print(f"🔍 Submit Epic - User: {current_user.email}, Role: {current_user.role.value}")
@@ -1263,7 +1263,7 @@ def submit_epic(epic_id):
 def review_epic(epic_id):
     """Approve or reject epic with comments"""
     try:
-        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         # Check if user has permission to review epics (Manager, Director, Admin)
         if current_user.role not in [RoleEnum.Admin, RoleEnum.Manager, RoleEnum.Director]:
@@ -1317,7 +1317,7 @@ def review_epic(epic_id):
 def reset_epic(epic_id):
     """Reset epic back to draft status for re-editing"""
     try:
-        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         # Check if user has permission (epic creator, manager, director, admin)
         if (epic.creator_id != current_user.id and 
@@ -1357,7 +1357,7 @@ def reset_epic(epic_id):
 def add_epic_comment(epic_id):
     """Add comment to epic"""
     try:
-        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id).first_or_404()
+        epic = Epic.query.filter_by(id=epic_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         message = request.form.get('message', '').strip()
         
         if not message:
@@ -1402,7 +1402,7 @@ def get_epic_comments(epic_id):
 def submit_all_draft_epics(case_id):
     """Submit all draft epics in a business case for review"""
     try:
-        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         # Check if user has permission to submit epics
         if current_user.role.value not in ['Admin', 'Manager', 'Director', 'BA']:
@@ -1451,8 +1451,8 @@ def link_case_to_project(case_id, project_id):
             flash('You do not have permission to link business cases to projects', 'error')
             return redirect(url_for('business.view_case', id=case_id))
         
-        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id).first_or_404()
-        project = Project.query.filter_by(id=project_id, organization_id=current_user.organization_id).first_or_404()
+        business_case = BusinessCase.query.filter_by(id=case_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
+        project = Project.query.filter_by(id=project_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
         
         # Link business case to project
         business_case.project_id = project_id

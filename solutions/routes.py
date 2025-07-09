@@ -16,7 +16,7 @@ def index():
 @login_required
 def view_solution(solution_id):
     """View solution details"""
-    solution = Solution.query.filter_by(id=solution_id, organization_id=current_user.organization_id).first_or_404()
+    solution = Solution.query.filter_by(id=solution_id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     user = current_user
     
     return render_template('solution_detail.html', 

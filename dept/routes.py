@@ -37,7 +37,7 @@ def create():
 @dept.route('/<int:id>/edit', methods=['GET','POST'])
 @login_required
 def edit(id):
-    dep = Department.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    dep = Department.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     form = DepartmentForm(obj=dep)
     # Set the current parent value for the form
     if dep.parent:
@@ -61,7 +61,7 @@ def edit(id):
 @dept.route('/<int:id>/delete', methods=['POST'])
 @login_required
 def delete(id):
-    dep = Department.query.filter_by(id=id, organization_id=current_user.organization_id).first_or_404()
+    dep = Department.query.filter_by(id=id, organization_id=current_user.organization_id, organization_id=current_user.organization_id).first_or_404()
     db.session.delete(dep)
     db.session.commit()
     flash("Department deleted", "success")
