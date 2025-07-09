@@ -102,7 +102,7 @@ def create():
     # Strict department enforcement: users can only create problems for their own department
     # Exception: Admin users can select any department
     if user.role == 'Admin':
-        form.department_id.choices = Department.get_hierarchical_choices()
+        form.department_id.choices = Department.get_hierarchical_choices(current_user.organization_id)
     else:
         # For non-admin users, auto-assign to the General department since org_units != departments
         general_dept = Department.query.filter_by(name='General', organization_id=user.organization_id).first()
@@ -249,7 +249,7 @@ def edit(id):
     # Strict department enforcement: users can only edit problems for their own department
     # Exception: Admin users can select any department
     if user.role == 'Admin':
-        form.department_id.choices = Department.get_hierarchical_choices()
+        form.department_id.choices = Department.get_hierarchical_choices(current_user.organization_id)
     else:
         # Hide department field for non-admin users - auto-assign their organizational unit
         form.department_id.choices = [(user.org_unit_id, user.org_unit.name if user.org_unit else 'Unknown Unit')]

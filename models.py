@@ -259,7 +259,7 @@ class Department(db.Model):
         return ids
     
     @staticmethod
-    def get_hierarchical_choices():
+    def get_hierarchical_choices(organization_id=None):
         """Get all departments formatted for dropdown with hierarchy indentation"""
         def build_hierarchy(dept, level=0):
             """Recursively build hierarchical list"""
@@ -272,8 +272,11 @@ class Department(db.Model):
                 choices.extend(build_hierarchy(child, level + 1))
             return choices
         
-        # Get all top-level departments (no parent)
-        top_level = Department.query.filter_by(parent_id=None).order_by(Department.name).all()
+        # Get all top-level departments (no parent) - filter by organization if provided
+        query = Department.query.filter_by(parent_id=None)
+        if organization_id:
+            query = query.filter_by(organization_id=organization_id)
+        top_level = query.order_by(Department.name).all()
         
         choices = []
         for dept in top_level:

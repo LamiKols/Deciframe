@@ -36,14 +36,22 @@ class ProblemForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(ProblemForm, self).__init__(*args, **kwargs)
-        # Populate department choices
-        self.department_id.choices = [(dept.id, dept.name) for dept in Department.query.all()]
-        # Populate organizational unit choices with hierarchy
-        org_units = OrgUnit.query.all()
-        self.org_unit_id.choices = [(0, 'No specific unit')] + [
-            (unit.id, f"{'  ' * unit.get_level()}{unit.name}") 
-            for unit in org_units
-        ]
+        from flask_login import current_user
+        
+        # Populate department choices - filter by organization
+        if current_user.is_authenticated:
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
+            self.department_id.choices = [(dept.id, dept.name) for dept in departments]
+            
+            # Populate organizational unit choices with hierarchy - filter by organization
+            org_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            self.org_unit_id.choices = [(0, 'No specific unit')] + [
+                (unit.id, f"{'  ' * unit.get_level()}{unit.name}") 
+                for unit in org_units
+            ]
+        else:
+            self.department_id.choices = []
+            self.org_unit_id.choices = [(0, 'No specific unit')]
 
 class ProblemFilterForm(FlaskForm):
     class Meta:
@@ -64,11 +72,19 @@ class ProblemFilterForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(ProblemFilterForm, self).__init__(*args, **kwargs)
-        # Populate department choices
-        self.department_id.choices = [(0, 'All Departments')] + [(dept.id, dept.name) for dept in Department.query.all()]
-        # Populate organizational unit choices with hierarchy
-        org_units = OrgUnit.query.all()
-        self.org_unit_id.choices = [(0, 'All Organizational Units')] + [
-            (unit.id, f"{'  ' * unit.get_level()}{unit.name}") 
-            for unit in org_units
-        ]
+        from flask_login import current_user
+        
+        # Populate department choices - filter by organization
+        if current_user.is_authenticated:
+            departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
+            self.department_id.choices = [(0, 'All Departments')] + [(dept.id, dept.name) for dept in departments]
+            
+            # Populate organizational unit choices with hierarchy - filter by organization
+            org_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
+            self.org_unit_id.choices = [(0, 'All Organizational Units')] + [
+                (unit.id, f"{'  ' * unit.get_level()}{unit.name}") 
+                for unit in org_units
+            ]
+        else:
+            self.department_id.choices = [(0, 'All Departments')]
+            self.org_unit_id.choices = [(0, 'All Organizational Units')]
