@@ -251,9 +251,20 @@ def edit(id):
     if user.role == 'Admin':
         form.department_id.choices = Department.get_hierarchical_choices(current_user.organization_id)
     else:
-        # Hide department field for non-admin users - auto-assign their organizational unit
-        form.department_id.choices = [(user.org_unit_id, user.org_unit.name if user.org_unit else 'Unknown Unit')]
-        form.department_id.data = user.org_unit_id
+        # For non-admin users, auto-assign to the General department since org_units != departments
+        general_dept = Department.query.filter_by(name='General', organization_id=user.organization_id).first()
+        if general_dept:
+            form.department_id.choices = [(general_dept.id, general_dept.name)]
+            form.department_id.data = general_dept.id
+        else:
+            # Fallback to any department in the organization
+            any_dept = Department.query.filter_by(organization_id=user.organization_id).first()
+            if any_dept:
+                form.department_id.choices = [(any_dept.id, any_dept.name)]
+                form.department_id.data = any_dept.id
+            else:
+                form.department_id.choices = [(0, 'No Department Available')]
+                form.department_id.data = 0
     
     # Pre-populate form data
     if request.method == 'GET':
