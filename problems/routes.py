@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from app import db
-from models import Problem, PriorityEnum, StatusEnum, Department, OrgUnit
+from models import Problem, PriorityEnum, StatusEnum, Department
 from problems.forms import ProblemForm, ProblemFilterForm
 from flask_login import login_required, current_user
 from auth.session_auth import require_session_auth

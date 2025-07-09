@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, DecimalField, SubmitField, RadioField, HiddenField
 from wtforms.validators import DataRequired, Length, Optional
-from models import Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum, OrgUnit
+from models import Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum
 
 class BusinessCaseForm(FlaskForm):
     case_type = RadioField(

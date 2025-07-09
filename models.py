@@ -126,7 +126,7 @@ class User(UserMixin, db.Model):
     # Multi-tenant organization assignment
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     
-    org_unit_id = db.Column(db.Integer, db.ForeignKey('org_units.id'), nullable=True)
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     department_status = db.Column(db.String(20), default='assigned')  # assigned, pending, requested
     
@@ -151,7 +151,7 @@ class User(UserMixin, db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    org_unit = db.relationship('OrgUnit', foreign_keys=[org_unit_id], backref='users')
+    department = db.relationship('Department', foreign_keys=[department_id], backref='users')
     
     def set_password(self, password):
         """Set password hash"""
@@ -163,9 +163,9 @@ class User(UserMixin, db.Model):
     
     @property
     def manager(self):
-        """Get the user's manager (user they report to)"""
-        if hasattr(self, 'reports_to') and self.reports_to:
-            return User.query.get(self.reports_to)
+        """Get the user's manager (department manager)"""
+        if self.department and self.department.manager:
+            return self.department.manager
         return None
     
     @property
@@ -176,16 +176,16 @@ class User(UserMixin, db.Model):
     @property
     def can_create_content(self):
         """Check if user can create problems, business cases, projects"""
-        return self.org_unit_id is not None and self.department_status == 'assigned'
+        return self.department_id is not None and self.department_status == 'assigned'
     
     def set_pending_department(self):
         """Set user to pending department status"""
         self.department_status = 'pending'
-        self.org_unit_id = None
+        self.department_id = None
     
-    def assign_department(self, org_unit_id):
-        """Assign organizational unit and activate user"""
-        self.org_unit_id = org_unit_id
+    def assign_department(self, department_id):
+        """Assign department and activate user"""
+        self.department_id = department_id
         self.department_status = 'assigned'
     
     def get_effective_timezone(self):
@@ -246,10 +246,15 @@ class Department(db.Model):
     description = db.Column(db.Text)
     level = db.Column(db.Integer, default=1)  # Hierarchy level (1-5)
     parent_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Manager for this department
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Self-referencing relationship for hierarchy
     parent = db.relationship('Department', remote_side=[id], backref='children')
+    
+    # Manager relationship
+    manager = db.relationship('User', foreign_keys=[manager_id])
     
     def get_descendant_ids(self, include_self=True):
         """Get IDs of this department and all its sub-departments recursively"""
@@ -257,6 +262,32 @@ class Department(db.Model):
         for child in self.children:
             ids.extend(child.get_descendant_ids(include_self=True))
         return ids
+    
+    def get_hierarchy_level(self):
+        """Return the depth level in the department hierarchy (0 = root)"""
+        level = 0
+        current = self.parent
+        while current:
+            level += 1
+            current = current.parent
+        return level
+    
+    def get_full_path(self):
+        """Return full departmental path (e.g., 'Company > IT > Development')"""
+        path = [self.name]
+        current = self.parent
+        while current:
+            path.insert(0, current.name)
+            current = current.parent
+        return ' > '.join(path)
+    
+    def get_all_descendants(self):
+        """Return all descendant departments recursively"""
+        descendants = []
+        for child in self.children:
+            descendants.append(child)
+            descendants.extend(child.get_all_descendants())
+        return descendants
     
     @staticmethod
     def get_hierarchical_choices(organization_id=None):
@@ -301,7 +332,6 @@ class Problem(db.Model):
     reported_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     assigned_to = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
-    org_unit_id = db.Column(db.Integer, db.ForeignKey('org_units.id'), nullable=True)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -322,7 +352,6 @@ class Problem(db.Model):
     reporter = db.relationship('User', foreign_keys=[reported_by])
     assignee = db.relationship('User', foreign_keys=[assigned_to])
     department = db.relationship('Department')
-    org_unit = db.relationship('OrgUnit', foreign_keys=[org_unit_id])
     
     def __repr__(self):
         return f'<Problem {self.code}: {self.title}>'
@@ -955,62 +984,7 @@ class AIThresholdSettings(db.Model):
     
     updater = db.relationship('User', foreign_keys=[updated_by])
 
-class OrgUnit(db.Model):
-    __tablename__ = 'org_units'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
-    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey('org_units.id'), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Self-referential relationship for hierarchy
-    children = db.relationship(
-        'OrgUnit',
-        backref=db.backref('parent', remote_side=[id]),
-        cascade='all, delete-orphan'
-    )
-    
-    # Manager relationship
-    manager = db.relationship('User', foreign_keys=[manager_id])
-    
-    # Organization relationship
-    organization = db.relationship('Organization', foreign_keys=[organization_id])
-    
-    def __repr__(self):
-        return f'<OrgUnit {self.name}>'
-    
-    def get_hierarchy_level(self):
-        """Return the depth level in the org chart (0 = root)"""
-        level = 0
-        current = self.parent
-        while current:
-            level += 1
-            current = current.parent
-        return level
-    
-    def get_level(self):
-        """Alias for get_hierarchy_level() for form compatibility"""
-        return self.get_hierarchy_level()
-    
-    def get_full_path(self):
-        """Return full organizational path (e.g., 'Company > IT > Development')"""
-        path = [self.name]
-        current = self.parent
-        while current:
-            path.insert(0, current.name)
-            current = current.parent
-        return ' > '.join(path)
-    
-    def get_all_descendants(self):
-        """Return all descendant org units recursively"""
-        descendants = []
-        for child in self.children:
-            descendants.append(child)
-            descendants.extend(child.get_all_descendants())
-        return descendants
+
 
 class Setting(db.Model):
     __tablename__ = 'settings'

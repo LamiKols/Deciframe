@@ -4,7 +4,7 @@ Working Admin Routes Implementation
 
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, OrgUnit, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings, WorkflowConfiguration
+from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings, WorkflowConfiguration
 from werkzeug.security import generate_password_hash
 from admin.forms import UserForm
 from datetime import datetime
@@ -44,12 +44,12 @@ def init_admin_routes(app):
     @admin_required
     def admin_dashboard():
         # Calculate comprehensive statistics - ORGANIZATION FILTERED
-        from models import User, Department, OrgUnit, Problem, Project, Epic, BusinessCase
+        from models import User, Department, Problem, Project, Epic, BusinessCase
         
         # Filter all queries by organization_id for proper multi-tenant isolation
         org_id = current_user.organization_id
         users_count = User.query.filter_by(organization_id=org_id).count()
-        departments_count = OrgUnit.query.filter_by(organization_id=org_id).count()
+        departments_count = Department.query.filter_by(organization_id=org_id).count()
         problems_count = Problem.query.filter_by(organization_id=org_id).count()
         business_cases_count = BusinessCase.query.filter_by(organization_id=org_id).count()
         projects_count = Project.query.filter_by(organization_id=org_id).count()
@@ -180,9 +180,9 @@ def init_admin_routes(app):
         
         # Department scoping for non-Admin users (Directors can only manage their department hierarchy)
         if current_user.role.value != 'Admin':
-            if current_user.org_unit_id:
-                allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
-                query = query.filter(User.org_unit_id.in_(allowed_dept_ids))
+            if current_user.department_id:
+                allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
+                query = query.filter(User.department_id.in_(allowed_dept_ids))
         
         if search:
             query = query.filter(db.or_(
@@ -251,13 +251,13 @@ def init_admin_routes(app):
                     
                     # Department access validation for non-Admin users
                     if current_user.role.value != 'Admin':
-                        if current_user.org_unit_id:
-                            allowed_dept_ids = current_user.org_unit.get_descendant_ids(include_self=True)
+                        if current_user.department_id:
+                            allowed_dept_ids = current_user.department.get_descendant_ids(include_self=True)
                             if dept_id not in allowed_dept_ids:
                                 flash('You can only create users in your department hierarchy', 'error')
                                 return redirect(url_for('admin_create_user'))
                     
-                    user.org_unit_id = dept_id
+                    user.department_id = dept_id
                     
                 db.session.add(user)
                 db.session.commit()
@@ -1836,34 +1836,34 @@ def init_admin_routes(app):
     @login_required
     @admin_required
     def view_org_chart():
-        """View organizational chart with hierarchical display"""
+        """View departmental chart with hierarchical display"""
         try:
-            from models import OrgUnit, User
+            from models import Department, User
             from flask import request, jsonify
             
-            # Get all org units with their hierarchy - filter by organization
+            # Get all departments with their hierarchy - filter by organization
             from flask_login import current_user
             org_id = current_user.organization_id if current_user.is_authenticated else None
             
             if org_id:
-                org_units = OrgUnit.query.filter_by(organization_id=org_id).all()
-                roots = OrgUnit.query.filter_by(parent_id=None, organization_id=org_id).all()
+                departments = Department.query.filter_by(organization_id=org_id).all()
+                roots = Department.query.filter_by(parent_id=None, organization_id=org_id).all()
             else:
-                org_units = []
+                departments = []
                 roots = []
             
-            print(f"DEBUG: Total org units: {len(org_units)}")
-            print(f"DEBUG: Root units: {len(roots)}")
+            print(f"DEBUG: Total departments: {len(departments)}")
+            print(f"DEBUG: Root departments: {len(roots)}")
             for root in roots:
-                print(f"DEBUG: Root unit: {root.name} (ID: {root.id})")
+                print(f"DEBUG: Root department: {root.name} (ID: {root.id})")
             
-            # Serialize units for JavaScript
-            def serialize_org_unit(unit):
+            # Serialize departments for JavaScript
+            def serialize_department(dept):
                 try:
                     # Get manager info
                     manager_info = None
-                    if unit.manager_id:
-                        manager = User.query.get(unit.manager_id)
+                    if dept.manager_id:
+                        manager = User.query.get(dept.manager_id)
                         if manager:
                             manager_info = {
                                 'id': manager.id,
@@ -1873,57 +1873,57 @@ def init_admin_routes(app):
                     
                     # Get children recursively
                     children_data = []
-                    children = OrgUnit.query.filter_by(parent_id=unit.id).all()
+                    children = Department.query.filter_by(parent_id=dept.id).all()
                     for child in children:
-                        children_data.append(serialize_org_unit(child))
+                        children_data.append(serialize_department(child))
                     
                     result = {
-                        'id': unit.id,
-                        'name': unit.name,
-                        'parent_id': unit.parent_id,
+                        'id': dept.id,
+                        'name': dept.name,
+                        'parent_id': dept.parent_id,
                         'manager': manager_info,
                         'children': children_data
                     }
-                    print(f"DEBUG: Serialized unit {unit.name}: {result}")
+                    print(f"DEBUG: Serialized department {dept.name}: {result}")
                     return result
                 except Exception as e:
-                    log_action('serialize_error', f'Error serializing unit {unit.id}: {str(e)}')
-                    print(f"DEBUG: Error serializing {unit.name}: {str(e)}")
+                    log_action('serialize_error', f'Error serializing department {dept.id}: {str(e)}')
+                    print(f"DEBUG: Error serializing {dept.name}: {str(e)}")
                     return {
-                        'id': unit.id,
-                        'name': unit.name,
-                        'parent_id': unit.parent_id,
+                        'id': dept.id,
+                        'name': dept.name,
+                        'parent_id': dept.parent_id,
                         'manager': None,
                         'children': []
                     }
             
             try:
-                serialized_roots = [serialize_org_unit(root) for root in roots]
-                log_action('org_structure_serialized', f'Serialized {len(serialized_roots)} root units from {len(roots)} total')
-                print(f"DEBUG: Found {len(roots)} root units, serialized {len(serialized_roots)} units")
-                print(f"DEBUG: Root units: {[r.name for r in roots]}")
+                serialized_roots = [serialize_department(root) for root in roots]
+                log_action('org_structure_serialized', f'Serialized {len(serialized_roots)} root departments from {len(roots)} total')
+                print(f"DEBUG: Found {len(roots)} root departments, serialized {len(serialized_roots)} departments")
+                print(f"DEBUG: Root departments: {[r.name for r in roots]}")
                 print(f"DEBUG: Serialized data: {serialized_roots}")
             except Exception as e:
                 log_action('serialization_error', f'Error serializing roots: {str(e)}')
                 print(f"DEBUG: Serialization error: {str(e)}")
                 serialized_roots = []
             
-            serialized_units = [{
-                'id': unit.id,
-                'name': unit.name,
-                'parent_id': unit.parent_id,
-                'manager_id': unit.manager_id
-            } for unit in org_units]
+            serialized_departments = [{
+                'id': dept.id,
+                'name': dept.name,
+                'parent_id': dept.parent_id,
+                'manager_id': dept.manager_id
+            } for dept in departments]
             
             # Check if this is a JSON request
             if request.headers.get('Accept') == 'application/json':
                 return jsonify({
-                    'org_units': serialized_units,
+                    'departments': serialized_departments,
                     'roots': serialized_roots
                 })
             
             return render_template('admin/org_structure.html', 
-                                org_units=serialized_units,
+                                departments=serialized_departments,
                                 roots=serialized_roots,
                                 current_user=current_user)
         except Exception as e:

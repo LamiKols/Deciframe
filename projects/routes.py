@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from sqlalchemy import and_, or_
 from datetime import datetime, date
 from app import db
-from models import Project, ProjectMilestone, User, Department, BusinessCase, StatusEnum, PriorityEnum, OrgUnit, Epic
+from models import Project, ProjectMilestone, User, Department, BusinessCase, StatusEnum, PriorityEnum, Epic
 from projects.forms import ProjectForm, MilestoneForm, ProjectFilterForm
 
 

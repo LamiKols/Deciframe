@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, DateField, SelectField, SubmitField, BooleanField, DecimalField
 from wtforms.validators import DataRequired, Length, Optional
-from models import StatusEnum, PriorityEnum, RoleEnum, User, Department, BusinessCase, OrgUnit
+from models import StatusEnum, PriorityEnum, RoleEnum, User, Department, BusinessCase
 from app import db
 
 def safe_int_coerce(value):

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Length
-from models import Department, OrgUnit, PriorityEnum, StatusEnum
+from models import Department, PriorityEnum, StatusEnum
 
 def safe_int_coerce(value):
     """Safely coerce to int, handling None values"""
@@ -20,7 +20,7 @@ class ProblemForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired()])
     priority = SelectField('Priority', coerce=str, choices=[(p.name, p.value) for p in PriorityEnum])
     department_id = SelectField('Department', coerce=safe_int_coerce, choices=[])
-    org_unit_id = SelectField('Organizational Unit', coerce=safe_int_coerce, choices=[])
+
     status = SelectField('Status', coerce=str, choices=[
         ('Open', 'Open'),
         ('In_Progress', 'In Progress'),
@@ -43,15 +43,8 @@ class ProblemForm(FlaskForm):
             departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
             self.department_id.choices = [(dept.id, dept.name) for dept in departments]
             
-            # Populate organizational unit choices with hierarchy - filter by organization
-            org_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
-            self.org_unit_id.choices = [(0, 'No specific unit')] + [
-                (unit.id, f"{'  ' * unit.get_level()}{unit.name}") 
-                for unit in org_units
-            ]
         else:
             self.department_id.choices = []
-            self.org_unit_id.choices = [(0, 'No specific unit')]
 
 class ProblemFilterForm(FlaskForm):
     class Meta:
@@ -67,7 +60,7 @@ class ProblemFilterForm(FlaskForm):
     priority = SelectField('Filter by Priority', choices=[('', 'All Priorities')] + 
                           [(priority.value, priority.value) for priority in PriorityEnum])
     department_id = SelectField('Filter by Department', coerce=safe_int_coerce, choices=[])
-    org_unit_id = SelectField('Filter by Organizational Unit', coerce=safe_int_coerce, choices=[])
+
     submit = SubmitField('Filter')
 
     def __init__(self, *args, **kwargs):
@@ -79,12 +72,5 @@ class ProblemFilterForm(FlaskForm):
             departments = Department.query.filter_by(organization_id=current_user.organization_id).all()
             self.department_id.choices = [(0, 'All Departments')] + [(dept.id, dept.name) for dept in departments]
             
-            # Populate organizational unit choices with hierarchy - filter by organization
-            org_units = OrgUnit.query.filter_by(organization_id=current_user.organization_id).all()
-            self.org_unit_id.choices = [(0, 'All Organizational Units')] + [
-                (unit.id, f"{'  ' * unit.get_level()}{unit.name}") 
-                for unit in org_units
-            ]
         else:
             self.department_id.choices = [(0, 'All Departments')]
-            self.org_unit_id.choices = [(0, 'All Organizational Units')]
