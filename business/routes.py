@@ -125,27 +125,25 @@ def new_case():
                 flash(f"Full case requires all sections to be completed. Missing: {', '.join(missing_fields)}", "danger")
                 return render_template('case_form.html', form=form)
 
-        # Determine department assignment
-        dept_id = user.org_unit_id
-        if not dept_id:
-            # If user has no department, try to find or create a default department
-            from models import Department
-            default_dept = Department.query.filter_by(
-                organization_id=user.organization_id,
-                name='General'
-            ).first()
-            
-            if not default_dept:
-                # Create a default "General" department for organization
-                default_dept = Department(
-                    name='General',
-                    description='Default department for users without specific department assignment',
-                    organization_id=user.organization_id
-                )
-                db.session.add(default_dept)
-                db.session.flush()  # Get the ID
-            
-            dept_id = default_dept.id
+        # Determine department assignment - business cases need department references, not org_unit
+        # For now, assign to the "General" department for the organization
+        from models import Department
+        default_dept = Department.query.filter_by(
+            organization_id=user.organization_id,
+            name='General'
+        ).first()
+        
+        if not default_dept:
+            # Create a default "General" department for organization
+            default_dept = Department(
+                name='General',
+                description='Default department for users without specific department assignment',
+                organization_id=user.organization_id
+            )
+            db.session.add(default_dept)
+            db.session.flush()  # Get the ID
+        
+        dept_id = default_dept.id
 
         # Create BusinessCase
         bc = BusinessCase(
