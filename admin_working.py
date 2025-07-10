@@ -2111,12 +2111,34 @@ def init_admin_routes(app):
         """Simplest possible admin test route"""
         return "<h1>Simple Test Route Working</h1><p>This route exists and is accessible.</p>"
     
-    @app.route('/admin/debug-data-export')
-    @login_required
-    @admin_required
+    @app.route('/admin/test-export-no-auth')
+    def test_export_no_auth():
+        """Test route with no authentication"""
+        return f"""
+        <h1>Export Test - No Auth Required</h1>
+        <p>This route works without authentication.</p>
+        <p>Current time: {datetime.now()}</p>
+        <p>If you can see this, basic routing is working.</p>
+        <p><a href="/admin/">Back to Admin</a></p>
+        """
+    
+    @app.route('/admin/debug-data-export', methods=['GET'])
     def debug_data_export():
-        """Debug version of data export that bypasses template rendering"""
+        """Debug version with manual auth check"""
         try:
+            print(f"🚀 DEBUG EXPORT: Route accessed!")
+            print(f"🚀 DEBUG EXPORT: User authenticated: {current_user.is_authenticated}")
+            
+            if not current_user.is_authenticated:
+                return redirect(url_for('auth.login', next=request.url))
+            
+            print(f"🚀 DEBUG EXPORT: User: {current_user.email}")
+            print(f"🚀 DEBUG EXPORT: Role: {current_user.role}")
+            
+            # Manual admin check
+            if current_user.role.name != 'Admin':
+                return "Access denied - Admin role required", 403
+            
             from models import Department, Problem, BusinessCase, Project
             
             org_id = current_user.organization_id
@@ -2126,18 +2148,20 @@ def init_admin_routes(app):
             projects_count = Project.query.filter_by(organization_id=org_id).count()
             
             return f"""
-            <h1>Data Export - Debug Version</h1>
+            <h1>✅ Data Export - Working!</h1>
             <h2>Organization Statistics for {current_user.email}</h2>
-            <p>Organization ID: {org_id}</p>
+            <p><strong>Organization ID:</strong> {org_id}</p>
             <ul>
-                <li>Departments: {departments_count}</li>
-                <li>Problems: {problems_count}</li>
-                <li>Business Cases: {business_cases_count}</li>
-                <li>Projects: {projects_count}</li>
+                <li><strong>Departments:</strong> {departments_count}</li>
+                <li><strong>Problems:</strong> {problems_count}</li>
+                <li><strong>Business Cases:</strong> {business_cases_count}</li>
+                <li><strong>Projects:</strong> {projects_count}</li>
             </ul>
-            <p><a href="/admin/">Back to Admin Dashboard</a></p>
+            <p><a href="/admin/" class="btn btn-primary">Back to Admin Dashboard</a></p>
+            <p>✅ Authentication and Data Export Working Correctly!</p>
             """
         except Exception as e:
+            print(f"🚀 DEBUG EXPORT ERROR: {str(e)}")
             return f"<h1>Debug Data Export Error</h1><p>{str(e)}</p>"
     
     # Register the main data export route with explicit methods
