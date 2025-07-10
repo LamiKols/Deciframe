@@ -438,23 +438,23 @@ class BusinessCase(db.Model):
             self.roi = 0
     
     def can_generate_requirements(self):
-        """Check if this business case type allows requirement generation"""
-        allowed_types = [
-            ProjectTypeEnum.SOFTWARE_DEVELOPMENT,
-            ProjectTypeEnum.SYSTEM_INTEGRATION,
-            ProjectTypeEnum.DATA_ANALYTICS
+        """
+        Determine if this business case can generate requirements based on project type.
+        Technology and Process projects support requirements generation.
+        Strategic and Regulatory projects typically don't need detailed technical requirements.
+        """
+        return self.project_type in [
+            ProjectTypeEnum.TECHNOLOGY,
+            ProjectTypeEnum.PROCESS
         ]
-        return self.project_type in allowed_types
     
     def get_epic_requirement_type(self):
         """Get the Epic requirement_type based on project_type"""
         mapping = {
-            ProjectTypeEnum.SOFTWARE_DEVELOPMENT: "Software",
-            ProjectTypeEnum.SYSTEM_INTEGRATION: "Software",
-            ProjectTypeEnum.DATA_ANALYTICS: "Infrastructure",
-            ProjectTypeEnum.TRAINING_PROGRAM: "Training",
-            ProjectTypeEnum.PROCESS_CHANGE: "Process",
-            ProjectTypeEnum.POLICY_COMPLIANCE: "Policy",
+            ProjectTypeEnum.TECHNOLOGY: "Software",
+            ProjectTypeEnum.PROCESS: "Process",
+            ProjectTypeEnum.STRATEGIC: "Strategy",
+            ProjectTypeEnum.REGULATORY: "Policy",
         }
         return mapping.get(self.project_type, "Other")
 
