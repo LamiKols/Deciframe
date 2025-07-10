@@ -2095,6 +2095,7 @@ def init_admin_routes(app):
     
     @app.route('/admin/data-export', methods=['GET'])
     @login_required
+    @admin_required
     def admin_data_export():
         """Admin data export page with multiple export options"""
         try:
