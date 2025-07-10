@@ -31,7 +31,32 @@ DeciFrame is a modular Flask application providing comprehensive problem and bus
 - **NotificationTemplate**: Configurable notification templates
 - **Notification**: In-app notifications with email integration
 
-## Current Implementation: DUPLICATE NOTIFICATION FIX COMPLETE - July 10, 2025 ✅ IMPLEMENTED
+## Current Implementation: PROJECT TYPE LOGIC CORRECTED - July 10, 2025 ✅ IMPLEMENTED
+
+### PROJECT TYPE REQUIREMENTS LOGIC FIX - FULLY OPERATIONAL ✅
+🔧 **AI Requirements Generation Logic Corrected - July 10, 2025**
+- **LOGIC ERROR FIXED**: Modified `can_generate_requirements()` method to only allow TECHNOLOGY projects to show "Generate Requirements" button
+- **PROCESS PROJECT EXCLUSION**: Business Case C0006 (Process type) no longer inappropriately shows AI requirements generation
+- **LOGICAL SEPARATION**: Only TECHNOLOGY projects should generate AI requirements; PROCESS, STRATEGIC, and REGULATORY require manual definition
+- **USER CONFIRMATION**: Verified Business Case C0006 "Generate Requirements" button no longer visible
+- **BUSINESS LOGIC**: Process improvements like "Streamlined Flight Closure Workflow" need operational procedures, not software specifications
+
+✅ **Technical Implementation Complete - July 10, 2025**
+- **Model Method Updated**: Changed BusinessCase.can_generate_requirements() to only return True for ProjectTypeEnum.TECHNOLOGY
+- **Template Logic**: Requirements generation section in case_detail.html now properly conditional based on project type
+- **Database Verification**: Confirmed Business Case C0006 correctly tagged as PROCESS project type
+- **AI Integration**: AI requirements generation now logically restricted to software/technology projects only
+
+### Business Value Delivered
+- **Logical Project Management**: Clear distinction between technology projects requiring detailed specs and process projects needing workflow definitions
+- **Enhanced User Experience**: Users no longer see inappropriate AI generation options for non-technical projects
+- **Professional Interface**: Requirements generation appears only when contextually appropriate for project type
+- **Business Process Alignment**: System now matches real-world project management practices where process and technology projects have different requirement approaches
+
+### Production Status: PROJECT TYPE LOGIC FULLY OPERATIONAL - July 10, 2025 ✅
+Complete project type-based requirements logic with proper AI generation restriction. Only TECHNOLOGY projects show "Generate Requirements" button. Process projects like Business Case C0006 appropriately exclude AI requirements generation, requiring manual operational procedure definition instead.
+
+## Previous Implementation: DUPLICATE NOTIFICATION FIX COMPLETE - July 10, 2025 ✅ IMPLEMENTED
 
 ### DUPLICATE SUCCESS NOTIFICATION RESOLVED - FULLY OPERATIONAL ✅
 🔧 **Business Case Creation Duplicate Messages Fixed - July 10, 2025**
