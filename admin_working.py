@@ -17,7 +17,7 @@ def init_admin_routes(app):
     def admin_required(f):
         def wrapper(*args, **kwargs):
             user = current_user
-            if not user or user.role.value != 'Admin':
+            if not user.is_authenticated or user.role.value != 'Admin':
                 flash('Admin access required', 'error')
                 return redirect(url_for('index'))
             return f(*args, **kwargs)
