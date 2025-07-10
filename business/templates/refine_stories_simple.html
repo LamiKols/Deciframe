@@ -135,7 +135,6 @@ select option {
                     <div>
                         <h5 class="mb-0">
                             <i class="fas fa-layer-group me-2"></i>{{ epic.title }}
-                            <span class="badge bg-info ms-2">{{ epic.requirement_type or 'Software' }}</span>
                             {% if epic.project_id %}
                                 <span class="badge bg-success ms-2">✅ Synced to Project</span>
                             {% else %}
@@ -172,7 +171,7 @@ select option {
                             <i class="fas fa-folder-open"></i>
                         </button>
                         <button class="btn btn-outline-light btn-sm" onclick="editEpic({{ epic.id }})" title="Edit Epic" 
-                                data-epic-id="{{ epic.id }}" data-epic-title="{{ epic.title }}" data-epic-description="{{ epic.description or '' }}" data-epic-assigned-by="{{ epic.assigned_by or '' }}" data-requirement-type="{{ epic.requirement_type or 'Software' }}"
+                                data-epic-id="{{ epic.id }}" data-epic-title="{{ epic.title }}" data-epic-description="{{ epic.description or '' }}" data-epic-assigned-by="{{ epic.assigned_by or '' }}"
                                 {% if epic.status == 'Approved' %}disabled{% endif %}>
                             <i class="fas fa-edit"></i>
                         </button>
@@ -400,17 +399,6 @@ select option {
                     <div class="mb-3">
                         <label for="epicDescription" class="form-label">Description</label>
                         <textarea class="form-control" id="epicDescription" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="epicRequirementType" class="form-label">Requirement Type</label>
-                        <select class="form-control" id="epicRequirementType" required>
-                            <option value="Software">Software</option>
-                            <option value="Process">Process</option>
-                            <option value="Training">Training</option>
-                            <option value="Policy">Policy</option>
-                            <option value="Infrastructure">Infrastructure</option>
-                            <option value="Other">Other</option>
-                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="epicAssignedBy" class="form-label">Assigned by (name or email)</label>
@@ -716,7 +704,6 @@ function addNewEpic() {
     document.getElementById('epicId').value = '';
     document.getElementById('epicTitle').value = '';
     document.getElementById('epicDescription').value = '';
-    document.getElementById('epicRequirementType').value = 'Software';
     document.getElementById('epicAssignedBy').value = '';
     document.querySelector('#editEpicModal .modal-title').textContent = 'Add New Epic';
     new bootstrap.Modal(document.getElementById('editEpicModal')).show();
@@ -738,7 +725,6 @@ function editEpic(epicId) {
     document.getElementById('epicId').value = epicId;
     document.getElementById('epicTitle').value = title;
     document.getElementById('epicDescription').value = description;
-    document.getElementById('epicRequirementType').value = editButton.getAttribute('data-requirement-type') || 'Software';
     document.getElementById('epicAssignedBy').value = assignedBy;
     document.querySelector('#editEpicModal .modal-title').textContent = 'Edit Epic';
     new bootstrap.Modal(document.getElementById('editEpicModal')).show();
@@ -784,7 +770,6 @@ function saveEpic() {
     const epicId = document.getElementById('epicId').value;
     const title = document.getElementById('epicTitle').value;
     const description = document.getElementById('epicDescription').value;
-    const requirementType = document.getElementById('epicRequirementType').value;
     const assignedBy = document.getElementById('epicAssignedBy').value;
     
     if (!title.trim()) {
@@ -796,7 +781,6 @@ function saveEpic() {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('requirement_type', requirementType);
     formData.append('assigned_by', assignedBy);
     
     const url = epicId ? `/api/epics/${epicId}` : '/api/epics';

@@ -24,18 +24,6 @@
                                       rows="4" required>{{ epic.description }}</textarea>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="requirement_type" class="form-label">Requirement Type</label>
-                            <select class="form-control" id="requirement_type" name="requirement_type" required>
-                                <option value="Software" {% if epic.requirement_type == 'Software' %}selected{% endif %}>Software</option>
-                                <option value="Process" {% if epic.requirement_type == 'Process' %}selected{% endif %}>Process</option>
-                                <option value="Training" {% if epic.requirement_type == 'Training' %}selected{% endif %}>Training</option>
-                                <option value="Policy" {% if epic.requirement_type == 'Policy' %}selected{% endif %}>Policy</option>
-                                <option value="Infrastructure" {% if epic.requirement_type == 'Infrastructure' %}selected{% endif %}>Infrastructure</option>
-                                <option value="Other" {% if epic.requirement_type == 'Other' %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        
                         <div class="d-flex justify-content-between">
                             <a href="{{ url_for('epics.view_epics', case_id=epic.case_id) }}" 
                                class="btn btn-secondary">
