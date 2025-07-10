@@ -2104,7 +2104,7 @@ def init_admin_routes(app):
             org_id = current_user.organization_id
             
             export_stats = {
-                'org_units': Department.query.filter_by(organization_id=org_id).count(),
+                'departments': Department.query.filter_by(organization_id=org_id).count(),
                 'problems': Problem.query.filter_by(organization_id=org_id).count(),
                 'business_cases': BusinessCase.query.filter_by(organization_id=org_id).count(),
                 'projects': Project.query.filter_by(organization_id=org_id).count()
