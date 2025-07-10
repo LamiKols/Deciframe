@@ -2111,8 +2111,37 @@ def init_admin_routes(app):
         """Simplest possible admin test route"""
         return "<h1>Simple Test Route Working</h1><p>This route exists and is accessible.</p>"
     
-    # Register the main data export route FIRST to ensure proper precedence
-    @app.route('/admin/data-export')
+    @app.route('/admin/debug-data-export')
+    @login_required
+    @admin_required
+    def debug_data_export():
+        """Debug version of data export that bypasses template rendering"""
+        try:
+            from models import Department, Problem, BusinessCase, Project
+            
+            org_id = current_user.organization_id
+            departments_count = Department.query.filter_by(organization_id=org_id).count()
+            problems_count = Problem.query.filter_by(organization_id=org_id).count()
+            business_cases_count = BusinessCase.query.filter_by(organization_id=org_id).count()
+            projects_count = Project.query.filter_by(organization_id=org_id).count()
+            
+            return f"""
+            <h1>Data Export - Debug Version</h1>
+            <h2>Organization Statistics for {current_user.email}</h2>
+            <p>Organization ID: {org_id}</p>
+            <ul>
+                <li>Departments: {departments_count}</li>
+                <li>Problems: {problems_count}</li>
+                <li>Business Cases: {business_cases_count}</li>
+                <li>Projects: {projects_count}</li>
+            </ul>
+            <p><a href="/admin/">Back to Admin Dashboard</a></p>
+            """
+        except Exception as e:
+            return f"<h1>Debug Data Export Error</h1><p>{str(e)}</p>"
+    
+    # Register the main data export route with explicit methods
+    @app.route('/admin/data-export', methods=['GET', 'POST'])
     @login_required  
     @admin_required
     def admin_data_export():
