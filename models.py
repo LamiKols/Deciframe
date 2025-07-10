@@ -440,13 +440,10 @@ class BusinessCase(db.Model):
     def can_generate_requirements(self):
         """
         Determine if this business case can generate requirements based on project type.
-        Technology and Process projects support requirements generation.
-        Strategic and Regulatory projects typically don't need detailed technical requirements.
+        Only Technology projects support detailed technical requirements generation.
+        Process, Strategic, and Regulatory projects typically need manual requirements definition.
         """
-        return self.project_type in [
-            ProjectTypeEnum.TECHNOLOGY,
-            ProjectTypeEnum.PROCESS
-        ]
+        return self.project_type == ProjectTypeEnum.TECHNOLOGY
     
     def get_epic_requirement_type(self):
         """Get the Epic requirement_type based on project_type"""
