@@ -26,7 +26,7 @@ class ProblemForm(FlaskForm):
         ('InProgress', 'In Progress'),
         ('Resolved', 'Resolved'),
         ('OnHold', 'On Hold')
-    ], default='Open')
+    ])
     issue_type = SelectField('Issue Type', coerce=str, choices=[
         ('PROCESS', 'Process Issue'),
         ('SYSTEM', 'System Issue'),
@@ -45,6 +45,10 @@ class ProblemForm(FlaskForm):
             
         else:
             self.department_id.choices = []
+            
+        # Set default status
+        if not self.status.data:
+            self.status.data = 'Open'
 
 class ProblemFilterForm(FlaskForm):
     class Meta:
