@@ -615,6 +615,7 @@ def save_requirements():
             if epic:
                 epic.title = e.get('title', epic.title)
                 epic.description = e.get('description', epic.description)
+                epic.requirement_type = e.get('requirement_type', epic.requirement_type)
                 updated_epics += 1
                 
                 for s in e.get('stories', []):
@@ -717,6 +718,7 @@ def create_epic():
         case_id = request.form.get('case_id')
         title = request.form.get('title')
         description = request.form.get('description', '')
+        requirement_type = request.form.get('requirement_type', 'Software')
         assigned_by = request.form.get('assigned_by', '').strip()
         
         if not case_id or not title:
@@ -728,9 +730,11 @@ def create_epic():
         epic = Epic(
             title=title,
             description=description,
+            requirement_type=requirement_type,
             case_id=case_id,
             creator_id=user.id,
-            assigned_by=assigned_by if assigned_by else None
+            assigned_by=assigned_by if assigned_by else None,
+            organization_id=user.organization_id
         )
         
         # Auto-link epic to project if business case is approved and has project
@@ -776,6 +780,7 @@ def update_epic(epic_id):
         
         title = request.form.get('title')
         description = request.form.get('description', '')
+        requirement_type = request.form.get('requirement_type', 'Software')
         assigned_by = request.form.get('assigned_by', '').strip()
         
         if not title:
@@ -783,6 +788,7 @@ def update_epic(epic_id):
         
         epic.title = title
         epic.description = description
+        epic.requirement_type = requirement_type
         epic.assigned_by = assigned_by if assigned_by else None
         db.session.commit()
         

@@ -1147,6 +1147,7 @@ def generate_requirements_epic(case_id):
                         case_id=case_id,
                         title=epic_data['title'],
                         description=epic_data['description'],
+                        requirement_type=epic_data.get('requirement_type', 'Software'),
                         creator_id=user.id,
                         organization_id=user.organization_id
                     )

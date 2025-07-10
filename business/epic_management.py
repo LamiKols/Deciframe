@@ -50,6 +50,7 @@ def edit_epic(epic_id):
         try:
             epic.title = request.form.get('title', '').strip()
             epic.description = request.form.get('description', '').strip()
+            epic.requirement_type = request.form.get('requirement_type', 'Software')
             
             if not epic.title or not epic.description:
                 flash('Title and description are required', 'error')

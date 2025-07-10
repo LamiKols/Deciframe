@@ -37,6 +37,7 @@
                         <div class="card mb-3">
                             <div class="card-header bg-info text-dark">
                                 <strong>Epic:</strong> {{ epic.title }}
+                                <span class="badge bg-secondary ms-2">{{ epic.requirement_type or 'Software' }}</span>
                             </div>
                             <div class="card-body">
                                 <p class="text-light">{{ epic.description }}</p>

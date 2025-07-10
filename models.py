@@ -778,6 +778,7 @@ class Epic(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default='Draft')  # Draft, Submitted, Approved, Rejected
+    requirement_type = db.Column(db.String(50), default='Software')  # Software, Process, Training, Policy, Infrastructure, Other
     comments = db.Column(db.Text)
     assigned_by = db.Column(db.String(100))  # Placeholder for now (name or email)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -812,6 +813,7 @@ class Epic(db.Model):
             'title': self.title,
             'description': self.description,
             'status': self.status,
+            'requirement_type': self.requirement_type,
             'comments': self.comments,
             'assigned_by': self.assigned_by,
             'creator_id': self.creator_id,
