@@ -52,8 +52,8 @@
               {% endif %}
             </span>
             <div>
-              <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ root.id }}', '{{ root.name }}', '{{ root.manager.id if root.manager else '' }}', '{{ root.parent_id if root.parent_id else '' }}')">Edit</button>
-              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteDepartment('{{ root.id }}', '{{ root.name }}')">Delete</button>
+              <button class="btn btn-sm btn-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ root.id }}', '{{ root.name }}', '{{ root.manager.id if root.manager else '' }}', '{{ root.parent_id if root.parent_id else '' }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteDepartment('{{ root.id }}', '{{ root.name }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Delete</button>
             </div>
           </div>
           {% if root.children %}
@@ -75,8 +75,8 @@
                       {% endif %}
                     </span>
                     <div>
-                      <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ child.id }}', '{{ child.name }}', '{{ child.manager.id if child.manager else '' }}', '{{ child.parent_id if child.parent_id else '' }}')">Edit</button>
-                      <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteDepartment('{{ child.id }}', '{{ child.name }}')">Delete</button>
+                      <button class="btn btn-sm btn-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ child.id }}', '{{ child.name }}', '{{ child.manager.id if child.manager else '' }}', '{{ child.parent_id if child.parent_id else '' }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Edit</button>
+                      <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteDepartment('{{ child.id }}', '{{ child.name }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Delete</button>
                     </div>
                   </div>
                   {% if child.children %}
@@ -98,8 +98,8 @@
                               {% endif %}
                             </span>
                             <div>
-                              <button class="btn btn-sm btn-outline-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ grandchild.id }}', '{{ grandchild.name }}', '{{ grandchild.manager.id if grandchild.manager else '' }}', '{{ grandchild.parent_id if grandchild.parent_id else '' }}')">Edit</button>
-                              <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteDepartment('{{ grandchild.id }}', '{{ grandchild.name }}')">Delete</button>
+                              <button class="btn btn-sm btn-primary me-1" onclick="event.stopPropagation(); editDepartment('{{ grandchild.id }}', '{{ grandchild.name }}', '{{ grandchild.manager.id if grandchild.manager else '' }}', '{{ grandchild.parent_id if grandchild.parent_id else '' }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Edit</button>
+                              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteDepartment('{{ grandchild.id }}', '{{ grandchild.name }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Delete</button>
                             </div>
                           </div>
                         </li>
@@ -407,8 +407,8 @@ async function exportOrgStructure() {
 }
 </script>
                     <div class="d-flex justify-content-between align-items-center mt-4">
-                        <a href="{{ url_for('dashboards.dashboard_home') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        <a href="{{ url_for('dashboards.dashboard_home') }}" class="btn btn-secondary" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
                         </a>
                     </div>
                 </div>

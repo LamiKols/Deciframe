@@ -10,7 +10,7 @@
                     <span class="badge bg-info">{{ logs.total }} Total Records</span>
                     <a href="{{ url_for('admin_audit_logs', export='csv', user_filter=user_filter, module_filter=module_filter, start_date=start_date, end_date=end_date) }}" 
                        class="btn btn-outline-success btn-sm">
-                        <i class="fas fa-download me-1"></i>Export CSV
+                        <i class="bi bi-download me-1"></i>Export CSV
                     </a>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2">Filter</button>
-                            <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-outline-secondary">Clear</a>
+                            <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-secondary" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Clear</a>
                         </div>
                     </form>
                 </div>
@@ -190,7 +190,7 @@
 
                     {% else %}
                     <div class="text-center py-5">
-                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <i class="bi bi-search fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">No audit logs found</h5>
                         <p class="text-muted">
                             {% if user_filter or module_filter or start_date or end_date %}

@@ -13,11 +13,11 @@
                     <p class="text-muted">Comprehensive system audit log and activity tracking</p>
                 </div>
                 <div>
-                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
                     </a>
                     <button type="button" class="btn btn-primary" onclick="exportAuditLog()">
-                        <i class="fas fa-download me-1"></i>Export CSV
+                        <i class="bi bi-download me-1"></i>Export CSV
                     </button>
                 </div>
             </div>
@@ -64,10 +64,10 @@
                                 <label class="form-label">&nbsp;</label>
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search me-1"></i>Filter
+                                        <i class="bi bi-search me-1"></i>Filter
                                     </button>
-                                    <a href="{{ url_for('admin_audit_trail') }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times me-1"></i>Clear
+                                    <a href="{{ url_for('admin_audit_trail') }}" class="btn btn-secondary" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
+                                        <i class="bi bi-x-lg me-1"></i>Clear
                                     </a>
                                 </div>
                             </div>
@@ -224,7 +224,7 @@
 
                     {% else %}
                         <div class="text-center text-muted py-5">
-                            <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
+                            <i class="bi bi-search fa-3x mb-3 opacity-25"></i>
                             <h5>No Audit Logs Found</h5>
                             <p>No audit logs match your current filters. Try adjusting the search criteria.</p>
                         </div>

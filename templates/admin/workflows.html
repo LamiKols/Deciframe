@@ -52,7 +52,7 @@
                             id="my-workflows-tab" data-bs-toggle="tab" data-bs-target="#my-workflows-pane" 
                             type="button" role="tab" onclick="updateActionButtons('my-workflows')"
                             style="background-color: var(--bs-primary); color: white; border: 1px solid var(--bs-primary);">
-                        <i class="fas fa-cogs me-2"></i>My Workflows
+                        <i class="bi bi-gears me-2"></i>My Workflows
                     </button>
                 </li>
             </ul>
@@ -94,12 +94,12 @@
                                                         <button type="button" class="btn btn-sm btn-outline-info me-1" 
                                                                 data-bs-toggle="modal" data-bs-target="#previewLibraryModal{{ workflow.id }}" 
                                                                 title="Preview">
-                                                            <i class="fas fa-eye"></i>
+                                                            <i class="bi bi-eye"></i>
                                                         </button>
                                                         <button type="button" class="btn btn-sm btn-outline-success" 
                                                                 onclick="importFromLibrary({{ workflow.id }})" 
                                                                 title="Import & Edit">
-                                                            <i class="fas fa-download me-1"></i>Import
+                                                            <i class="bi bi-download me-1"></i>Import
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -160,23 +160,23 @@
                                                         <button type="button" class="btn btn-sm btn-outline-info me-1" 
                                                                 data-bs-toggle="modal" data-bs-target="#viewWorkflowModal{{ workflow.id }}" 
                                                                 title="View Template">
-                                                            <i class="fas fa-eye"></i>
+                                                            <i class="bi bi-eye"></i>
                                                         </button>
                                                         <button type="button" class="btn btn-sm btn-outline-warning me-1" 
                                                                 data-bs-toggle="modal" data-bs-target="#editWorkflowModal{{ workflow.id }}" 
                                                                 onclick="initializeEditModal({{ workflow.id }})"
                                                                 title="Edit">
-                                                            <i class="fas fa-edit"></i>
+                                                            <i class="bi bi-pencil"></i>
                                                         </button>
                                                         <button type="button" class="btn btn-sm btn-outline-{{ 'secondary' if workflow.is_active else 'success' }} me-1"
                                                                 onclick="toggleWorkflow({{ workflow.id }}, {{ 'true' if workflow.is_active else 'false' }})"
                                                                 title="{{ 'Deactivate' if workflow.is_active else 'Activate' }}">
                                                             <i class="fas fa-{{ 'pause' if workflow.is_active else 'play' }}"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        <button type="button" class="btn btn-sm btn-danger" 
                                                                 onclick="deleteWorkflow({{ workflow.id }}, '{{ workflow.name|replace("'", "\\'") }}')"
-                                                                title="Delete">
-                                                            <i class="fas fa-trash"></i>
+                                                                title="Delete" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
+                                                            <i class="bi bi-trash"></i>
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -252,7 +252,7 @@
                                                                 
                                                                 {% if step.get('assignee') %}
                                                                     <div class="small text-info mb-1">
-                                                                        <i class="fas fa-user me-1"></i>
+                                                                        <i class="bi bi-person me-1"></i>
                                                                         Assignee: {{ step.get('assignee').replace('_', ' ').title() }}
                                                                     </div>
                                                                 {% endif %}
@@ -279,8 +279,8 @@
                                                 
                                                 <!-- Raw JSON Toggle -->
                                                 <div class="mt-3">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                                            onclick="toggleRawJson('{{ workflow.id }}')">
+                                                    <button type="button" class="btn btn-sm btn-secondary" 
+                                                            onclick="toggleRawJson('{{ workflow.id }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
                                                         <i class="fas fa-code me-1"></i>Show Raw JSON
                                                     </button>
                                                     <div id="rawJson{{ workflow.id }}" class="mt-2" style="display: none;">
@@ -353,7 +353,7 @@
                                                         <!-- Steps will be populated by JavaScript -->
                                                     </div>
                                                     <button type="button" class="btn btn-outline-light mt-2" onclick="addEditStep({{ workflow.id }})">
-                                                        <i class="fas fa-plus me-1"></i>Add Step
+                                                        <i class="bi bi-plus-lg me-1"></i>Add Step
                                                     </button>
                                                 </div>
                                             </div>
@@ -374,7 +374,7 @@
                                     <div class="modal-footer border-secondary">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                         <button type="button" class="btn btn-success" onclick="saveWorkflow({{ workflow.id }})">
-                                            <i class="fas fa-save me-1"></i>Save Changes
+                                            <i class="bi bi-check-lg me-1"></i>Save Changes
                                         </button>
                                     </div>
                                 </div>
@@ -467,8 +467,8 @@
                                 
                                 <!-- Raw JSON Toggle -->
                                 <div class="mt-3">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                            onclick="toggleRawJson('library{{ workflow.id }}')">
+                                    <button type="button" class="btn btn-sm btn-secondary" 
+                                            onclick="toggleRawJson('library{{ workflow.id }}')" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
                                         <i class="fas fa-code me-1"></i>Show Raw JSON
                                     </button>
                                     <div id="rawJsonlibrary{{ workflow.id }}" class="mt-2" style="display: none;">
@@ -482,7 +482,7 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-success" 
                                 onclick="importFromLibrary({{ workflow.id }})">
-                            <i class="fas fa-download me-1"></i>Import & Edit
+                            <i class="bi bi-download me-1"></i>Import & Edit
                         </button>
                     </div>
                 </div>
@@ -531,7 +531,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="text-light mb-0">Build Your Workflow</h6>
                                 <button type="button" class="btn btn-sm btn-primary" onclick="addWorkflowStep()">
-                                    <i class="fas fa-plus me-1"></i>Add Step
+                                    <i class="bi bi-plus-lg me-1"></i>Add Step
                                 </button>
                             </div>
                             <div id="workflowSteps">
@@ -592,7 +592,7 @@
             <div class="modal-footer border-secondary">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="importFromPreview" onclick="importAndEditFromPreview()">
-                    <i class="fas fa-download me-1"></i>Import & Edit
+                    <i class="bi bi-download me-1"></i>Import & Edit
                 </button>
             </div>
         </div>
@@ -613,8 +613,8 @@ function addWorkflowStep() {
     stepDiv.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="text-light mb-0">Step ${stepCounter}</h6>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeWorkflowStep(${stepCounter})">
-                <i class="fas fa-trash"></i>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeWorkflowStep(${stepCounter})" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
+                <i class="bi bi-trash"></i>
             </button>
         </div>
         
@@ -1086,8 +1086,8 @@ function addWorkflowStep() {
     stepDiv.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="text-light mb-0">Step ${stepCount}</h6>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeWorkflowStep(this)">
-                <i class="fas fa-trash"></i>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeWorkflowStep(this)" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
+                <i class="bi bi-trash"></i>
             </button>
         </div>
         <div class="row">
@@ -1143,7 +1143,7 @@ function toggleRawJson(workflowId) {
     
     if (jsonDiv.style.display === 'none') {
         jsonDiv.style.display = 'block';
-        button.innerHTML = '<i class="fas fa-eye-slash me-1"></i>Hide Raw JSON';
+        button.innerHTML = '<i class="bi bi-eye-slash me-1"></i>Hide Raw JSON';
     } else {
         jsonDiv.style.display = 'none';
         button.innerHTML = '<i class="fas fa-code me-1"></i>Show Raw JSON';
@@ -1193,8 +1193,8 @@ function addEditStepWithData(workflowId, stepData = null, stepNumber = null) {
             <div class="d-flex align-items-center justify-content-between mb-2">
                 <span class="badge bg-success me-2">${stepCount}</span>
                 <strong class="text-light flex-grow-1">${actionTitle}</strong>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeStep(this)">
-                    <i class="fas fa-trash"></i>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeStep(this)" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
+                    <i class="bi bi-trash"></i>
                 </button>
             </div>
             <div class="row">
