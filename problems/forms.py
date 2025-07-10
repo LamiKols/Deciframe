@@ -26,7 +26,7 @@ class ProblemForm(FlaskForm):
         (StatusEnum.InProgress.name, StatusEnum.InProgress.value),
         (StatusEnum.Resolved.name, StatusEnum.Resolved.value),
         (StatusEnum.OnHold.name, StatusEnum.OnHold.value)
-    ])
+    ], default=StatusEnum.Open.name)
     issue_type = SelectField('Issue Type', coerce=str, choices=[
         ('PROCESS', 'Process Issue'),
         ('SYSTEM', 'System Issue'),
