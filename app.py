@@ -445,6 +445,72 @@ def create_app():
         division_by_zero = 1 / 0
         return "This should not be reached"
     
+    # Emergency admin data export route registered directly in app.py
+    @app.route('/admin/emergency-export')
+    def emergency_export():
+        """Emergency data export route registered in main app"""
+        try:
+            # Manual authentication check
+            if not current_user.is_authenticated:
+                from flask import redirect, url_for
+                return redirect(url_for('auth.login'))
+            
+            print(f"🆘 EMERGENCY EXPORT: Route accessed by {current_user.email}")
+            
+            # Check admin role
+            if current_user.role.name != 'Admin':
+                return "Access denied - Admin role required", 403
+            
+            from models import Department, Problem, BusinessCase, Project
+            
+            org_id = current_user.organization_id
+            departments_count = Department.query.filter_by(organization_id=org_id).count()
+            problems_count = Problem.query.filter_by(organization_id=org_id).count()
+            business_cases_count = BusinessCase.query.filter_by(organization_id=org_id).count()
+            projects_count = Project.query.filter_by(organization_id=org_id).count()
+            
+            return f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Emergency Data Export</title>
+                <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+            </head>
+            <body>
+                <div class="container mt-4">
+                    <h1 class="text-success">🆘 Emergency Data Export - WORKING!</h1>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Organization Statistics for {current_user.email}</h2>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Organization ID:</strong> {org_id}</p>
+                            <ul class="list-group">
+                                <li class="list-group-item"><strong>Departments:</strong> {departments_count}</li>
+                                <li class="list-group-item"><strong>Problems:</strong> {problems_count}</li>
+                                <li class="list-group-item"><strong>Business Cases:</strong> {business_cases_count}</li>
+                                <li class="list-group-item"><strong>Projects:</strong> {projects_count}</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/admin/" class="btn btn-primary">Back to Admin Dashboard</a>
+                            <span class="text-success ms-3">✅ Emergency Route Working Successfully!</span>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+        except Exception as e:
+            print(f"🆘 EMERGENCY EXPORT ERROR: {str(e)}")
+            return f"""
+            <div class="container mt-4">
+                <h1 class="text-danger">Emergency Export Error</h1>
+                <p>{str(e)}</p>
+                <a href="/admin/" class="btn btn-primary">Back to Admin</a>
+            </div>
+            """
+    
     @app.before_request
     def before_request():
         """Debug session and authentication state before each request"""
