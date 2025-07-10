@@ -8,8 +8,9 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="text-light">Settings Management</h2>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSettingModal">
-                    <i class="fas fa-plus me-2"></i>Add Setting
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSettingModal"
+                        style="color: #ffffff !important; font-weight: 600 !important;">
+                    <i class="bi bi-plus-lg me-2"></i>Add Setting
                 </button>
             </div>
 
@@ -46,16 +47,20 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" 
+                                        <button type="button" class="btn btn-sm btn-primary me-1" 
                                                 data-bs-toggle="modal" data-bs-target="#editSettingModal"
                                                 data-key="{{ setting.key }}" data-value="{{ setting.value }}" 
-                                                data-description="{{ setting.description or '' }}">
-                                            <i class="fas fa-edit"></i>
+                                                data-description="{{ setting.description or '' }}"
+                                                style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;"
+                                                title="Edit Setting">
+                                            <i class="bi bi-pencil"></i> EDIT
                                         </button>
                                         <form method="POST" action="{{ url_for('admin_delete_setting', setting_id=setting.key) }}" 
                                               class="d-inline" onsubmit="return confirm('Delete this setting?')">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="fas fa-trash"></i>
+                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                    style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;"
+                                                    title="Delete Setting">
+                                                <i class="bi bi-trash"></i> DELETE
                                             </button>
                                         </form>
                                     </td>
