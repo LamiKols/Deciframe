@@ -31,7 +31,33 @@ DeciFrame is a modular Flask application providing comprehensive problem and bus
 - **NotificationTemplate**: Configurable notification templates
 - **Notification**: In-app notifications with email integration
 
-## Current Implementation: NOTIFICATIONS CONFIGURATION UI FIX COMPLETE - July 10, 2025 ✅ IMPLEMENTED
+## Current Implementation: PROBLEM FORM STATUS FIELD REGRESSION - July 10, 2025 ⚠️ CRITICAL ISSUE
+
+### PROBLEM FORM FIELD REGRESSION - REQUIRES INVESTIGATION ⚠️
+🔧 **Status and Department Fields Non-Functional - July 10, 2025**
+- **CRITICAL ISSUE**: Both Status and Department dropdown fields in problem form showing "Select..." but not displaying options
+- **USER CONFIRMATION**: Multiple fix attempts unsuccessful - fields remain non-functional
+- **COMPARISON**: Status field works correctly in business case module, indicating problem-specific issue
+- **SCOPE**: Both status dropdown and department dropdown affected in problems/templates/problem_form.html
+- **INVESTIGATION NEEDED**: Root cause analysis required to identify why form fields not populating choices
+
+⚠️ **Failed Fix Attempts - July 10, 2025**
+- **Direct HTML Select**: Created hardcoded select element with options - no improvement
+- **Enum Value Fixes**: Updated StatusEnum references and mappings - no improvement  
+- **Form Choice Updates**: Modified form field choices multiple times - no improvement
+- **Template Rendering**: Switched between WTForm field rendering and direct HTML - no improvement
+- **Default Value Setting**: Added default status assignment in form init - no improvement
+
+### Technical Investigation Required
+- **Template Rendering**: Form fields render as "Select..." dropdown but options not displayed
+- **Business Case Comparison**: Same StatusEnum works correctly in business/forms.py filter
+- **Multi-Field Issue**: Both status and department fields affected suggests systemic problem
+- **Form Validation**: Need to investigate if form initialization or choice population failing
+
+### Production Status: PROBLEM FORM PARTIALLY BROKEN - July 10, 2025 ⚠️
+Problem form creation affected by non-functional dropdown fields. Status and department selection not working despite multiple fix attempts. Issue marked as incomplete pending root cause analysis and comprehensive fix.
+
+## Previous Implementation: NOTIFICATIONS CONFIGURATION UI FIX COMPLETE - July 10, 2025 ✅ IMPLEMENTED
 
 ### CRITICAL UI BUTTON VISIBILITY FIX - FULLY OPERATIONAL ✅
 🔧 **Notifications Action Buttons Fix - July 10, 2025**
