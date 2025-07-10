@@ -153,9 +153,9 @@ def create():
         # Handle status enum conversion safely
         status_mapping = {
             'Open': StatusEnum.Open,
-            'In_Progress': StatusEnum.In_Progress,
+            'InProgress': StatusEnum.InProgress,
             'Resolved': StatusEnum.Resolved,
-            'On_Hold': StatusEnum.On_Hold
+            'OnHold': StatusEnum.OnHold
         }
         
         # Generate next available problem code
@@ -281,9 +281,9 @@ def edit(id):
         # Handle status enum conversion safely
         status_mapping = {
             'Open': StatusEnum.Open,
-            'In_Progress': StatusEnum.In_Progress,
+            'InProgress': StatusEnum.InProgress,
             'Resolved': StatusEnum.Resolved,
-            'On_Hold': StatusEnum.On_Hold
+            'OnHold': StatusEnum.OnHold
         }
         problem.status = status_mapping.get(form.status.data, StatusEnum.Open)
         

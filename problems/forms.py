@@ -22,10 +22,10 @@ class ProblemForm(FlaskForm):
     department_id = SelectField('Department', coerce=safe_int_coerce, choices=[])
 
     status = SelectField('Status', coerce=str, choices=[
-        ('Open', 'Open'),
-        ('In_Progress', 'In Progress'),
-        ('Resolved', 'Resolved'),
-        ('On_Hold', 'On Hold')
+        (StatusEnum.Open.name, StatusEnum.Open.value),
+        (StatusEnum.InProgress.name, StatusEnum.InProgress.value),
+        (StatusEnum.Resolved.name, StatusEnum.Resolved.value),
+        (StatusEnum.OnHold.name, StatusEnum.OnHold.value)
     ])
     issue_type = SelectField('Issue Type', coerce=str, choices=[
         ('PROCESS', 'Process Issue'),
