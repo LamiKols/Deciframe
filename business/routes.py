@@ -184,13 +184,7 @@ def new_case():
         bc.roi = ((bc.benefit_estimate - bc.cost_estimate) / bc.cost_estimate * 100) if bc.cost_estimate else None
         db.session.commit()
         
-        # Trigger notification for business case creation
-        try:
-            from notifications.events import NotificationEvents
-            NotificationEvents.on_business_case_created(bc.id)
-        except Exception as e:
-            print(f"Notification failed: {e}")
-        
+        # Use only the flash notification to avoid duplicate messages
         flash(f"Business Case {bc.code} created successfully!", 'success')
         return redirect(url_for('business.list_cases'))
     else:
