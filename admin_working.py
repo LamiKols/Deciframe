@@ -2094,13 +2094,14 @@ def init_admin_routes(app):
         try:
             print(f"🔧 Export Test Debug: current_user.is_authenticated = {current_user.is_authenticated}")
             if current_user.is_authenticated:
-                return f"Export test successful for user: {current_user.email} in org: {current_user.organization_id}"
+                return f"✓ Export test successful for user: {current_user.email} in org: {current_user.organization_id}"
             else:
-                return f"Export test failed: User not authenticated. Session: {dict(session)}"
+                return f"❌ Export test failed: User not authenticated. Session: {dict(session)}"
         except Exception as e:
-            return f"Export test failed: {str(e)}"
+            return f"❌ Export test failed: {str(e)}"
     
     @app.route('/admin/data-export', methods=['GET'])
+    @login_required
     @admin_required
     def admin_data_export():
         """Admin data export page with multiple export options"""
