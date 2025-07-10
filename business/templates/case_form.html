@@ -91,7 +91,7 @@
                             <!-- Project Type Selection -->
                             <div class="mb-3">
                                 {{ form.project_type.label(class="form-label") }}
-                                {{ form.project_type(class="form-select" + (" is-invalid" if form.project_type.errors else ""), onchange="updateRequirementsAvailability()") }}
+                                {{ form.project_type(class="form-select" + (" is-invalid" if form.project_type.errors else "")) }}
                                 {% if form.project_type.errors %}
                                     <div class="text-danger">
                                         {% for error in form.project_type.errors %}

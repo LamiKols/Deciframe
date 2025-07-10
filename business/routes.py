@@ -88,7 +88,7 @@ def new_case():
         # Determine case type, depth, and project type
         ct = CaseTypeEnum[form.case_type.data]
         cd = CaseDepthEnum[form.case_depth.data]
-        pt = ProjectTypeEnum[form.project_type.data.replace(' ', '_').replace('/', '_').replace('-', '_').upper()]
+        pt = ProjectTypeEnum[form.project_type.data]  # Direct mapping since form now uses enum values
         cost = float(form.cost_estimate.data) if form.cost_estimate.data else 0.0
         
         # Validate case type requirements
