@@ -66,17 +66,10 @@ class CaseDepthEnum(enum.Enum):
     Full = "Full"    # Comprehensive business case
 
 class ProjectTypeEnum(enum.Enum):
-    SOFTWARE_DEVELOPMENT = "Software Development"
-    SYSTEM_INTEGRATION = "System Integration"
-    DATA_ANALYTICS = "Data Analytics Initiative"
-    INFRASTRUCTURE_UPGRADE = "Infrastructure Upgrade"
-    TRAINING_PROGRAM = "Training Program"
-    PROCESS_CHANGE = "Process Change"
-    POLICY_COMPLIANCE = "Policy or Compliance"
-    PROCUREMENT = "Procurement/Installation"
-    CUSTOMER_SERVICE = "Customer Service Initiative"
-    MARKETING = "Marketing/Communications"
-    OTHER = "Other"
+    TECHNOLOGY = "Technology"  # Default for existing records
+    PROCESS = "Process"
+    STRATEGIC = "Strategic"
+    REGULATORY = "Regulatory"
 
 class NotificationEventEnum(enum.Enum):
     BUSINESS_CASE_APPROVED = "business_case_approved"
@@ -380,7 +373,7 @@ class BusinessCase(db.Model):
     status = db.Column(db.Enum(StatusEnum), default=StatusEnum.Open)
     case_type = db.Column(db.Enum(CaseTypeEnum), default=CaseTypeEnum.Reactive)
     case_depth = db.Column(db.Enum(CaseDepthEnum), default=CaseDepthEnum.Light)
-    project_type = db.Column(db.Enum(ProjectTypeEnum), default=ProjectTypeEnum.SOFTWARE_DEVELOPMENT, nullable=False)
+    project_type = db.Column(db.Enum(ProjectTypeEnum), default=ProjectTypeEnum.TECHNOLOGY, nullable=False)
     
     # Financial data
     cost_estimate = db.Column(db.Float, nullable=False)
