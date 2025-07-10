@@ -2111,20 +2111,18 @@ def init_admin_routes(app):
         """Simplest possible admin test route"""
         return "<h1>Simple Test Route Working</h1><p>This route exists and is accessible.</p>"
     
-    print(f"🔧 Route Registration Debug: Admin routes registration complete")
-    
-    @app.route('/admin/data-export-unprotected')
-    def admin_data_export_unprotected():
-        """Temporarily unprotected data export for testing"""
-        return "<h1>Data Export Route Working!</h1><p>The route registration and function are working correctly.</p>"
-    
+    # Register the main data export route FIRST to ensure proper precedence
     @app.route('/admin/data-export')
     @login_required  
     @admin_required
     def admin_data_export():
         """Admin data export page with multiple export options"""
         try:
-            print(f"🔧 Data Export Debug: Route accessed by user {current_user.email}")
+            print(f"🚀 DATA EXPORT ROUTE ACCESSED SUCCESSFULLY! User: {current_user.email}")
+            print(f"🚀 DATA EXPORT: User authenticated: {current_user.is_authenticated}")
+            print(f"🚀 DATA EXPORT: User role: {current_user.role}")
+            print(f"🚀 DATA EXPORT: Organization ID: {current_user.organization_id}")
+            
             from models import Department, Problem, BusinessCase, Project
             
             # Get counts for current organization
@@ -2146,6 +2144,8 @@ def init_admin_routes(app):
         except Exception as e:
             print(f"🔧 Data Export Error: {str(e)}")
             return f"<h1>Data Export Error</h1><p>{str(e)}</p>"
+
+    print(f"🔧 Route Registration Debug: Data export route registered successfully")
 
     @app.route('/admin/org-reports', methods=['GET'])
     @login_required
