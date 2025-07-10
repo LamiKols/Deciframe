@@ -2106,10 +2106,12 @@ def init_admin_routes(app):
     def admin_data_export():
         """Admin data export page with multiple export options"""
         try:
+            print(f"🔧 Data Export Debug: Route accessed by user {current_user.email}")
             from models import Department, Problem, BusinessCase, Project
             
             # Get counts for current organization
             org_id = current_user.organization_id
+            print(f"🔧 Data Export Debug: Organization ID: {org_id}")
             
             export_stats = {
                 'departments': Department.query.filter_by(organization_id=org_id).count(),
@@ -2118,10 +2120,13 @@ def init_admin_routes(app):
                 'projects': Project.query.filter_by(organization_id=org_id).count()
             }
             
+            print(f"🔧 Data Export Debug: Export stats: {export_stats}")
+            
             return render_template('admin/data_export.html', 
                                  export_stats=export_stats,
                                  user=current_user)
         except Exception as e:
+            print(f"🔧 Data Export Error: {str(e)}")
             flash(f'Error loading export page: {str(e)}', 'error')
             return redirect('/')
 
