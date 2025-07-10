@@ -27,14 +27,13 @@
 <div class="container-fluid mt-4">
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 gap-2">
                 <h2>User Management</h2>
-                <div class="btn-group" role="group">
-                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary"
+                <div class="btn-group gap-1" role="group">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary me-2"
                        style="color: #ffffff !important; font-weight: 600 !important;">
                         <i class="bi bi-arrow-left"></i> Back to Admin
-                    </a>
-                    <a href="{{ url_for('admin_create_user') }}" class="btn btn-primary"
+                    </a> <a href="{{ url_for('admin_create_user') }}" class="btn btn-primary"
                        style="color: #ffffff !important; font-weight: 600 !important;">
                         <i class="bi bi-plus-lg"></i> Add User
                     </a>
@@ -93,11 +92,10 @@
                             <div class="col-md-2">
                                 <label class="form-label">&nbsp;</label>
                                 <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary"
+                                    <button type="submit" class="btn btn-primary me-2"
                                             style="color: #ffffff !important; font-weight: 600 !important;">
                                         <i class="bi bi-search"></i> Filter
-                                    </button>
-                                    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary"
+                                    </button> <a href="{{ url_for('admin_users') }}" class="btn btn-secondary"
                                        style="color: #ffffff !important; font-weight: 600 !important;">
                                         <i class="bi bi-x-lg"></i> Clear
                                     </a>
@@ -114,7 +112,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center gap-2">
                     <h5 class="mb-0">Users ({{ users|length }})</h5>
                     <small class="text-muted">
                         Showing {{ users|length }} user(s)
@@ -139,7 +137,7 @@
                                 {% for user in users %}
                                 <tr>
                                     <td>
-                                        <div class="d-flex align-items-center">
+                                        <div class="d-flex align-items-center gap-2">
                                             <div class="avatar-sm me-3">
                                                 <div class="avatar-title bg-secondary rounded-circle">
                                                     {{ user.name[0].upper() if user.name else 'U' }}
@@ -167,7 +165,7 @@
                                     </td>
                                     <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</td>
                                     <td>
-                                        <div class="btn-group btn-group-sm" role="group">
+                                        <div class="btn-group btn-group-sm gap-1" role="group">
                                             <a href="{{ url_for('admin_edit_user', id=user.id) }}" 
                                                class="btn btn-sm btn-primary" 
                                                title="Edit User">

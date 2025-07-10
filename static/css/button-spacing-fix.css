@@ -1,0 +1,34 @@
+
+/* Button Navigation Spacing Fix */
+.btn-group .btn {
+    margin-right: 8px !important;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0 !important;
+}
+
+/* Horizontal button navigation spacing */
+.d-flex .btn + .btn,
+.nav .btn + .btn {
+    margin-left: 8px !important;
+}
+
+/* Configuration navigation specific fix */
+nav .btn {
+    margin-right: 8px !important;
+}
+
+nav .btn:last-child {
+    margin-right: 0 !important;
+}
+
+/* Tab-like navigation buttons */
+.nav-tabs .nav-link {
+    margin-right: 4px !important;
+}
+
+/* Admin navigation buttons */
+.admin-nav .btn {
+    margin-right: 12px !important;
+}

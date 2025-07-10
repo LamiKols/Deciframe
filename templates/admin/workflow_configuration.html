@@ -129,7 +129,7 @@ html body .container-fluid .card .card-body .form-check:hover .form-check-input,
     <div class="row">
         <div class="col-12">
             <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 gap-2">
                 <div>
                     <h2 class="mb-1">Configure Workflow</h2>
                     <p class="text-muted mb-0">{{ workflow.name }}</p>
@@ -455,9 +455,8 @@ html body .container-fluid .card .card-body .form-check:hover .form-check-input,
                 </div>
 
                 <!-- Submit Button -->
-                <div class="d-flex justify-content-end">
-                    <a href="{{ url_for('admin_workflows_fixed') }}" class="btn btn-secondary me-2">Cancel</a>
-                    <button type="submit" class="btn btn-primary">
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('admin_workflows_fixed') }}" class="btn btn-secondary me-2">Cancel</a> <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-circle"></i> Save Configuration
                     </button>
                 </div>

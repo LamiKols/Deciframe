@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 gap-2">
                 <h2 class="mb-0">Audit Logs</h2>
                 <div class="d-flex align-items-center gap-3">
                     <span class="badge bg-info">{{ logs.total }} Total Records</span>
@@ -49,9 +49,8 @@
                             <label for="end_date" class="form-label">End Date</label>
                             <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date }}">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary me-2">Filter</button>
-                            <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-secondary" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Clear</a>
+                        <div class="col-md-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary me-2">Filter</button> <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-secondary" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">Clear</a>
                         </div>
                     </form>
                 </div>
