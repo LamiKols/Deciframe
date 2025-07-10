@@ -119,8 +119,14 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                {{ form.status.label(class="form-label") }}
-                                {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else "")) }}
+                                <label class="form-label" for="status">Status</label>
+                                <select name="status" id="status" class="form-select{{ ' is-invalid' if form.status.errors else '' }}">
+                                    <option value="">Select Status...</option>
+                                    <option value="Open" {% if form.status.data == 'Open' %}selected{% endif %}>Open</option>
+                                    <option value="InProgress" {% if form.status.data == 'InProgress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Resolved" {% if form.status.data == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                    <option value="OnHold" {% if form.status.data == 'OnHold' %}selected{% endif %}>On Hold</option>
+                                </select>
                                 {% if form.status.errors %}
                                     <div class="invalid-feedback">
                                         {% for error in form.status.errors %}
