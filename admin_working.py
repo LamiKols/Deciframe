@@ -2,7 +2,7 @@
 Working Admin Routes Implementation
 """
 
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings, WorkflowConfiguration
 from werkzeug.security import generate_password_hash
@@ -17,6 +17,10 @@ def init_admin_routes(app):
     def admin_required(f):
         def wrapper(*args, **kwargs):
             user = current_user
+            print(f"🔧 Admin Required Debug: User authenticated: {user.is_authenticated}")
+            if user.is_authenticated:
+                print(f"🔧 Admin Required Debug: User role: {user.role}, Role value: {user.role.value}")
+            
             if not user.is_authenticated or user.role.value != 'Admin':
                 flash('Admin access required', 'error')
                 return redirect(url_for('index'))
@@ -2085,11 +2089,14 @@ def init_admin_routes(app):
             return f"Error exporting organizational structure: {str(e)}", 500
     
     @app.route('/admin/export-test', methods=['GET'])
-    @login_required  
     def export_test():
         """Simple export test route"""
         try:
-            return f"Export test successful for user: {current_user.email} in org: {current_user.organization_id}"
+            print(f"🔧 Export Test Debug: current_user.is_authenticated = {current_user.is_authenticated}")
+            if current_user.is_authenticated:
+                return f"Export test successful for user: {current_user.email} in org: {current_user.organization_id}"
+            else:
+                return f"Export test failed: User not authenticated. Session: {dict(session)}"
         except Exception as e:
             return f"Export test failed: {str(e)}"
     
@@ -2115,7 +2122,7 @@ def init_admin_routes(app):
                                  user=current_user)
         except Exception as e:
             flash(f'Error loading export page: {str(e)}', 'error')
-            return redirect(url_for('admin_dashboard'))
+            return redirect('/')
 
     @app.route('/admin/org-reports', methods=['GET'])
     @login_required

@@ -18,8 +18,8 @@ class Config:
     FULL_CASE_THRESHOLD = float(os.getenv('FULL_CASE_THRESHOLD', '25000'))
     # Session configuration for Flask-Login - simplified for debugging
     SESSION_COOKIE_SECURE = False
-    SESSION_COOKIE_HTTPONLY = False
-    SESSION_COOKIE_SAMESITE = None
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
     PERMANENT_SESSION_LIFETIME = 43200  # 12 hours in seconds
     
     # AI Service Configuration
