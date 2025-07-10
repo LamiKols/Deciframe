@@ -2094,7 +2094,6 @@ def init_admin_routes(app):
             return f"Export test failed: {str(e)}"
     
     @app.route('/admin/data-export', methods=['GET'])
-    @login_required
     @admin_required
     def admin_data_export():
         """Admin data export page with multiple export options"""
