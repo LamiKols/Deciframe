@@ -88,6 +88,20 @@
                                 <small class="text-light">Light cases are for quick approvals under {{ org_settings.get_currency_symbol() }}25,000. Full cases require detailed analysis for higher-value initiatives.</small>
                             </div>
 
+                            <!-- Project Type Selection -->
+                            <div class="mb-3">
+                                {{ form.project_type.label(class="form-label") }}
+                                {{ form.project_type(class="form-select" + (" is-invalid" if form.project_type.errors else ""), onchange="updateRequirementsAvailability()") }}
+                                {% if form.project_type.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.project_type.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="text-light">Select the type of project this business case will lead to. This determines available features and workflow options.</small>
+                            </div>
+
                             <!-- Problem Selection (for Reactive cases) -->
                             <div class="mb-3" id="problemField">
                                 {{ form.problem.label(class="form-label") }}

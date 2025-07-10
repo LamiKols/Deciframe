@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from app import db
-from models import BusinessCase, Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum, Department, RoleEnum, Epic, Story, PriorityEnum, Project, EpicComment, EpicSyncLog
+from models import BusinessCase, Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum, ProjectTypeEnum, Department, RoleEnum, Epic, Story, PriorityEnum, Project, EpicComment, EpicSyncLog
 from business.forms import BusinessCaseForm, AssignBAForm, BusinessCaseFilterForm
 from flask_login import login_required, current_user
 from auth.session_auth import require_session_auth, require_role
@@ -85,9 +85,10 @@ def new_case():
         print(f"🔧 Form validated successfully")
         user = current_user
         
-        # Determine case type and depth
+        # Determine case type, depth, and project type
         ct = CaseTypeEnum[form.case_type.data]
         cd = CaseDepthEnum[form.case_depth.data]
+        pt = ProjectTypeEnum[form.project_type.data.replace(' ', '_').replace('/', '_').replace('-', '_').upper()]
         cost = float(form.cost_estimate.data) if form.cost_estimate.data else 0.0
         
         # Validate case type requirements
@@ -159,6 +160,7 @@ def new_case():
             organization_id=user.organization_id,  # Critical: enforce multi-tenant isolation
             case_type=ct,
             case_depth=cd,
+            project_type=pt,
             initiative_name=init_name,
             strategic_alignment=form.strategic_alignment.data if cd is CaseDepthEnum.Full else None,
             benefit_breakdown=form.benefit_breakdown.data if cd is CaseDepthEnum.Full else None,

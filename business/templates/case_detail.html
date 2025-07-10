@@ -21,6 +21,9 @@
                                 <span class="badge bg-{{ 'success' if business_case.case_depth.value == 'Full' else 'warning' }}">
                                     {{ business_case.case_depth.value }} Case
                                 </span>
+                                <span class="badge bg-info">
+                                    {{ business_case.project_type.value }} Project
+                                </span>
                                 {% if business_case.full_case_requested %}
                                     <span class="badge bg-info">
                                         Full Case Requested
@@ -294,9 +297,16 @@
                                 <i class="fas fa-eye"></i> View Generated Requirements
                             </a>
                             {% else %}
-                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-info w-100 mb-2">
-                                <i class="fas fa-list-check"></i> Generate Requirements
-                            </a>
+                                {% if business_case.can_generate_requirements() %}
+                                <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-info w-100 mb-2">
+                                    <i class="fas fa-list-check"></i> Generate Requirements
+                                </a>
+                                {% else %}
+                                <div class="alert alert-warning w-100 mb-2">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Requirements generation is not available for {{ business_case.project_type.value }} projects.
+                                </div>
+                                {% endif %}
                             {% endif %}
                             <a href="{{ url_for('business.edit_case', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-primary w-100 mb-2">
                                 <i class="fas fa-edit"></i> Edit Business Case

@@ -65,6 +65,19 @@ class CaseDepthEnum(enum.Enum):
     Light = "Light"  # Basic cost/benefit analysis
     Full = "Full"    # Comprehensive business case
 
+class ProjectTypeEnum(enum.Enum):
+    SOFTWARE_DEVELOPMENT = "Software Development"
+    SYSTEM_INTEGRATION = "System Integration"
+    DATA_ANALYTICS = "Data Analytics Initiative"
+    INFRASTRUCTURE_UPGRADE = "Infrastructure Upgrade"
+    TRAINING_PROGRAM = "Training Program"
+    PROCESS_CHANGE = "Process Change"
+    POLICY_COMPLIANCE = "Policy or Compliance"
+    PROCUREMENT = "Procurement/Installation"
+    CUSTOMER_SERVICE = "Customer Service Initiative"
+    MARKETING = "Marketing/Communications"
+    OTHER = "Other"
+
 class NotificationEventEnum(enum.Enum):
     BUSINESS_CASE_APPROVED = "business_case_approved"
     PROBLEM_CREATED = "problem_created"
@@ -367,6 +380,7 @@ class BusinessCase(db.Model):
     status = db.Column(db.Enum(StatusEnum), default=StatusEnum.Open)
     case_type = db.Column(db.Enum(CaseTypeEnum), default=CaseTypeEnum.Reactive)
     case_depth = db.Column(db.Enum(CaseDepthEnum), default=CaseDepthEnum.Light)
+    project_type = db.Column(db.Enum(ProjectTypeEnum), default=ProjectTypeEnum.SOFTWARE_DEVELOPMENT, nullable=False)
     
     # Financial data
     cost_estimate = db.Column(db.Float, nullable=False)
@@ -429,6 +443,27 @@ class BusinessCase(db.Model):
             self.roi = ((self.benefit_estimate - self.cost_estimate) / self.cost_estimate) * 100
         else:
             self.roi = 0
+    
+    def can_generate_requirements(self):
+        """Check if this business case type allows requirement generation"""
+        allowed_types = [
+            ProjectTypeEnum.SOFTWARE_DEVELOPMENT,
+            ProjectTypeEnum.SYSTEM_INTEGRATION,
+            ProjectTypeEnum.DATA_ANALYTICS
+        ]
+        return self.project_type in allowed_types
+    
+    def get_epic_requirement_type(self):
+        """Get the Epic requirement_type based on project_type"""
+        mapping = {
+            ProjectTypeEnum.SOFTWARE_DEVELOPMENT: "Software",
+            ProjectTypeEnum.SYSTEM_INTEGRATION: "Software",
+            ProjectTypeEnum.DATA_ANALYTICS: "Infrastructure",
+            ProjectTypeEnum.TRAINING_PROGRAM: "Training",
+            ProjectTypeEnum.PROCESS_CHANGE: "Process",
+            ProjectTypeEnum.POLICY_COMPLIANCE: "Policy",
+        }
+        return mapping.get(self.project_type, "Other")
 
 class BusinessCaseComment(db.Model):
     __tablename__ = 'business_case_comments'

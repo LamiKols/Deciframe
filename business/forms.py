@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, DecimalField, SubmitField, RadioField, HiddenField
 from wtforms.validators import DataRequired, Length, Optional
-from models import Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum
+from models import Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum, ProjectTypeEnum
 
 class BusinessCaseForm(FlaskForm):
     case_type = RadioField(
@@ -13,6 +13,24 @@ class BusinessCaseForm(FlaskForm):
         'Case Depth',
         choices=[('Light', 'Light Case'), ('Full', 'Full Case')],
         default='Light'
+    )
+    
+    project_type = SelectField(
+        'What type of project will this business case lead to?',
+        choices=[
+            ('Software Development', 'Software Development'),
+            ('System Integration', 'System Integration'),
+            ('Data Analytics Initiative', 'Data Analytics Initiative'),
+            ('Infrastructure Upgrade', 'Infrastructure Upgrade'),
+            ('Training Program', 'Training Program'),
+            ('Process Change', 'Process Change'),
+            ('Policy or Compliance', 'Policy or Compliance'),
+            ('Procurement/Installation', 'Procurement/Installation'),
+            ('Customer Service Initiative', 'Customer Service Initiative'),
+            ('Marketing/Communications', 'Marketing/Communications'),
+            ('Other', 'Other')
+        ],
+        default='Software Development'
     )
     
     # Core fields (Light case)
