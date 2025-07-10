@@ -13,6 +13,12 @@ import os
 
 def init_admin_routes(app):
     """Initialize admin routes on Flask app"""
+    print(f"🔧 Route Registration Debug: Initializing admin routes on app {app}")
+    
+    # Test route to verify registration is working
+    @app.route('/admin/route-test')
+    def admin_route_test():
+        return "<h1>Admin Route Test Working!</h1><p>Route registration is successful.</p>"
     
     def admin_required(f):
         def wrapper(*args, **kwargs):
@@ -2088,7 +2094,7 @@ def init_admin_routes(app):
             print(f"🔧 Export Error: {str(e)}")
             return f"Error exporting organizational structure: {str(e)}", 500
     
-    @app.route('/admin/export-test', methods=['GET'])
+    @app.route('/admin/export-test')
     def export_test():
         """Simple export test route"""
         try:
@@ -2100,8 +2106,20 @@ def init_admin_routes(app):
         except Exception as e:
             return f"❌ Export test failed: {str(e)}"
     
-    @app.route('/admin/data-export', methods=['GET'])
-    @login_required
+    @app.route('/admin/simple-test')
+    def simple_test():
+        """Simplest possible admin test route"""
+        return "<h1>Simple Test Route Working</h1><p>This route exists and is accessible.</p>"
+    
+    print(f"🔧 Route Registration Debug: Admin routes registration complete")
+    
+    @app.route('/admin/data-export-unprotected')
+    def admin_data_export_unprotected():
+        """Temporarily unprotected data export for testing"""
+        return "<h1>Data Export Route Working!</h1><p>The route registration and function are working correctly.</p>"
+    
+    @app.route('/admin/data-export')
+    @login_required  
     @admin_required
     def admin_data_export():
         """Admin data export page with multiple export options"""
@@ -2127,8 +2145,7 @@ def init_admin_routes(app):
                                  user=current_user)
         except Exception as e:
             print(f"🔧 Data Export Error: {str(e)}")
-            flash(f'Error loading export page: {str(e)}', 'error')
-            return redirect('/')
+            return f"<h1>Data Export Error</h1><p>{str(e)}</p>"
 
     @app.route('/admin/org-reports', methods=['GET'])
     @login_required
