@@ -123,19 +123,46 @@ select.form-select option:hover {
                     </div>
                     
                     <div class="mb-3">
-                        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 1px solid #dee2e6; border-radius: 5px; background-color: #f8f9fa;">
-                            <input type="checkbox" id="agree_terms" name="agree_terms" required 
-                                   style="width: 18px; height: 18px; margin-top: 2px; accent-color: #0d6efd; cursor: pointer;">
-                            <label for="agree_terms" style="cursor: pointer; font-size: 14px; line-height: 1.4; flex: 1;">
+                        <div style="display: flex; align-items: flex-start; gap: 15px; padding: 15px; border: 2px solid #0d6efd; border-radius: 8px; background-color: rgba(13, 110, 253, 0.1);">
+                            <div style="position: relative; display: inline-block; width: 20px; height: 20px;">
+                                <input type="checkbox" id="agree_terms" name="agree_terms" required 
+                                       style="position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; z-index: -1;">
+                                <div id="custom_checkbox" style="position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #212529; border: 3px solid #0d6efd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" 
+                                     onclick="toggleCheckbox()">
+                                    <span id="checkmark" style="display: none; color: white; font-size: 14px; font-weight: bold; line-height: 1;">✓</span>
+                                </div>
+                            </div>
+                            <label for="agree_terms" style="cursor: pointer; font-size: 14px; line-height: 1.4; flex: 1; color: var(--bs-body-color);" onclick="toggleCheckbox()">
                                 <span style="color: red; font-weight: bold;">*</span> I agree to the 
-                                <a href="{{ url_for('public.terms') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Terms of Use</a>
-                                and <a href="{{ url_for('public.privacy') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Privacy Policy</a>.
+                                <a href="{{ url_for('public.terms') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;" onclick="event.stopPropagation();">Terms of Use</a>
+                                and <a href="{{ url_for('public.privacy') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;" onclick="event.stopPropagation();">Privacy Policy</a>.
                             </label>
                         </div>
                         <div class="form-text text-muted mt-2">
                             <i class="bi bi-info-circle"></i> You must accept the terms to create an account
                         </div>
                     </div>
+                    
+                    <script>
+                    function toggleCheckbox() {
+                        const checkbox = document.getElementById('agree_terms');
+                        const customBox = document.getElementById('custom_checkbox');
+                        const checkmark = document.getElementById('checkmark');
+                        
+                        checkbox.checked = !checkbox.checked;
+                        
+                        if (checkbox.checked) {
+                            customBox.style.backgroundColor = '#0d6efd';
+                            checkmark.style.display = 'block';
+                        } else {
+                            customBox.style.backgroundColor = '#212529';
+                            checkmark.style.display = 'none';
+                        }
+                        
+                        // Trigger change event for form validation
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                    </script>
                     
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">Register</button>

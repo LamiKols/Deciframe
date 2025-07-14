@@ -129,14 +129,35 @@
                         </div>
 
                         <!-- Terms and Privacy -->
-                        <div class="mb-3">
-                            <input type="checkbox" id="agree_terms" name="agree_terms" required>
-                            <label for="agree_terms" style="margin-left: 8px; cursor: pointer;">
-                                I agree to the <a href="{{ url_for('public.terms') }}" target="_blank">Terms of Use</a> 
-                                and <a href="{{ url_for('public.privacy') }}" target="_blank">Privacy Policy</a>
-                                <span class="text-danger">*</span>
+                        <div class="mb-3" style="display: flex; align-items: flex-start; gap: 10px; padding: 15px; border: 2px solid #0d6efd; border-radius: 8px; background-color: rgba(13, 110, 253, 0.1);">
+                            <div style="position: relative; display: inline-block;">
+                                <input type="checkbox" id="agree_terms" name="agree_terms" required 
+                                       style="position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;">
+                                <span style="position: absolute; top: 0; left: 0; height: 20px; width: 20px; background-color: #212529; border: 3px solid #0d6efd; border-radius: 4px; cursor: pointer;" 
+                                      onclick="document.getElementById('agree_terms').click()"></span>
+                                <span style="display: none; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg);" 
+                                      id="checkmark"></span>
+                            </div>
+                            <label for="agree_terms" style="cursor: pointer; margin-left: 25px; line-height: 1.4; color: var(--bs-body-color);">
+                                <span style="color: red; font-weight: bold;">*</span> I agree to the 
+                                <a href="{{ url_for('public.terms') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Terms of Use</a> 
+                                and <a href="{{ url_for('public.privacy') }}" target="_blank" style="color: #0d6efd; text-decoration: underline;">Privacy Policy</a>
                             </label>
                         </div>
+                        
+                        <script>
+                        document.getElementById('agree_terms').addEventListener('change', function() {
+                            const checkmark = document.getElementById('checkmark');
+                            const box = this.parentElement.querySelector('span');
+                            if (this.checked) {
+                                checkmark.style.display = 'block';
+                                box.style.backgroundColor = '#0d6efd';
+                            } else {
+                                checkmark.style.display = 'none';
+                                box.style.backgroundColor = '#212529';
+                            }
+                        });
+                        </script>
 
                         <div class="d-grid">
                             {{ form.submit(class="btn btn-primary btn-lg") }}
