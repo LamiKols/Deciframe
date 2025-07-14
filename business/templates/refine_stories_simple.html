@@ -163,46 +163,55 @@ select option {
                     </div>
                     <div class="btn-group btn-group-sm">
                         {% if epic.status != 'Approved' %}
-                        <button class="btn btn-outline-success btn-sm" onclick="generateWithAI('{{ epic.title }}', '{{ epic.description or '' }}', {{ epic.id }})" title="AI: Suggest Stories"
-                                {% if epic.status == 'Approved' %}disabled{% endif %}>
+                        <button class="btn btn-success btn-sm" onclick="generateWithAI('{{ epic.title }}', '{{ epic.description or '' }}', {{ epic.id }})" title="AI: Suggest Stories"
+                                {% if epic.status == 'Approved' %}disabled{% endif %}
+                                style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
                             ✨ AI: Suggest Stories
                         </button>
-                        <button class="btn btn-outline-light btn-sm" onclick="loadStories({{ epic.id }})" title="View Stories">
-                            <i class="fas fa-folder-open"></i>
+                        <button class="btn btn-secondary btn-sm" onclick="loadStories({{ epic.id }})" title="View Stories"
+                                style="color: #ffffff !important; font-weight: 600 !important;">
+                            <i class="fas fa-folder-open"></i> View Stories
                         </button>
-                        <button class="btn btn-outline-light btn-sm" onclick="editEpic({{ epic.id }})" title="Edit Epic" 
+                        <button class="btn btn-primary btn-sm" onclick="editEpic({{ epic.id }})" title="Edit Epic" 
                                 data-epic-id="{{ epic.id }}" data-epic-title="{{ epic.title }}" data-epic-description="{{ epic.description or '' }}" data-epic-assigned-by="{{ epic.assigned_by or '' }}"
-                                {% if epic.status == 'Approved' %}disabled{% endif %}>
-                            <i class="fas fa-edit"></i>
+                                {% if epic.status == 'Approved' %}disabled{% endif %}
+                                style="color: #ffffff !important; font-weight: 600 !important;">
+                            <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn btn-outline-light btn-sm" onclick="addStoryToEpic({{ epic.id }})" title="Add Story"
-                                {% if epic.status == 'Approved' %}disabled{% endif %}>
-                            <i class="fas fa-plus"></i>
+                        <button class="btn btn-info btn-sm" onclick="addStoryToEpic({{ epic.id }})" title="Add Story"
+                                {% if epic.status == 'Approved' %}disabled{% endif %}
+                                style="color: #ffffff !important; font-weight: 600 !important;">
+                            <i class="fas fa-plus"></i> Add Story
                         </button>
-                        <button class="btn btn-outline-danger btn-sm" onclick="deleteEpic({{ epic.id }})" title="Delete Epic"
-                                {% if epic.status == 'Approved' %}disabled{% endif %}>
-                            <i class="fas fa-trash"></i>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEpic({{ epic.id }})" title="Delete Epic"
+                                {% if epic.status == 'Approved' %}disabled{% endif %}
+                                style="color: #ffffff !important; font-weight: 600 !important;">
+                            <i class="fas fa-trash"></i> Delete
                         </button>
                         {% endif %}
                         
                         <!-- Workflow buttons -->
                         {% if epic.status == 'Draft' and current_user.role.value in ['Manager', 'Director', 'CEO', 'BA'] %}
-                        <button class="btn btn-outline-warning btn-sm" onclick="submitEpic({{ epic.id }})" title="Submit for Review">
+                        <button class="btn btn-warning btn-sm" onclick="submitEpic({{ epic.id }})" title="Submit for Review"
+                                style="color: #ffffff !important; font-weight: 600 !important;">
                             <i class="fas fa-paper-plane"></i> Submit
                         </button>
                         {% endif %}
                         
                         {% if epic.status == 'Submitted' and current_user.role.value in ['Manager', 'Director', 'CEO'] %}
-                        <button class="btn btn-outline-success btn-sm" onclick="approveEpic({{ epic.id }})" title="Approve Epic">
+                        <button class="btn btn-success btn-sm" onclick="approveEpic({{ epic.id }})" title="Approve Epic"
+                                style="color: #ffffff !important; font-weight: 600 !important;">
                             <i class="fas fa-check"></i> Approve
                         </button>
-                        <button class="btn btn-outline-danger btn-sm" onclick="rejectEpic({{ epic.id }})" title="Reject Epic">
+                        <button class="btn btn-danger btn-sm" onclick="rejectEpic({{ epic.id }})" title="Reject Epic"
+                                style="color: #ffffff !important; font-weight: 600 !important;">
                             <i class="fas fa-times"></i> Reject
                         </button>
                         {% endif %}
                         
                         {% if epic.status == 'Rejected' and current_user.role.value in ['Manager', 'Director', 'CEO', 'BA'] %}
-                        <button class="btn btn-outline-secondary btn-sm" onclick="resetEpic({{ epic.id }})" title="Reset to Draft">
+                        <button class="btn btn-secondary btn-sm" onclick="resetEpic({{ epic.id }})" title="Reset to Draft"
+                                style="color: #ffffff !important; font-weight: 600 !important;">
                             <i class="fas fa-undo"></i> Reset
                         </button>
                         {% endif %}
