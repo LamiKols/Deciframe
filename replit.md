@@ -54,7 +54,7 @@ DeciFrame is a modular Flask application providing comprehensive problem and bus
 - **Reduced Confusion**: Clear success messages and automatic state updates prevent user uncertainty
 
 ### Production Status: AI REQUIREMENTS GENERATION UI FULLY OPERATIONAL - July 14, 2025 ✅
-Complete AI requirements generation system with proper UI state management. Users can generate requirements through AI, see success confirmation, and immediately access "View Generated Requirements" button after page refresh. All authentication tokens preserved during navigation.
+Complete AI requirements generation system with proper UI state management and correct authorization. Directors, Managers, BAs, and Admins can generate requirements through AI, see success confirmation, and immediately access "View Generated Requirements" button after page refresh. All authentication tokens preserved during navigation and epics are properly saved to database.
 
 ## Previous Implementation: QUICK ACTIONS BUTTONS & BUSINESS CASE CREATION COMPLETE - July 14, 2025 ✅ IMPLEMENTED
 
