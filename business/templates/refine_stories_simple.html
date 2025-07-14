@@ -1183,18 +1183,18 @@ async function saveAIStory(epicId, i) {
             storyBlock.style.opacity = '0.5';
             storyBlock.innerHTML += '<div class="alert alert-success mt-2">✅ Story saved successfully!</div>';
             
-            // Update story count badge
-            updateStoryCount(epicId);
-            
-            // Refresh stories if they're currently displayed
-            if (storyState[epicId] && storyState[epicId].loaded) {
-                await loadStoriesV2(epicId, true); // Force refresh with reset
-            }
-            
             showAlert(`Story "${title}" saved successfully!`, 'success');
             
-            // Update story count badge after successful save
-            setTimeout(() => updateStoryCount(epicId), 500);
+            // Force refresh the story display and count with proper delay
+            setTimeout(async () => {
+                await updateStoryCount(epicId);
+                
+                // If stories are currently displayed, refresh them
+                if (storyState[epicId] && storyState[epicId].loaded) {
+                    storyState[epicId].loaded = false; // Force full refresh
+                    await loadStoriesV2(epicId, true);
+                }
+            }, 600);
         } else {
             alert(`❌ Failed to save story: ${responseData.error || 'Unknown error'}`);
         }
@@ -1263,13 +1263,22 @@ async function saveAllAIStories(epicId) {
     if (saved > 0) {
         showAlert(`Successfully imported ${saved} stories!`, 'success');
         
-        // Update story count badge with delay to ensure database is updated
-        setTimeout(() => updateStoryCount(epicId), 500);
-        
-        // Refresh stories if they're currently displayed
-        if (storyState[epicId] && storyState[epicId].loaded) {
-            await loadStoriesV2(epicId, true); // Force refresh with reset
+        // Hide the AI output container since stories are now saved
+        const aiOutputContainer = document.getElementById(`ai-output-${epicId}`);
+        if (aiOutputContainer) {
+            aiOutputContainer.style.display = 'none';
         }
+        
+        // Force refresh the story display and count with proper delay
+        setTimeout(async () => {
+            await updateStoryCount(epicId);
+            
+            // If stories are currently displayed, refresh them
+            if (storyState[epicId] && storyState[epicId].loaded) {
+                storyState[epicId].loaded = false; // Force full refresh
+                await loadStoriesV2(epicId, true);
+            }
+        }, 800);
     }
     
     if (errors.length > 0) {
@@ -1285,21 +1294,27 @@ async function updateStoryCount(epicId) {
         const response = await fetch(`/business/api/stories/v2?epic_id=${epicId}&limit=1000`, {
             credentials: 'same-origin'
         });
+        
+        if (!response.ok) {
+            console.error(`❌ Story count API failed: ${response.status}`);
+            return;
+        }
+        
         const data = await response.json();
         
         console.log(`📊 Story count data:`, data);
-        if (data.success) {
-            const countBadge = document.getElementById(`story-count-${epicId}`);
-            console.log(`🎯 Count badge element:`, countBadge);
-            if (countBadge) {
-                const oldText = countBadge.textContent;
-                countBadge.textContent = `${data.total} stories`;
-                console.log(`✅ Updated count from "${oldText}" to "${data.total} stories"`);
-            } else {
-                console.error(`❌ Could not find story count badge with ID: story-count-${epicId}`);
-            }
+        
+        // The API returns stories directly, not wrapped in success object
+        const totalStories = data.stories ? data.stories.length : 0;
+        
+        const countBadge = document.getElementById(`story-count-${epicId}`);
+        console.log(`🎯 Count badge element:`, countBadge);
+        if (countBadge) {
+            const oldText = countBadge.textContent;
+            countBadge.textContent = `${totalStories} stories`;
+            console.log(`✅ Updated count from "${oldText}" to "${totalStories} stories"`);
         } else {
-            console.error(`❌ Story count API failed:`, data);
+            console.error(`❌ Could not find story count badge with ID: story-count-${epicId}`);
         }
     } catch (error) {
         console.error('Error updating story count:', error);
