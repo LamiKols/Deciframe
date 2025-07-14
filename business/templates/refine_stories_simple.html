@@ -979,7 +979,115 @@ function showAlert(message, type = 'info') {
     }, 5000);
 }
 
+// AI story generation function
+async function generateWithAI(title, description, epicId) {
+    const container = document.getElementById(`ai-output-${epicId}`);
+    container.style.display = 'block';
+    container.innerHTML = "⏳ Generating suggestions...";
+    
+    try {
+        const res = await fetch('/ai/generate-stories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ 
+                epic_id: epicId,
+                title: title, 
+                description: description 
+            })
+        });
 
+        const data = await res.json();
+        if (data.success) {
+            container.innerHTML = `
+                <div class="card bg-dark border-success">
+                    <div class="card-header bg-success text-dark">
+                        <strong>🤖 AI-Generated User Stories</strong>
+                        <button class="btn btn-sm btn-outline-light float-end" onclick="document.getElementById('ai-output-${epicId}').style.display='none'">×</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="ai-stories-container-${epicId}"></div>
+                    </div>
+                </div>
+            `;
+            
+            const storiesContainer = document.getElementById(`ai-stories-container-${epicId}`);
+            data.stories.forEach((story, i) => {
+                const div = document.createElement('div');
+                div.className = 'ai-story-block border border-secondary rounded p-3 mb-3';
+                div.innerHTML = `
+                    <h6 class="text-info">User Story ${i + 1}</h6>
+                    <div class="mb-2">
+                        <label class="form-label text-light">Title</label>
+                        <input type="text" class="form-control" value="${story.title.replace(/"/g, '&quot;')}" id="ai-title-${epicId}-${i}">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-light">Description</label>
+                        <textarea class="form-control" rows="2" id="ai-description-${epicId}-${i}">${(story.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-light">Acceptance Criteria</label>
+                        <textarea class="form-control" rows="3" id="ai-criteria-${epicId}-${i}">${(Array.isArray(story.acceptance_criteria) ? story.acceptance_criteria.join('\\n') : story.acceptance_criteria || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label text-light">Priority</label>
+                            <select class="form-select" id="ai-priority-${epicId}-${i}">
+                                <option value="Critical" ${story.priority === 'Critical' ? 'selected' : ''}>Critical</option>
+                                <option value="High" ${story.priority === 'High' ? 'selected' : ''}>High</option>
+                                <option value="Medium" ${story.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+                                <option value="Low" ${story.priority === 'Low' ? 'selected' : ''}>Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-light">Effort</label>
+                            <select class="form-select" id="ai-effort-${epicId}-${i}">
+                                <option value="XS" ${story.effort_estimate === 'XS' ? 'selected' : ''}>XS</option>
+                                <option value="S" ${story.effort_estimate === 'S' ? 'selected' : ''}>S</option>
+                                <option value="M" ${story.effort_estimate === 'M' ? 'selected' : ''}>M</option>
+                                <option value="L" ${story.effort_estimate === 'L' ? 'selected' : ''}>L</option>
+                                <option value="XL" ${story.effort_estimate === 'XL' ? 'selected' : ''}>XL</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-light">Stakeholder</label>
+                            <input type="text" class="form-control" id="ai-stakeholder-${epicId}-${i}" placeholder="Enter stakeholder">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm" onclick="saveAIStory(${epicId}, ${i})">
+                            💾 Save Story
+                        </button>
+                    </div>
+                `;
+                storiesContainer.appendChild(div);
+            });
+            
+            // Add Import All button after all story blocks
+            const importBtn = document.createElement('button');
+            importBtn.className = 'btn btn-success btn-sm mt-3';
+            importBtn.innerHTML = '⬇️ Import All Stories';
+            importBtn.onclick = () => saveAllAIStories(epicId);
+            storiesContainer.appendChild(importBtn);
+            
+        } else {
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    ❌ Error: ${data.error}
+                    <button class="btn btn-sm btn-outline-danger float-end" onclick="document.getElementById('ai-output-${epicId}').style.display='none'">×</button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                ❌ Error: Failed to generate stories. Please try again.
+                <button class="btn btn-sm btn-outline-danger float-end" onclick="document.getElementById('ai-output-${epicId}').style.display='none'">×</button>
+            </div>
+        `;
+        console.error('AI generation error:', error);
+    }
+}
 
 // Function to save individual AI story
 async function saveAIStory(epicId, i) {
