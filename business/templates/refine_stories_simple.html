@@ -612,10 +612,15 @@ async function loadStoriesV2(epicId, reset = false) {
 
 // Render stories to the container
 function renderStories(epicId) {
+    console.log(`🎨 renderStories called for epic ${epicId}`);
     const container = document.getElementById(`stories-${epicId}`);
     const stories = storyState[epicId].stories;
     
+    console.log(`📦 Container:`, container);
+    console.log(`📚 Stories to render:`, stories);
+    
     if (stories.length === 0) {
+        console.log(`❌ No stories found, showing empty state`);
         container.innerHTML = `
             <div class="text-muted mb-2">No stories found for this epic.</div>
             <button class="btn btn-sm btn-outline-success" onclick="addStoryToEpic(${epicId})">
@@ -624,6 +629,8 @@ function renderStories(epicId) {
         `;
         return;
     }
+    
+    console.log(`✅ Rendering ${stories.length} stories`);
     
     const storiesHtml = stories.map(s => `
         <div class="story-card border rounded p-3 mb-2" style="background-color: #2a2a2a; border-color: #444 !important;">
@@ -685,13 +692,21 @@ function renderStories(epicId) {
         </div>
     `).join('');
     
-    container.innerHTML = storiesHtml + `
+    const finalHtml = storiesHtml + `
         <div class="mt-2">
             <button class="btn btn-sm btn-outline-success" onclick="addStoryToEpic(${epicId})">
                 <i class="fas fa-plus"></i> Add New Story
             </button>
         </div>
     `;
+    
+    console.log(`🖼️ Generated HTML length: ${finalHtml.length}`);
+    console.log(`🖼️ First 500 chars of HTML:`, finalHtml.substring(0, 500));
+    
+    container.innerHTML = finalHtml;
+    container.style.display = 'block';
+    
+    console.log(`✅ Stories rendered to container`);
 }
 
 // Load more stories
