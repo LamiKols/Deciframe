@@ -203,7 +203,75 @@ body[data-bs-theme="light"] .badge {
 /* Progress bar container borders for light theme */
 body[data-bs-theme="light"] .progress {
     border: 1px solid #0d6efd !important;
+}
+
+/* Home page button consistency for light theme */
+body[data-bs-theme="light"] .container-fluid .btn {
+    min-height: 100px !important;
+    padding: 15px !important;
+    border-width: 2px !important;
     border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn i {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+    display: block !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-outline-primary {
+    background-color: transparent !important;
+    border-color: #0d6efd !important;
+    color: #0d6efd !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-outline-primary:hover {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-info {
+    background-color: #20c997 !important;
+    border-color: #20c997 !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-outline-info {
+    background-color: transparent !important;
+    border-color: #20c997 !important;
+    color: #20c997 !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-outline-info:hover {
+    background-color: #20c997 !important;
+    border-color: #20c997 !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-outline-secondary {
+    background-color: transparent !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .btn-outline-secondary:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+}
 }
 
 /* Accordion borders for light theme */

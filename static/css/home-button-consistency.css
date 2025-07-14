@@ -1,0 +1,172 @@
+/* Home Page Button Consistency - Light and Dark Theme */
+
+/* Universal button styling for home page quick actions */
+.container-fluid .quick-actions .btn {
+    min-height: 100px !important;
+    padding: 15px !important;
+    border-width: 2px !important;
+    border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.container-fluid .quick-actions .btn i {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+    display: block !important;
+}
+
+/* Light Theme Specific Styles */
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-primary:hover {
+    background-color: #0a58ca !important;
+    border-color: #0a58ca !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3) !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-outline-primary {
+    background-color: transparent !important;
+    border-color: #0d6efd !important;
+    color: #0d6efd !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-outline-primary:hover {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3) !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-info {
+    background-color: #20c997 !important;
+    border-color: #20c997 !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-info:hover {
+    background-color: #1ea389 !important;
+    border-color: #1ea389 !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3) !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-outline-info {
+    background-color: transparent !important;
+    border-color: #20c997 !important;
+    color: #20c997 !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-outline-info:hover {
+    background-color: #20c997 !important;
+    border-color: #20c997 !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3) !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-outline-secondary {
+    background-color: transparent !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+body[data-bs-theme="light"] .container-fluid .quick-actions .btn-outline-secondary:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3) !important;
+}
+
+/* Dark Theme Specific Styles */
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-primary:hover {
+    background-color: #0a58ca !important;
+    border-color: #0a58ca !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.4) !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-outline-primary {
+    background-color: transparent !important;
+    border-color: #0d6efd !important;
+    color: #0d6efd !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-outline-primary:hover {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.4) !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-info {
+    background-color: #20c997 !important;
+    border-color: #20c997 !important;
+    color: #fff !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-info:hover {
+    background-color: #1ea389 !important;
+    border-color: #1ea389 !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(32, 201, 151, 0.4) !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-outline-info {
+    background-color: transparent !important;
+    border-color: #20c997 !important;
+    color: #20c997 !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-outline-info:hover {
+    background-color: #20c997 !important;
+    border-color: #20c997 !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(32, 201, 151, 0.4) !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-outline-secondary {
+    background-color: transparent !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+body[data-bs-theme="dark"] .container-fluid .quick-actions .btn-outline-secondary:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4) !important;
+}
+
+/* Quick Links section buttons */
+.quick-links .btn-sm {
+    min-height: auto !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    border-width: 1px !important;
+}
