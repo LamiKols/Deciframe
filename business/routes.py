@@ -135,58 +135,87 @@ def new_case():
         ).first()
         
         if not default_dept:
-            # Create a default "General" department for organization
-            default_dept = Department(
-                name='General',
-                description='Default department for users without specific department assignment',
-                organization_id=user.organization_id
-            )
-            db.session.add(default_dept)
-            db.session.flush()  # Get the ID
+            # Try to find any General department first (due to unique constraint on name)
+            general_dept = Department.query.filter_by(name='General').first()
+            if general_dept:
+                # Use existing General department
+                default_dept = general_dept
+            else:
+                # Create a default "General" department for organization
+                default_dept = Department(
+                    name='General',
+                    description='Default department for users without specific department assignment',
+                    organization_id=user.organization_id
+                )
+                db.session.add(default_dept)
+                db.session.flush()  # Get the ID
         
         dept_id = default_dept.id
 
-        # Create BusinessCase
-        bc = BusinessCase(
-            problem_id=(form.problem.data if ct is CaseTypeEnum.Reactive else None),
-            solution_id=int(form.solution_id.data) if form.solution_id.data else None,
-            title=form.title.data,
-            description=form.description.data,
-            summary=form.summary.data,
-            cost_estimate=cost,
-            benefit_estimate=float(form.benefit_estimate.data) if form.benefit_estimate.data else 0.0,
-            created_by=user.id,
-            dept_id=dept_id,  # Use determined department (user's or default)
-            organization_id=user.organization_id,  # Critical: enforce multi-tenant isolation
-            case_type=ct,
-            case_depth=cd,
-            project_type=pt,
-            initiative_name=init_name,
-            strategic_alignment=form.strategic_alignment.data if cd is CaseDepthEnum.Full else None,
-            benefit_breakdown=form.benefit_breakdown.data if cd is CaseDepthEnum.Full else None,
-            risk_mitigation=form.risk_mitigation.data if cd is CaseDepthEnum.Full else None,
-            stakeholder_analysis=form.stakeholder_analysis.data if cd is CaseDepthEnum.Full else None,
-            dependencies=form.dependencies.data if cd is CaseDepthEnum.Full else None,
-            roadmap=form.roadmap.data if cd is CaseDepthEnum.Full else None,
-            sensitivity_analysis=form.sensitivity_analysis.data if cd is CaseDepthEnum.Full else None
-        )
+        # Create BusinessCase with enhanced error handling
+        try:
+            print(f"🔧 Creating BusinessCase with dept_id={dept_id}, org_id={user.organization_id}")
+            print(f"🔧 Solution context: solution_id={form.solution_id.data if form.solution_id.data else 'None'}")
+            
+            bc = BusinessCase(
+                problem_id=(form.problem.data if ct is CaseTypeEnum.Reactive else None),
+                solution_id=int(form.solution_id.data) if form.solution_id.data else None,
+                title=form.title.data,
+                description=form.description.data,
+                summary=form.summary.data,
+                cost_estimate=cost,
+                benefit_estimate=float(form.benefit_estimate.data) if form.benefit_estimate.data else 0.0,
+                created_by=user.id,
+                dept_id=dept_id,  # Use determined department (user's or default)
+                organization_id=user.organization_id,  # Critical: enforce multi-tenant isolation
+                case_type=ct,
+                case_depth=cd,
+                project_type=pt,
+                initiative_name=init_name,
+                strategic_alignment=form.strategic_alignment.data if cd is CaseDepthEnum.Full else None,
+                benefit_breakdown=form.benefit_breakdown.data if cd is CaseDepthEnum.Full else None,
+                risk_mitigation=form.risk_mitigation.data if cd is CaseDepthEnum.Full else None,
+                stakeholder_analysis=form.stakeholder_analysis.data if cd is CaseDepthEnum.Full else None,
+                dependencies=form.dependencies.data if cd is CaseDepthEnum.Full else None,
+                roadmap=form.roadmap.data if cd is CaseDepthEnum.Full else None,
+                sensitivity_analysis=form.sensitivity_analysis.data if cd is CaseDepthEnum.Full else None
+            )
+            print(f"🔧 BusinessCase object created successfully")
+        except Exception as e:
+            print(f"❌ Error creating BusinessCase object: {e}")
+            flash(f"Error creating business case: {str(e)}", "danger")
+            return render_template('case_form.html', form=form, solution=solution)
         
-        db.session.add(bc)
-        db.session.flush()
-        
-        # Generate unique code by finding the next available number
-        existing_codes = [int(c.code[1:]) for c in BusinessCase.query.filter(BusinessCase.code.isnot(None)).all() if c.code and c.code.startswith('C')]
-        next_code_num = 1
-        while next_code_num in existing_codes:
-            next_code_num += 1
-        bc.code = f"C{next_code_num:04d}"
-        
-        bc.roi = ((bc.benefit_estimate - bc.cost_estimate) / bc.cost_estimate * 100) if bc.cost_estimate else None
-        db.session.commit()
-        
-        # Use only the flash notification to avoid duplicate messages
-        flash(f"Business Case {bc.code} created successfully!", 'success')
-        return redirect(url_for('business.list_cases'))
+        try:
+            db.session.add(bc)
+            db.session.flush()
+            print(f"🔧 BusinessCase added to session and flushed, ID: {bc.id}")
+            
+            # Generate unique code by finding the next available number
+            existing_codes = [int(c.code[1:]) for c in BusinessCase.query.filter(BusinessCase.code.isnot(None)).all() if c.code and c.code.startswith('C')]
+            next_code_num = 1
+            while next_code_num in existing_codes:
+                next_code_num += 1
+            bc.code = f"C{next_code_num:04d}"
+            print(f"🔧 Generated code: {bc.code}")
+            
+            bc.roi = ((bc.benefit_estimate - bc.cost_estimate) / bc.cost_estimate * 100) if bc.cost_estimate else None
+            print(f"🔧 Calculated ROI: {bc.roi}")
+            
+            db.session.commit()
+            print(f"🔧 BusinessCase committed successfully")
+            
+            # Use only the flash notification to avoid duplicate messages
+            flash(f"Business Case {bc.code} created successfully!", 'success')
+            return redirect(url_for('business.list_cases'))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Database error: {e}")
+            import traceback
+            traceback.print_exc()
+            flash(f"Database error creating business case: {str(e)}", "danger")
+            return render_template('case_form.html', form=form, solution=solution)
     else:
         if request.method == 'POST':
             print(f"🔧 Form validation failed: {form.errors}")
