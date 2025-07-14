@@ -1078,7 +1078,7 @@ async function generateWithAI(title, description, epicId) {
                     </div>
                     <div class="mb-2">
                         <label class="form-label text-light">Acceptance Criteria</label>
-                        <textarea class="form-control" rows="3" id="ai-criteria-${epicId}-${i}">${(Array.isArray(story.acceptance_criteria) ? story.acceptance_criteria.join('\\n') : story.acceptance_criteria || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                        <textarea class="form-control" rows="3" id="ai-criteria-${epicId}-${i}">${(Array.isArray(story.acceptance_criteria) ? story.acceptance_criteria.join('\n') : story.acceptance_criteria || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
