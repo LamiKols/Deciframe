@@ -46,6 +46,44 @@ body[data-bs-theme="light"] .navbar {
     border-bottom: 2px solid #0d6efd !important;
 }
 
+/* Header/Navbar styling for light theme - better visibility */
+body[data-bs-theme="light"] .navbar-dark {
+    background-color: #f8f9fa !important;
+    border-bottom: 2px solid #0d6efd !important;
+}
+
+body[data-bs-theme="light"] .navbar-dark .navbar-brand {
+    color: #212529 !important;
+    font-weight: 600 !important;
+}
+
+body[data-bs-theme="light"] .navbar-dark .navbar-toggler {
+    border-color: #0d6efd !important;
+    background-color: #fff !important;
+}
+
+body[data-bs-theme="light"] .navbar-dark .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+body[data-bs-theme="light"] .navbar-dark .navbar-nav .nav-link {
+    color: #212529 !important;
+    font-weight: 500 !important;
+}
+
+body[data-bs-theme="light"] .navbar-dark .navbar-nav .nav-link:hover,
+body[data-bs-theme="light"] .navbar-dark .navbar-nav .nav-link:focus {
+    color: #0d6efd !important;
+    background-color: #e3f2fd !important;
+    border-radius: 0.25rem !important;
+}
+
+body[data-bs-theme="light"] .navbar-dark .navbar-nav .nav-link.active {
+    color: #0d6efd !important;
+    background-color: #e3f2fd !important;
+    border-radius: 0.25rem !important;
+}
+
 /* Dropdown borders for light theme */
 body[data-bs-theme="light"] .dropdown-menu {
     border: 1px solid #0d6efd !important;
