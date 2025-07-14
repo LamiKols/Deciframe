@@ -1019,15 +1019,15 @@ async function generateWithAI(title, description, epicId) {
                     <h6 class="text-info">User Story ${i + 1}</h6>
                     <div class="mb-2">
                         <label class="form-label text-light">Title</label>
-                        <input type="text" class="form-control" value="${story.title}" id="ai-title-${epicId}-${i}">
+                        <input type="text" class="form-control" value="${story.title.replace(/"/g, '&quot;')}" id="ai-title-${epicId}-${i}">
                     </div>
                     <div class="mb-2">
                         <label class="form-label text-light">Description</label>
-                        <textarea class="form-control" rows="2" id="ai-description-${epicId}-${i}">${story.description || ''}</textarea>
+                        <textarea class="form-control" rows="2" id="ai-description-${epicId}-${i}">${(story.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                     </div>
                     <div class="mb-2">
                         <label class="form-label text-light">Acceptance Criteria</label>
-                        <textarea class="form-control" rows="3" id="ai-criteria-${epicId}-${i}">${Array.isArray(story.acceptance_criteria) ? story.acceptance_criteria.join('\\n') : story.acceptance_criteria || ''}</textarea>
+                        <textarea class="form-control" rows="3" id="ai-criteria-${epicId}-${i}">${(Array.isArray(story.acceptance_criteria) ? story.acceptance_criteria.join('\\n') : story.acceptance_criteria || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
