@@ -2,6 +2,7 @@
 
 {% block extra_css %}
 <link href="{{ url_for('static', filename='css/checkbox-visibility-fix.css') }}?v={{ range(1000, 9999) | random }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/nuclear-checkbox-fix.css') }}?v={{ range(1000, 9999) | random }}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -128,18 +129,13 @@
                         </div>
 
                         <!-- Terms and Privacy -->
-                        <div class="mb-3 d-flex align-items-center">
-                            <div class="custom-checkbox-wrapper me-2">
-                                <input type="checkbox" class="custom-checkbox-input" id="agree_terms" name="agree_terms" required style="display: none;">
-                                <label for="agree_terms" class="custom-checkbox-label">
-                                    <span class="custom-checkbox-box"></span>
-                                    <span class="custom-checkbox-text">
-                                        I agree to the <a href="{{ url_for('public.terms') }}" target="_blank">Terms of Use</a> 
-                                        and <a href="{{ url_for('public.privacy') }}" target="_blank">Privacy Policy</a>
-                                        <span class="text-danger">*</span>
-                                    </span>
-                                </label>
-                            </div>
+                        <div class="mb-3">
+                            <input type="checkbox" id="agree_terms" name="agree_terms" required>
+                            <label for="agree_terms" style="margin-left: 8px; cursor: pointer;">
+                                I agree to the <a href="{{ url_for('public.terms') }}" target="_blank">Terms of Use</a> 
+                                and <a href="{{ url_for('public.privacy') }}" target="_blank">Privacy Policy</a>
+                                <span class="text-danger">*</span>
+                            </label>
                         </div>
 
                         <div class="d-grid">

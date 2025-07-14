@@ -1,0 +1,111 @@
+/* Nuclear Checkbox Fix - Maximum Specificity Override */
+html body div.container div.row div.col div.card div.card-body form div.mb-3 div.custom-checkbox-wrapper input[type="checkbox"].custom-checkbox-input {
+    position: absolute !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    height: 0 !important;
+    width: 0 !important;
+    z-index: -1 !important;
+}
+
+html body div.container div.row div.col div.card div.card-body form div.mb-3 div.custom-checkbox-wrapper label.custom-checkbox-label {
+    display: flex !important;
+    align-items: flex-start !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    color: var(--bs-body-color) !important;
+    font-weight: 500 !important;
+    gap: 8px !important;
+}
+
+html body div.container div.row div.col div.card div.card-body form div.mb-3 div.custom-checkbox-wrapper label.custom-checkbox-label span.custom-checkbox-box {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    border: 3px solid #0d6efd !important;
+    border-radius: 4px !important;
+    background-color: #212529 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+    margin-top: 2px !important;
+}
+
+html body div.container div.row div.col div.card div.card-body form div.mb-3 div.custom-checkbox-wrapper input[type="checkbox"].custom-checkbox-input:checked + label.custom-checkbox-label span.custom-checkbox-box {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+html body div.container div.row div.col div.card div.card-body form div.mb-3 div.custom-checkbox-wrapper input[type="checkbox"].custom-checkbox-input:checked + label.custom-checkbox-label span.custom-checkbox-box::after {
+    content: '✓' !important;
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+/* Alternative approach - override any existing checkbox styles */
+input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+}
+
+/* Specific override for the terms checkbox */
+#agree_terms {
+    display: none !important;
+}
+
+#agree_terms + label {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+}
+
+/* Create visual checkbox with CSS */
+#agree_terms + label::before {
+    content: '' !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    border: 3px solid #0d6efd !important;
+    border-radius: 4px !important;
+    background-color: #212529 !important;
+    display: inline-block !important;
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+}
+
+#agree_terms:checked + label::before {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+#agree_terms:checked + label::after {
+    content: '✓' !important;
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
+    position: absolute !important;
+    left: 6px !important;
+    top: 4px !important;
+}
+
+/* Hover effects */
+#agree_terms + label:hover::before {
+    border-color: #0a58ca !important;
+    filter: brightness(1.1) !important;
+}
