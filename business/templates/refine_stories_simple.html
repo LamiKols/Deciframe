@@ -1063,6 +1063,9 @@ async function generateWithAI(title, description, epicId) {
                 storiesContainer.appendChild(div);
             });
             
+            // Set story count attribute for saveAllAIStories function
+            container.setAttribute('data-story-count', data.stories.length);
+            
             // Add Import All button after all story blocks
             const importBtn = document.createElement('button');
             importBtn.className = 'btn btn-success btn-sm mt-3';
