@@ -52,6 +52,32 @@ body[data-bs-theme="light"] .dropdown-menu {
     border-radius: 0.375rem !important;
 }
 
+/* Dropdown menu item borders for light theme */
+body[data-bs-theme="light"] .dropdown-item {
+    border: 1px solid #e3f2fd !important;
+    border-radius: 0.25rem !important;
+    margin: 2px !important;
+    padding: 0.375rem 1rem !important;
+}
+
+body[data-bs-theme="light"] .dropdown-item:hover,
+body[data-bs-theme="light"] .dropdown-item:focus {
+    border-color: #0d6efd !important;
+    background-color: #e3f2fd !important;
+}
+
+body[data-bs-theme="light"] .dropdown-item.active {
+    border-color: #0d6efd !important;
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+/* Dropdown divider enhanced styling */
+body[data-bs-theme="light"] .dropdown-divider {
+    border-top: 1px solid #0d6efd !important;
+    margin: 0.25rem 0 !important;
+}
+
 /* Table borders for light theme */
 body[data-bs-theme="light"] .table {
     border: 1px solid #0d6efd !important;
