@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="{{ org_settings.theme if org_settings and org_settings.theme else 'dark' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,11 +76,21 @@
     <!-- Contextual Help JS -->
     <script src="{{ url_for('static', filename='js/contextual_help.js') }}"></script>
     <script src="{{ url_for('static', filename='js/help_buttons.js') }}"></script>
+    
+    <!-- Theme Toggle JS -->
+    <script src="{{ url_for('static', filename='js/theme-toggle-simple.js') }}"></script>
+    
     <script>
         // Initialize contextual help when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             new ContextualHelp();
         });
+        
+        // Set theme data for JavaScript access
+        window.THEME_DATA = {
+            user_theme: '{{ current_user.theme if current_user.is_authenticated else "" }}',
+            effective_theme: '{{ org_settings.theme if org_settings and org_settings.theme else "dark" }}'
+        };
     </script>
     
     <!-- Floating Help Widget -->
