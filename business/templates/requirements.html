@@ -52,12 +52,14 @@
                                             </span>
                                             <span class="badge bg-secondary">{{ story.effort_estimate }}</span>
                                         </div>
-                                        {% if story.acceptance_criteria %}
+                                        {% if story.acceptance_criteria_list %}
                                         <div class="text-muted small mt-1">
-                                            Criteria: 
-                                            {% for criteria in story.acceptance_criteria %}
-                                                {{ criteria }}{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
+                                            <strong>Criteria:</strong>
+                                            <ul class="mb-0 mt-1">
+                                                {% for criteria in story.acceptance_criteria_list %}
+                                                    <li>{{ criteria }}</li>
+                                                {% endfor %}
+                                            </ul>
                                         </div>
                                         {% endif %}
                                     </li>

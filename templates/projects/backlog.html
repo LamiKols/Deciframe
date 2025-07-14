@@ -93,11 +93,15 @@
                                         </div>
                                         
                                         <!-- Acceptance Criteria -->
-                                        {% if story.acceptance_criteria %}
+                                        {% if story.acceptance_criteria_list %}
                                         <div class="mt-2">
                                             <small class="text-warning fw-bold">Acceptance Criteria:</small>
                                             <div class="small text-dark mt-1 p-2 bg-light rounded border" style="max-height: 100px; overflow-y: auto;">
-                                                {{ story.acceptance_criteria|replace('\n', '<br>')|safe }}
+                                                <ul class="mb-0">
+                                                    {% for criteria in story.acceptance_criteria_list %}
+                                                        <li>{{ criteria }}</li>
+                                                    {% endfor %}
+                                                </ul>
                                             </div>
                                         </div>
                                         {% endif %}

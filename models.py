@@ -931,6 +931,27 @@ class Story(db.Model):
     organization = db.relationship('Organization', foreign_keys=[organization_id])
     epic = db.relationship('Epic', backref=db.backref('stories', cascade='all, delete-orphan'))
     
+    @property
+    def acceptance_criteria_list(self):
+        """Parse acceptance criteria JSON into a list for template display"""
+        if not self.acceptance_criteria:
+            return []
+        
+        try:
+            import json
+            # Try to parse as JSON first
+            criteria = json.loads(self.acceptance_criteria)
+            # Ensure it's a list
+            if isinstance(criteria, list):
+                return criteria
+            elif isinstance(criteria, str):
+                return [criteria]
+            else:
+                return []
+        except (json.JSONDecodeError, TypeError):
+            # If it's not valid JSON, treat as a plain string
+            return [self.acceptance_criteria] if self.acceptance_criteria else []
+    
     def to_dict(self):
         """Convert story to dictionary"""
         return {

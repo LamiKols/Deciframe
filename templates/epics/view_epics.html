@@ -87,16 +87,12 @@
                                     <div class="card-body">
                                         <p class="card-text">{{ story.description }}</p>
                                         
-                                        {% if story.acceptance_criteria %}
+                                        {% if story.acceptance_criteria_list %}
                                         <h6 class="mt-3 mb-2">Acceptance Criteria:</h6>
                                         <ul class="small">
-                                            {% set criteria_json = story.acceptance_criteria %}
-                                            {% if criteria_json %}
-                                                {% set criteria = criteria_json | safe | from_json if criteria_json.startswith('[') else [criteria_json] %}
-                                                {% for criterion in criteria %}
-                                                <li>{{ criterion }}</li>
-                                                {% endfor %}
-                                            {% endif %}
+                                            {% for criterion in story.acceptance_criteria_list %}
+                                            <li>{{ criterion }}</li>
+                                            {% endfor %}
                                         </ul>
                                         {% endif %}
                                     </div>
