@@ -105,7 +105,7 @@ def staff_dashboard():
 @login_required
 def manager_dashboard():
     """Manager dashboard - shows department problems and pending cases"""
-    dept_id = current_user.dept_id
+    dept_id = current_user.department_id
     
     # Department problems by priority
     problems = Problem.query.filter_by(department_id=dept_id, organization_id=current_user.organization_id)\
@@ -196,7 +196,7 @@ def pm_dashboard():
 @login_required
 def director_dashboard():
     """Director/CEO dashboard - shows department KPIs and approvals"""
-    dept_id = current_user.dept_id
+    dept_id = current_user.department_id
     
     # Department KPIs
     kpis = compute_department_kpis(dept_id)
@@ -380,7 +380,7 @@ def executive_dashboard():
     # Show all if Admin or CEO, else just their department with error handling
     try:
         if current_user.role.value == "Director":
-            dept_id = current_user.dept_id
+            dept_id = current_user.department_id
             if dept_id:
                 cases = BusinessCase.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
                 projects = Project.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
@@ -480,7 +480,7 @@ def export_exec_dashboard():
 
     # Fetch metrics (reusing logic from executive_dashboard)
     if current_user.role.value == "Director":
-        dept_id = current_user.dept_id
+        dept_id = current_user.department_id
         cases = BusinessCase.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
         projects = Project.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
         departments = Department.query.filter_by(id=dept_id, organization_id=current_user.organization_id).all()
