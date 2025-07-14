@@ -168,9 +168,9 @@ select option {
                                 style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
                             ✨ AI: Suggest Stories
                         </button>
-                        <button class="btn btn-secondary btn-sm" onclick="loadStories({{ epic.id }})" title="View Stories"
+                        <button class="btn btn-secondary btn-sm" onclick="loadStoriesV2({{ epic.id }}, true)" title="View User Stories"
                                 style="color: #ffffff !important; font-weight: 600 !important;">
-                            <i class="fas fa-folder-open"></i> View Stories
+                            <i class="fas fa-folder-open"></i> View User Stories
                         </button>
                         <button class="btn btn-primary btn-sm" onclick="editEpic({{ epic.id }})" title="Edit Epic" 
                                 data-epic-id="{{ epic.id }}" data-epic-title="{{ epic.title }}" data-epic-description="{{ epic.description or '' }}" data-epic-assigned-by="{{ epic.assigned_by or '' }}"
