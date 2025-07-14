@@ -2,16 +2,37 @@
 .form-check-input {
     width: 18px !important;
     height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
     margin-right: 8px !important;
     border: 2px solid var(--bs-primary) !important;
     background-color: var(--bs-body-bg) !important;
     opacity: 1 !important;
     cursor: pointer !important;
+    border-radius: 4px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    position: relative !important;
 }
 
 .form-check-input:checked {
     background-color: var(--bs-primary) !important;
     border-color: var(--bs-primary) !important;
+}
+
+.form-check-input:checked::before {
+    content: '✓' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    color: white !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
 }
 
 .form-check-input:focus {
@@ -34,13 +55,36 @@
 
 /* Dark theme specific enhancements */
 [data-bs-theme="dark"] .form-check-input {
-    background-color: var(--bs-dark) !important;
-    border-color: var(--bs-light) !important;
+    background-color: #343a40 !important;
+    border-color: #6c757d !important;
 }
 
 [data-bs-theme="dark"] .form-check-input:checked {
-    background-color: var(--bs-primary) !important;
-    border-color: var(--bs-primary) !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+/* Additional nuclear overrides to ensure box visibility */
+input[type="checkbox"].form-check-input {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    border: 2px solid #0d6efd !important;
+    background-color: #343a40 !important;
+    border-radius: 4px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+}
+
+input[type="checkbox"].form-check-input:checked {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
 }
 
 /* Hover effects for better UX */
