@@ -524,10 +524,29 @@ async function loadStories(epicId) {
 
 // Load stories using v2 API
 async function loadStoriesV2(epicId, reset = false) {
+    console.log(`🔄 loadStoriesV2 called with epicId: ${epicId}, reset: ${reset}`);
+    
     const container = document.getElementById(`stories-${epicId}`);
     const loadMoreContainer = document.getElementById(`load-more-container-${epicId}`);
     
+    console.log(`🎯 Container element:`, container);
+    console.log(`📦 Load more container:`, loadMoreContainer);
+    
+    // Initialize story state if not exists
+    if (!storyState[epicId]) {
+        console.log(`🆕 Initializing story state for epic ${epicId}`);
+        storyState[epicId] = {
+            loaded: false,
+            offset: 0,
+            limit: 10,
+            total: 0,
+            stories: [],
+            filters: { status: '', stakeholder: '' }
+        };
+    }
+    
     if (reset) {
+        console.log(`🔄 Resetting state for epic ${epicId}`);
         storyState[epicId].offset = 0;
         storyState[epicId].stories = [];
         container.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading stories...</div>';
@@ -548,31 +567,46 @@ async function loadStoriesV2(epicId, reset = false) {
             params.append('stakeholder', storyState[epicId].filters.stakeholder);
         }
         
+        console.log(`🌐 API URL: /business/api/stories/v2?${params.toString()}`);
+        
         const res = await fetch(`/business/api/stories/v2?${params}`, {
             credentials: 'same-origin'
         });
+        
+        console.log(`🌐 Response status: ${res.status}`);
         
         if (!res.ok) {
             throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
         
         const data = await res.json();
+        console.log(`📊 API Response:`, data);
         
         // Update state
         storyState[epicId].total = data.total;
         storyState[epicId].stories = reset ? data.stories : [...storyState[epicId].stories, ...data.stories];
         storyState[epicId].loaded = true;
         
+        console.log(`📈 Updated story state for epic ${epicId}:`, storyState[epicId]);
+        
         // Render stories
         renderStories(epicId);
         
         // Show/hide load more button
         const hasMore = storyState[epicId].stories.length < storyState[epicId].total;
-        loadMoreContainer.style.display = hasMore ? 'block' : 'none';
+        if (loadMoreContainer) {
+            loadMoreContainer.style.display = hasMore ? 'block' : 'none';
+        }
+        
+        // Show filters container
+        const filtersContainer = document.getElementById(`filters-${epicId}`);
+        if (filtersContainer) {
+            filtersContainer.style.display = 'flex';
+        }
         
     } catch (error) {
-        console.error('Error loading stories:', error);
-        container.innerHTML = '<div class="text-danger">Error loading stories.</div>';
+        console.error('❌ Error loading stories:', error);
+        container.innerHTML = `<div class="text-danger">Error loading stories: ${error.message}</div>`;
     }
 }
 
