@@ -20,6 +20,8 @@
     
     <!-- Theme-specific CSS fixes -->
     {% if org_settings and org_settings.theme == 'light' %}
+    <!-- Light theme: border fixes for containers and boxes -->
+    <link href="{{ url_for('static', filename='css/light-theme-border-fix.css') }}?v={{ range(1000, 9999) | random }}" rel="stylesheet">
     <!-- Light theme: comprehensive button fixes -->
     <style>
         /* Ensure all buttons are visible and properly styled */

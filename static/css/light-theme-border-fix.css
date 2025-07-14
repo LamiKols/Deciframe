@@ -1,0 +1,151 @@
+/**
+ * Light Theme Border Fix
+ * Adds dark blue borders to containers and boxes for visual consistency
+ * Applied when body has data-bs-theme="light"
+ */
+
+/* Card borders for light theme */
+body[data-bs-theme="light"] .card {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Container borders for light theme */
+body[data-bs-theme="light"] .container,
+body[data-bs-theme="light"] .container-fluid {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Modal borders for light theme */
+body[data-bs-theme="light"] .modal-content {
+    border: 2px solid #0d6efd !important;
+    border-radius: 0.5rem !important;
+}
+
+/* Alert borders for light theme */
+body[data-bs-theme="light"] .alert {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Form group borders for light theme */
+body[data-bs-theme="light"] .form-group,
+body[data-bs-theme="light"] .mb-3,
+body[data-bs-theme="light"] .mb-4 {
+    border: 1px solid #e3f2fd;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem !important;
+}
+
+/* Navigation borders for light theme */
+body[data-bs-theme="light"] .navbar {
+    border-bottom: 2px solid #0d6efd !important;
+}
+
+/* Dropdown borders for light theme */
+body[data-bs-theme="light"] .dropdown-menu {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Table borders for light theme */
+body[data-bs-theme="light"] .table {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Button group borders for light theme */
+body[data-bs-theme="light"] .btn-group {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Pagination borders for light theme */
+body[data-bs-theme="light"] .pagination {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+    padding: 0.5rem !important;
+}
+
+/* List group borders for light theme */
+body[data-bs-theme="light"] .list-group {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Badge borders for light theme */
+body[data-bs-theme="light"] .badge {
+    border: 1px solid #0d6efd !important;
+}
+
+/* Progress bar container borders for light theme */
+body[data-bs-theme="light"] .progress {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Accordion borders for light theme */
+body[data-bs-theme="light"] .accordion {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Breadcrumb borders for light theme */
+body[data-bs-theme="light"] .breadcrumb {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+    padding: 0.75rem 1rem !important;
+}
+
+/* Card header and footer enhanced borders */
+body[data-bs-theme="light"] .card-header {
+    border-bottom: 1px solid #0d6efd !important;
+    background-color: #f8f9fa !important;
+}
+
+body[data-bs-theme="light"] .card-footer {
+    border-top: 1px solid #0d6efd !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Tab content borders */
+body[data-bs-theme="light"] .tab-content {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0 0.375rem 0.375rem 0.375rem !important;
+    padding: 1rem !important;
+}
+
+/* Nav tabs enhanced styling */
+body[data-bs-theme="light"] .nav-tabs {
+    border-bottom: 2px solid #0d6efd !important;
+}
+
+body[data-bs-theme="light"] .nav-tabs .nav-link.active {
+    border: 1px solid #0d6efd !important;
+    border-bottom-color: transparent !important;
+}
+
+/* Offcanvas borders */
+body[data-bs-theme="light"] .offcanvas {
+    border: 2px solid #0d6efd !important;
+}
+
+/* Carousel borders */
+body[data-bs-theme="light"] .carousel {
+    border: 1px solid #0d6efd !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Tooltip borders */
+body[data-bs-theme="light"] .tooltip .tooltip-inner {
+    border: 1px solid #0d6efd !important;
+}
+
+/* Popover borders */
+body[data-bs-theme="light"] .popover {
+    border: 1px solid #0d6efd !important;
+}
