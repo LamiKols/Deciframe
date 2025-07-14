@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/checkbox-visibility-fix.css') }}?v={{ range(1000, 9999) | random }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-4">
@@ -41,9 +45,11 @@
                         {% endif %}
                     </div>
                     
-                    <div class="mb-3 form-check">
-                        {{ form.remember_me(class="form-check-input") }}
-                        {{ form.remember_me.label(class="form-check-label") }}
+                    <div class="mb-3 form-check d-flex align-items-center">
+                        {{ form.remember_me(class="form-check-input me-2", 
+                                          style="width: 18px; height: 18px; border: 2px solid var(--bs-primary); background-color: var(--bs-body-bg); opacity: 1;") }}
+                        {{ form.remember_me.label(class="form-check-label", 
+                                                style="color: var(--bs-body-color); font-weight: 500; cursor: pointer;") }}
                     </div>
                     
                     <div class="d-grid">
