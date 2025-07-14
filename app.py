@@ -309,7 +309,10 @@ def create_app():
             org_settings = None
         
         # Use user theme preference first, then organization default, then 'light'
-        user_theme = getattr(current_user, 'theme', None)
+        # Force fresh lookup from database to avoid caching issues
+        from models import User
+        fresh_user = User.query.get(current_user.id) if current_user.id else None
+        user_theme = getattr(fresh_user, 'theme', None) if fresh_user else getattr(current_user, 'theme', None)
         org_theme = getattr(org_settings, 'default_theme', 'light') if org_settings else 'light'
         theme = user_theme if user_theme else org_theme
         

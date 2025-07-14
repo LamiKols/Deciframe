@@ -386,6 +386,9 @@ def toggle_theme():
         current_user.theme = 'dark' if current_user.theme == 'light' else 'light'
         db.session.commit()
         
+        # Refresh the current_user object to ensure theme change is reflected
+        db.session.refresh(current_user)
+        
         flash(f"Theme changed to {current_user.theme} mode", "info")
         return redirect(request.referrer or url_for('dashboards.dashboard_home'))
     except Exception as e:
