@@ -222,6 +222,23 @@ async function generateEpicsAndStories() {
                 resultsDiv.scrollIntoView({ behavior: 'smooth' });
             }
             
+            // Redirect to case detail page after successful generation
+            setTimeout(() => {
+                showSuccessMessage('Requirements generated successfully! Redirecting to case detail...');
+                setTimeout(() => {
+                    // Get the case ID from the data attribute
+                    const caseIdElement = document.querySelector('[data-case-id]');
+                    if (caseIdElement) {
+                        const caseId = caseIdElement.getAttribute('data-case-id');
+                        const authToken = new URLSearchParams(window.location.search).get('auth_token');
+                        const returnUrl = `/business/cases/${caseId}${authToken ? '?auth_token=' + authToken : ''}`;
+                        window.location.href = returnUrl;
+                    } else {
+                        location.reload();
+                    }
+                }, 2000);
+            }, 3000);
+            
         } else {
             throw new Error(data.error || 'Unknown error occurred');
         }
