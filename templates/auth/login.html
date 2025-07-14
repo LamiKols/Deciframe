@@ -45,11 +45,14 @@
                         {% endif %}
                     </div>
                     
-                    <div class="mb-3 form-check d-flex align-items-center">
-                        {{ form.remember_me(class="form-check-input me-2", 
-                                          style="width: 18px; height: 18px; border: 2px solid var(--bs-primary); background-color: var(--bs-body-bg); opacity: 1;") }}
-                        {{ form.remember_me.label(class="form-check-label", 
-                                                style="color: var(--bs-body-color); font-weight: 500; cursor: pointer;") }}
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="custom-checkbox-wrapper me-2">
+                            {{ form.remember_me(class="custom-checkbox-input", id="remember_me", style="display: none;") }}
+                            <label for="remember_me" class="custom-checkbox-label">
+                                <span class="custom-checkbox-box"></span>
+                                <span class="custom-checkbox-text">Remember me</span>
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="d-grid">

@@ -1,21 +1,68 @@
-/* Checkbox Visibility Fix for Remember Me */
-.form-check-input {
-    width: 18px !important;
-    height: 18px !important;
-    min-width: 18px !important;
-    min-height: 18px !important;
-    margin-right: 8px !important;
-    border: 2px solid var(--bs-primary) !important;
-    background-color: var(--bs-body-bg) !important;
-    opacity: 1 !important;
-    cursor: pointer !important;
-    border-radius: 4px !important;
-    display: inline-block !important;
-    vertical-align: middle !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    position: relative !important;
+/* Custom Checkbox Solution - Complete replacement for Bootstrap checkbox */
+.custom-checkbox-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.custom-checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    color: var(--bs-body-color);
+    font-weight: 500;
+}
+
+.custom-checkbox-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #0d6efd;
+    border-radius: 4px;
+    background-color: #343a40;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox-text {
+    color: var(--bs-body-color);
+    font-weight: 500;
+}
+
+/* Checked state */
+.custom-checkbox-input:checked + .custom-checkbox-label .custom-checkbox-box {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.custom-checkbox-input:checked + .custom-checkbox-label .custom-checkbox-box::after {
+    content: '✓';
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Hover state */
+.custom-checkbox-label:hover .custom-checkbox-box {
+    border-color: #0a58ca;
+    filter: brightness(1.1);
+}
+
+.custom-checkbox-label:hover .custom-checkbox-text {
+    color: #0d6efd;
 }
 
 .form-check-input:checked {
