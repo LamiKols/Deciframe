@@ -880,7 +880,8 @@ def create_story():
             acceptance_criteria=acceptance_criteria,
             epic_id=epic_id,
             priority=priority,
-            effort_estimate=effort_estimate
+            effort_estimate=effort_estimate,
+            organization_id=current_user.organization_id
         )
         db.session.add(story)
         db.session.commit()

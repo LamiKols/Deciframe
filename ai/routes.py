@@ -426,9 +426,20 @@ def generate_stories():
         epic_id = data['epic_id']
         user = current_user
         
-        # Get the epic and validate access
-        epic = Epic.query.get_or_404(epic_id)
-        business_case = BusinessCase.query.get_or_404(epic.case_id)
+        # Get the epic and validate access with organization filtering
+        epic = Epic.query.filter_by(id=epic_id, organization_id=user.organization_id).first()
+        if not epic:
+            return jsonify({
+                'success': False,
+                'error': 'Epic not found or access denied'
+            }), 404
+        
+        business_case = BusinessCase.query.filter_by(id=epic.case_id, organization_id=user.organization_id).first()
+        if not business_case:
+            return jsonify({
+                'success': False,
+                'error': 'Business case not found or access denied'
+            }), 404
         
         current_app.logger.info(f"AI story generation requested for epic {epic_id}: {epic.title}")
         
