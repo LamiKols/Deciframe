@@ -63,14 +63,14 @@ Provides consistent custom dropdown styling and functionality across all templat
 {% endmacro %}
 
 {# Status Dropdown with Standard Options #}
-{% macro status_dropdown(name, statuses, selected=None, placeholder='Select Status', class='form-select', id=None, multiple=False) %}
+{% macro status_dropdown(name, statuses, selected=None, placeholder='Select Status', class='form-select', id=None, multiple=False, onchange=None) %}
   {% set status_options = [] %}
   {% if statuses %}
     {% for status in statuses %}
       {% set status_options = status_options + [(status, status)] %}
     {% endfor %}
   {% endif %}
-  {{ dropdown(name, status_options, selected, placeholder, class=class, id=id, multiple=multiple) }}
+  {{ dropdown(name, status_options, selected, placeholder, class=class, id=id, multiple=multiple, onchange=onchange) }}
 {% endmacro %}
 
 {# Priority Dropdown with Standard Values #}
