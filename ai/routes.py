@@ -416,8 +416,12 @@ def clear_epics(case_id):
 def generate_stories():
     """Generate AI-powered user stories for an epic"""
     try:
+        current_app.logger.info("🤖 AI story generation requested")
         data = request.get_json()
+        current_app.logger.info(f"🤖 Request data: {data}")
+        
         if not data or 'epic_id' not in data:
+            current_app.logger.error("🤖 Epic ID missing from request")
             return jsonify({
                 'success': False,
                 'error': 'Epic ID is required'
