@@ -52,7 +52,10 @@ body[data-bs-theme="light"] .navbar-dark {
     border-bottom: 2px solid #0d6efd !important;
 }
 
+/* Nuclear overrides for navbar brand visibility in light theme */
+body[data-bs-theme="light"] .navbar .navbar-brand,
 body[data-bs-theme="light"] .navbar-dark .navbar-brand,
+body[data-bs-theme="light"] .bg-dark .navbar-brand,
 body[data-bs-theme="light"] .navbar-brand {
     color: #212529 !important;
     font-weight: 700 !important;
@@ -60,10 +63,22 @@ body[data-bs-theme="light"] .navbar-brand {
     text-shadow: none !important;
     opacity: 1 !important;
     visibility: visible !important;
+    display: inline-block !important;
 }
 
+body[data-bs-theme="light"] .navbar .navbar-brand:hover,
 body[data-bs-theme="light"] .navbar-brand:hover {
     color: #0d6efd !important;
+}
+
+/* Additional brand text styling */
+body[data-bs-theme="light"] a.navbar-brand {
+    color: #212529 !important;
+    text-decoration: none !important;
+}
+
+body[data-bs-theme="light"] a.navbar-brand:visited {
+    color: #212529 !important;
 }
 
 body[data-bs-theme="light"] .navbar-dark .navbar-toggler {
