@@ -1202,9 +1202,9 @@ def generate_requirements_epic(case_id):
             generated_epics = generate_fallback_epics(business_case, answers)
             print(f"🤖 Using fallback epics: {len(generated_epics)} generated")
         
-        # Save epics to database if user is a Business Analyst or Admin
-        print(f"🤖 User role: {user.role}, checking if BA or Admin...")
-        if user.role and user.role.value in ['BA', 'Admin']:
+        # Save epics to database if user is a Business Analyst, Admin, Director, or Manager
+        print(f"🤖 User role: {user.role}, checking if authorized...")
+        if user.role and user.role.value in ['BA', 'Admin', 'Director', 'Manager']:
             print(f"🤖 User authorized, saving to database...")
             try:
                 # Clear existing stories first, then epics to avoid foreign key constraint violations
