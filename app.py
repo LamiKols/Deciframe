@@ -405,13 +405,14 @@ def create_app():
         from models import User
         from flask import session
         
+        print(f"🔧 User Loader Debug: Called with user_id={user_id}")
+        
         # Always try to load user if user_id is provided
         try:
             user = User.query.get(int(user_id))
             if user:
                 print(f"🔧 User Loader Debug: Successfully loaded user {user.email} (ID: {user_id})")
-                # Store user_id in session for debugging
-                session['user_id'] = user.id
+                print(f"🔧 User Loader Debug: User active: {user.is_active}")
                 return user
             else:
                 print(f"🔧 User Loader Debug: No user found with ID {user_id}")

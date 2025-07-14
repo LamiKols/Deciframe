@@ -167,6 +167,24 @@ class User(UserMixin, db.Model):
         """Check password against hash"""
         return check_password_hash(self.password_hash, password)
     
+    # Flask-Login required methods
+    def get_id(self):
+        """Required by Flask-Login to get user ID"""
+        return str(self.id)
+    
+    def is_authenticated(self):
+        """Required by Flask-Login - return True if user is authenticated"""
+        return True
+    
+    def is_active(self):
+        """Required by Flask-Login - return True if user is active"""
+        # Use the database column directly to avoid circular reference
+        return bool(getattr(self, 'is_active', True))
+    
+    def is_anonymous(self):
+        """Required by Flask-Login - return False for real users"""
+        return False
+    
     @property
     def manager(self):
         """Get the user's manager (department manager)"""
