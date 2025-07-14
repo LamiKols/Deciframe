@@ -222,22 +222,36 @@ async function generateEpicsAndStories() {
                 resultsDiv.scrollIntoView({ behavior: 'smooth' });
             }
             
-            // Redirect to case detail page after successful generation
-            setTimeout(() => {
-                showSuccessMessage('Requirements generated successfully! Redirecting to case detail...');
+            // Check if we're on the requirements page or case detail page
+            const currentUrl = window.location.pathname;
+            const isRequirementsPage = currentUrl.includes('/requirements/');
+            
+            if (isRequirementsPage) {
+                // On requirements page, redirect to case detail to see updated button
                 setTimeout(() => {
-                    // Get the case ID from the data attribute
-                    const caseIdElement = document.querySelector('[data-case-id]');
-                    if (caseIdElement) {
-                        const caseId = caseIdElement.getAttribute('data-case-id');
-                        const authToken = new URLSearchParams(window.location.search).get('auth_token');
-                        const returnUrl = `/business/cases/${caseId}${authToken ? '?auth_token=' + authToken : ''}`;
-                        window.location.href = returnUrl;
-                    } else {
+                    showSuccessMessage('Requirements generated successfully! Redirecting to case detail...');
+                    setTimeout(() => {
+                        // Get the case ID from the data attribute
+                        const caseIdElement = document.querySelector('[data-case-id]');
+                        if (caseIdElement) {
+                            const caseId = caseIdElement.getAttribute('data-case-id');
+                            const authToken = new URLSearchParams(window.location.search).get('auth_token');
+                            const returnUrl = `/business/cases/${caseId}${authToken ? '?auth_token=' + authToken : ''}`;
+                            window.location.href = returnUrl;
+                        } else {
+                            location.reload();
+                        }
+                    }, 2000);
+                }, 3000);
+            } else {
+                // On case detail page, just refresh to update the button state
+                setTimeout(() => {
+                    showSuccessMessage('Requirements generated successfully! Refreshing page...');
+                    setTimeout(() => {
                         location.reload();
-                    }
-                }, 2000);
-            }, 3000);
+                    }, 2000);
+                }, 3000);
+            }
             
         } else {
             throw new Error(data.error || 'Unknown error occurred');
