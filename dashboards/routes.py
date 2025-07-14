@@ -383,7 +383,7 @@ def executive_dashboard():
             dept_id = current_user.department_id
             if dept_id:
                 cases = BusinessCase.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
-                projects = Project.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
+                projects = Project.query.filter_by(department_id=dept_id, organization_id=current_user.organization_id)
                 departments = Department.query.filter_by(id=dept_id, organization_id=current_user.organization_id).all()
             else:
                 # Fallback if no department assigned
@@ -398,18 +398,23 @@ def executive_dashboard():
         case_stats = []
         for dept in departments:
             try:
+                # Use correct column name for business cases
                 dept_cases = BusinessCase.query.filter_by(dept_id=dept.id, organization_id=current_user.organization_id)
                 total_count = dept_cases.count()
-                approved_count = dept_cases.filter_by(status="Approved").count()
-                rejected_count = dept_cases.filter_by(status="Rejected").count()
-                pending_count = dept_cases.filter_by(status="Submitted").count()
+                
+                # Use actual status enum values from database
+                approved_count = dept_cases.filter_by(status=StatusEnum.Approved).count()
+                rejected_count = dept_cases.filter_by(status=StatusEnum.Rejected).count()
+                pending_count = dept_cases.filter_by(status=StatusEnum.Submitted).count()
+                open_count = dept_cases.filter_by(status=StatusEnum.Open).count()
                 
                 case_stats.append({
                     "name": dept.name,
                     "total": total_count,
                     "approved": approved_count,
                     "rejected": rejected_count,
-                    "pending": pending_count
+                    "pending": pending_count,
+                    "open": open_count
                 })
             except Exception as e:
                 # Skip departments that cause database errors
@@ -482,7 +487,7 @@ def export_exec_dashboard():
     if current_user.role.value == "Director":
         dept_id = current_user.department_id
         cases = BusinessCase.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
-        projects = Project.query.filter_by(dept_id=dept_id, organization_id=current_user.organization_id)
+        projects = Project.query.filter_by(department_id=dept_id, organization_id=current_user.organization_id)
         departments = Department.query.filter_by(id=dept_id, organization_id=current_user.organization_id).all()
     else:
         cases = BusinessCase.query.filter_by(organization_id=current_user.organization_id)
