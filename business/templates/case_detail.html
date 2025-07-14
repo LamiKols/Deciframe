@@ -292,11 +292,7 @@
                                 <i class="fas fa-edit"></i> Refine Stories ({{ epics_count }} epics)
                             </a>
                             {% endif %}
-                            {% if epics %}
-                            <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-success w-100 mb-2">
-                                <i class="fas fa-eye"></i> View Generated Requirements
-                            </a>
-                            {% else %}
+                            {% if not epics %}
                                 {% if business_case.can_generate_requirements() %}
                                 <a href="{{ url_for('business.requirements', id=business_case.id, auth_token=request.args.get('auth_token')) }}" class="btn btn-info w-100 mb-2">
                                     <i class="fas fa-list-check"></i> Generate Requirements
