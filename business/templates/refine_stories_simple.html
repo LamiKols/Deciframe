@@ -636,8 +636,8 @@ function renderStories(epicId) {
         <div class="story-card border rounded p-3 mb-2" style="background-color: #2a2a2a; border-color: #444 !important;">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <h6 class="story-title text-light mb-1" style="color: #fff !important;">${s.title}</h6>
-                <div class="story-actions">
-                    <button class="btn btn-sm btn-outline-primary me-1" 
+                <div class="story-actions" style="display: flex !important; gap: 5px !important; flex-shrink: 0 !important;">
+                    <button class="btn btn-sm btn-primary me-1" 
                             onclick="editStory(this)" 
                             data-story-id="${s.id}" 
                             data-epic-id="${epicId}"
@@ -645,10 +645,12 @@ function renderStories(epicId) {
                             data-story-description="${s.description || ''}"
                             data-story-criteria="${s.acceptance_criteria || ''}"
                             data-story-priority="${s.priority}"
-                            data-effort-estimate="${s.effort_estimate}">
+                            data-effort-estimate="${s.effort_estimate}"
+                            style="color: #ffffff !important; background-color: #0d6efd !important; border: 1px solid #0d6efd !important; min-width: 40px !important; display: inline-block !important;">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteStory(${s.id}, ${epicId})">
+                    <button class="btn btn-sm btn-danger" onclick="deleteStory(${s.id}, ${epicId})"
+                            style="color: #ffffff !important; background-color: #dc3545 !important; border: 1px solid #dc3545 !important; min-width: 40px !important; display: inline-block !important;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
