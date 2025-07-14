@@ -986,7 +986,7 @@ async function generateWithAI(title, description, epicId) {
     container.innerHTML = "⏳ Generating suggestions...";
     
     try {
-        const res = await fetch('/ai/generate-stories', {
+        const res = await fetch('/api/ai/generate-stories', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
