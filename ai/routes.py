@@ -1112,13 +1112,17 @@ def generate_requirements_epic(case_id):
     """Generate requirements using intelligent contextual analysis with OpenAI enhancement"""
     try:
         user = current_user
+        print(f"🤖 AI Requirements Generation - User: {user.name if user else 'None'}, Case ID: {case_id}")
+        
         business_case = BusinessCase.query.get_or_404(case_id)
         current_app.logger.info(f"Generating epics for case {case_id}: {business_case.title}")
+        print(f"🤖 Found business case: {business_case.title}")
         
         # Get user answers from request
         data = request.get_json()
         if not data:
             current_app.logger.error("No JSON data provided in request")
+            print("❌ No JSON data provided in request")
             return jsonify({
                 'success': False,
                 'error': 'No input data provided'
@@ -1126,20 +1130,27 @@ def generate_requirements_epic(case_id):
         
         answers = data.get('answers', {})
         current_app.logger.info(f"Processing {len(answers)} requirement answers")
+        print(f"🤖 Processing {len(answers)} requirement answers: {list(answers.keys())}")
         
         # Generate intelligent contextual epics based on requirements analysis
+        print(f"🤖 Generating contextual epics...")
         generated_epics = generate_contextual_epics(business_case, answers)
         current_app.logger.info(f"Generated {len(generated_epics)} contextual epics from requirements analysis")
+        print(f"🤖 Generated {len(generated_epics)} contextual epics")
         
         # Save epics to database if user is a Business Analyst or Admin
+        print(f"🤖 User role: {user.role}, checking if BA or Admin...")
         if user.role and user.role.value in ['BA', 'Admin']:
+            print(f"🤖 User authorized, saving to database...")
             try:
                 # Clear existing stories first, then epics to avoid foreign key constraint violations
+                print(f"🤖 Clearing existing epics and stories for case {case_id}...")
                 existing_epics = Epic.query.filter_by(case_id=case_id).all()
                 for epic in existing_epics:
                     Story.query.filter_by(epic_id=epic.id).delete()
                 Epic.query.filter_by(case_id=case_id).delete()
                 db.session.commit()
+                print(f"🤖 Cleared {len(existing_epics)} existing epics")
                 
                 # Save new epics
                 for epic_data in generated_epics:
@@ -1182,8 +1193,14 @@ def generate_requirements_epic(case_id):
             except Exception as e:
                 db.session.rollback()
                 current_app.logger.error(f"Database save error: {e}")
+                print(f"❌ Database save error: {e}")
+                import traceback
+                traceback.print_exc()
+        else:
+            print(f"🤖 User not authorized to save to database (role: {user.role})")
         
         # Return contextual epics 
+        print(f"🤖 Returning {len(generated_epics)} epics to client")
         return jsonify({
             'success': True,
             'epics': generated_epics,
@@ -1192,6 +1209,9 @@ def generate_requirements_epic(case_id):
         
     except Exception as e:
         current_app.logger.exception(f"Fatal error in generate_requirements_epic: {e}")
+        print(f"❌ Fatal error in generate_requirements_epic: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': f'Failed to generate requirements: {str(e)}'
