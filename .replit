@@ -36,3 +36,6 @@ externalPort = 80
 [[ports]]
 localPort = 8080
 externalPort = 8080
+
+[agent]
+integrations = ["python_sendgrid==1.0.0", "styling_replit==1.0.0", "python_openai==1.0.0", "python_database==1.0.0", "python_log_in_with_replit==1.0.0"]
