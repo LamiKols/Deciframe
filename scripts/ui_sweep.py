@@ -6,18 +6,15 @@ import os
 import sys
 import re
 import csv
-import json
 import requests
-from urllib.parse import urljoin, urlparse, parse_qs
+from urllib.parse import urljoin
 from datetime import datetime
 from collections import defaultdict
 import logging
-from pathlib import Path
 try:
     from bs4 import BeautifulSoup
 except ImportError:
     BeautifulSoup = None
-    import html.parser
 
 
 class UISweeper:
@@ -497,7 +494,7 @@ def main():
         sweeper.run_sweep()
         csv_file, md_file = sweeper.generate_reports()
         
-        print(f"\n📄 Reports generated:")
+        print("\n📄 Reports generated:")
         print(f"  CSV: {csv_file}")
         print(f"  Markdown: {md_file}")
         
