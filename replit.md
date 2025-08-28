@@ -14,6 +14,8 @@ DeciFrame employs a modular Flask backend with SQLAlchemy ORM and a PostgreSQL d
 
 **Admin Module (Completed August 2025):** Enterprise-grade administrative functionality with comprehensive RBAC (Role-Based Access Control), full audit logging system, and 13+ new admin endpoints covering audit trails, user role management, regional settings, system health monitoring, and organization policies. All routes enforce strict multi-tenant data isolation with before/after state tracking for all administrative mutations.
 
+**Executive Dashboard (Completed August 2025):** Comprehensive org-wide executive analytics with cached metrics API, interactive Chart.js visualizations, CSV export capabilities, and AI-powered weekly summaries. Features portfolio funnel tracking, ROI analysis, department performance metrics, and real-time KPI monitoring with 5-minute TTL caching and role-based access control (Admin/CEO/Director only).
+
 **Core Modules:**
 -   **Auth**: User authentication and profile management, including multi-tenant organization registration with business email domain validation.
 -   **Department**: Hierarchical management up to 5 levels with a unified Department model (eliminating the dual hierarchy system). Directors have department-scoped admin access.
@@ -23,6 +25,7 @@ DeciFrame employs a modular Flask backend with SQLAlchemy ORM and a PostgreSQL d
 -   **Notifications**: Workflow automation and notification system with in-app notifications and SendGrid email integration, offering configurable templates and frequency.
 -   **Admin**: Comprehensive dashboard with user management, role permissions, system settings, audit logs, and data management (import/export).
 -   **Help**: Contextual help system with a floating widget, public help center, and AI-powered chat assistant.
+-   **Executive Dashboard**: Real-time organizational analytics with portfolio funnel tracking, ROI analysis, department performance metrics, cached data delivery, CSV export, and AI-powered executive summaries.
 
 **Key Technical Implementations & Design Decisions:**
 -   **Database Models**: User (role-based), Department (hierarchical), Problem, BusinessCase, Project, ProjectMilestone, NotificationTemplate, Notification, Epic, Story, Solution, AuditLog, ImportJob, OrgUnit, EpicSyncLog, ReportTemplate, ReportRun, PredictionFeedback, AIThresholdSettings. All core business models include `organization_id` for multi-tenant data isolation.

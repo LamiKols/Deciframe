@@ -63,3 +63,4 @@ pytest-cov
 pytest-playwright
 requests
 ruff
+cachetools

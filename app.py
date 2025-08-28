@@ -714,6 +714,16 @@ def create_app():
     except ImportError as e:
         print(f"⚠️ Additional admin routes not available: {e}")
     
+    # Register metrics and executive dashboard blueprints
+    try:
+        from executive_metrics import metrics_bp, exec_dash_bp
+        app.register_blueprint(metrics_bp)
+        app.register_blueprint(exec_dash_bp)
+        print("✓ Executive dashboard and metrics API registered successfully")
+    except ImportError as e:
+        print(f"⚠️ Executive dashboard not available: {e}")
+        print("⚠️ Continuing without executive dashboard functionality")
+    
     # Note: scheduled doesn't have a routes.py, only send_exec_report.py
     
     # Initialize workflow automation and scheduled tasks
