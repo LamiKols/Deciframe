@@ -4,9 +4,9 @@ Additional admin routes for comprehensive management
 
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import db, User, Organization, Department, AuditLog, OrganizationSettings, RoleEnum
+from models import db, User, Organization, Department, AuditLog, OrganizationSettings, UserRoleEnum as RoleEnum
 from admin.permissions import require_admin, require_super_admin, validate_admin_action
-from audit.log import audit_user_action, audit_organization_action, audit_role_change, get_audit_trail
+from audit.log import audit, audit_user_action, audit_organization_action, audit_role_change, get_audit_trail
 import logging
 from datetime import datetime, timedelta
 

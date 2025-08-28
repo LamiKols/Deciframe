@@ -12,6 +12,8 @@ DeciFrame is a modular Flask application designed for comprehensive problem and 
 ## System Architecture
 DeciFrame employs a modular Flask backend with SQLAlchemy ORM and a PostgreSQL database. Authentication is handled via a JWT stateless system, transitioning towards session-based Flask-Login for enhanced security. The frontend utilizes Bootstrap's dark theme for responsive design. Security is enforced with WTForms validation and Flask-CSRF protection.
 
+**Admin Module (Completed August 2025):** Enterprise-grade administrative functionality with comprehensive RBAC (Role-Based Access Control), full audit logging system, and 13+ new admin endpoints covering audit trails, user role management, regional settings, system health monitoring, and organization policies. All routes enforce strict multi-tenant data isolation with before/after state tracking for all administrative mutations.
+
 **Core Modules:**
 -   **Auth**: User authentication and profile management, including multi-tenant organization registration with business email domain validation.
 -   **Department**: Hierarchical management up to 5 levels with a unified Department model (eliminating the dual hierarchy system). Directors have department-scoped admin access.
