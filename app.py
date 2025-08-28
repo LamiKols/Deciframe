@@ -709,6 +709,7 @@ def create_app():
     @app.errorhandler(403)
     def forbidden(error):
         """Handle 403 Forbidden errors"""
+        from flask import render_template
         from flask_login import current_user
         
         # Log security violation
