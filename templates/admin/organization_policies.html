@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Organization Policies - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-primary" style="border-width: 3px;">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Organization Policies
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Policy Configuration</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Policy</th>
+                                            <th>Current Setting</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Currency</td>
+                                            <td><strong>{{ settings.currency }}</strong></td>
+                                            <td>Default currency for financial calculations</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Date Format</td>
+                                            <td><strong>{{ settings.date_format }}</strong></td>
+                                            <td>Standard date format across the organization</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Timezone</td>
+                                            <td><strong>{{ settings.timezone }}</strong></td>
+                                            <td>Default timezone for all timestamps</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Business Hours</td>
+                                            <td><strong>{{ settings.business_hours_start }} - {{ settings.business_hours_end }}</strong></td>
+                                            <td>Standard business operating hours</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <a href="{{ url_for('admin_regional_settings') }}" class="btn btn-primary">
+                                    <i class="fas fa-edit me-2"></i>Modify Settings
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h5>Recent Policy Changes</h5>
+                            {% if policy_changes %}
+                                <div class="list-group">
+                                    {% for change in policy_changes[:10] %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ change.action }}</h6>
+                                            <small>{{ change.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        </div>
+                                        <p class="mb-1">{{ change.details }}</p>
+                                        <small>by {{ change.user.name if change.user else 'System' }}</small>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No recent policy changes</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

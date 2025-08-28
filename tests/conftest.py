@@ -3,7 +3,6 @@ Test configuration and fixtures for DeciFrame Flask app
 """
 
 import pytest
-import tempfile
 import os
 from datetime import datetime
 

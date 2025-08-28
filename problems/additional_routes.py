@@ -2,9 +2,9 @@
 Additional problem management routes
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import db, Problem, User, Department, AuditLog
+from models import db, Problem, User, AuditLog
 import logging
 
 logger = logging.getLogger(__name__)

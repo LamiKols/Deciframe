@@ -705,6 +705,14 @@ def create_app():
         print("✓ Additional project routes registered successfully")
     except ImportError as e:
         print(f"⚠️ Additional project routes not available: {e}")
+        
+    # Register additional admin routes
+    try:
+        from admin.additional_routes import init_additional_admin_routes
+        init_additional_admin_routes(app)
+        print("✓ Additional admin routes registered successfully")
+    except ImportError as e:
+        print(f"⚠️ Additional admin routes not available: {e}")
     
     # Note: scheduled doesn't have a routes.py, only send_exec_report.py
     

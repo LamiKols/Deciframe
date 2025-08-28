@@ -2,7 +2,7 @@
 User profile management routes
 """
 
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import db, User, AuditLog

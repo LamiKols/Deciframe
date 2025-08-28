@@ -1,120 +1,44 @@
 {% extends "base.html" %}
 
-{% block title %}Regional Settings - Admin Center{% endblock %}
-
-{% block extra_head %}
-<style>
-/* Ensure form inputs are visible in dark theme */
-.form-select, .form-control {
-    background-color: #2e2e48 !important;
-    color: #f8f9fa !important;
-    border-color: #555 !important;
-}
-
-.form-select option {
-    background-color: #2e2e48 !important;
-    color: #f8f9fa !important;
-}
-
-/* Auto-detection display styling */
-#autoDetectionDisplay {
-    background-color: #1a1a2e !important;
-    color: #f8f9fa !important;
-    border-color: #28a745 !important;
-}
-
-/* Preview display styling */
-#previewDisplay {
-    background-color: #1a1a2e !important;
-    color: #f8f9fa !important;
-}
-
-/* Make input text clearly visible */
-input[type="text"], input[type="email"], input[readonly] {
-    background-color: #2e2e48 !important;
-    color: #f8f9fa !important;
-    border-color: #555 !important;
-}
-
-input[readonly] {
-    background-color: #1a1a2e !important;
-    border-color: #28a745 !important;
-}
-</style>
-{% endblock %}
+{% block title %}Regional Settings - Admin{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('dashboards.dashboard_home') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Admin Center</a></li>
-                    <li class="breadcrumb-item active">Regional Settings</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-8 col-xl-6">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">🌍 Organization Regional Settings</h3>
-                    <span class="badge bg-secondary">
-                        <i class="fa fa-clock"></i> 
-                        Last Updated: 
-                        {% if settings.updated_at %}
-                            {{ settings.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
-                        {% else %}
-                            Never
-                        {% endif %}
-                    </span>
+            <div class="card border-primary" style="border-width: 3px;">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-globe me-2"></i>Regional Settings
+                    </h4>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-4">
-                        Configure organization-wide regional preferences for timezone, currency, and date/time formatting. 
-                        These settings serve as defaults for new users and fallbacks when user preferences are not set.
-                    </p>
-
-                    <form method="POST">
-                        {{ form.hidden_tag() }}
-                        
+                    <form method="POST" action="{{ url_for('admin_regional_settings') }}">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    {{ form.timezone.label(class="form-label") }}
-                                    {{ form.timezone(class="form-select") }}
-                                    {% if form.timezone.errors %}
-                                        <div class="text-danger small">
-                                            {% for error in form.timezone.errors %}
-                                                <div>{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <div class="form-text">
-                                        <i class="fa fa-info-circle"></i>
-                                        Default timezone for the organization. Users can override this in their profile.
-                                    </div>
+                                    <label for="currency" class="form-label">Currency</label>
+                                    <select class="form-select" id="currency" name="currency" required>
+                                        <option value="USD" {% if settings.currency == 'USD' %}selected{% endif %}>USD - US Dollar ($)</option>
+                                        <option value="EUR" {% if settings.currency == 'EUR' %}selected{% endif %}>EUR - Euro (€)</option>
+                                        <option value="GBP" {% if settings.currency == 'GBP' %}selected{% endif %}>GBP - British Pound (£)</option>
+                                        <option value="CAD" {% if settings.currency == 'CAD' %}selected{% endif %}>CAD - Canadian Dollar (C$)</option>
+                                        <option value="AUD" {% if settings.currency == 'AUD' %}selected{% endif %}>AUD - Australian Dollar (A$)</option>
+                                        <option value="JPY" {% if settings.currency == 'JPY' %}selected{% endif %}>JPY - Japanese Yen (¥)</option>
+                                        <option value="CNY" {% if settings.currency == 'CNY' %}selected{% endif %}>CNY - Chinese Yuan (¥)</option>
+                                        <option value="INR" {% if settings.currency == 'INR' %}selected{% endif %}>INR - Indian Rupee (₹)</option>
+                                    </select>
                                 </div>
                             </div>
-                            
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    {{ form.currency.label(class="form-label") }}
-                                    {{ form.currency(class="form-select") }}
-                                    {% if form.currency.errors %}
-                                        <div class="text-danger small">
-                                            {% for error in form.currency.errors %}
-                                                <div>{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <div class="form-text">
-                                        <i class="fa fa-info-circle"></i>
-                                        Used for financial calculations and budget displays.
-                                    </div>
+                                    <label for="date_format" class="form-label">Date Format</label>
+                                    <select class="form-select" id="date_format" name="date_format" required>
+                                        <option value="US" {% if settings.date_format == 'US' %}selected{% endif %}>US - MM/DD/YYYY</option>
+                                        <option value="EU" {% if settings.date_format == 'EU' %}selected{% endif %}>EU - DD/MM/YYYY</option>
+                                        <option value="ISO" {% if settings.date_format == 'ISO' %}selected{% endif %}>ISO - YYYY-MM-DD</option>
+                                        <option value="Long" {% if settings.date_format == 'Long' %}selected{% endif %}>Long - Month DD, YYYY</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -122,268 +46,54 @@ input[readonly] {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    {{ form.date_format.label(class="form-label") }}
-                                    {{ form.date_format(class="form-select") }}
-                                    {% if form.date_format.errors %}
-                                        <div class="text-danger small">
-                                            {% for error in form.date_format.errors %}
-                                                <div>{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <div class="form-text">
-                                        <i class="fa fa-info-circle"></i>
-                                        How dates are displayed throughout the application.
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    {{ form.time_format.label(class="form-label") }}
-                                    {{ form.time_format(class="form-select") }}
-                                    {% if form.time_format.errors %}
-                                        <div class="text-danger small">
-                                            {% for error in form.time_format.errors %}
-                                                <div>{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <div class="form-text">
-                                        <i class="fa fa-info-circle"></i>
-                                        How times are displayed throughout the application.
-                                    </div>
+                                    <label for="timezone" class="form-label">Timezone</label>
+                                    <select class="form-select" id="timezone" name="timezone" required>
+                                        <option value="UTC" {% if settings.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                                        <option value="America/New_York" {% if settings.timezone == 'America/New_York' %}selected{% endif %}>Eastern Time (US)</option>
+                                        <option value="America/Chicago" {% if settings.timezone == 'America/Chicago' %}selected{% endif %}>Central Time (US)</option>
+                                        <option value="America/Denver" {% if settings.timezone == 'America/Denver' %}selected{% endif %}>Mountain Time (US)</option>
+                                        <option value="America/Los_Angeles" {% if settings.timezone == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time (US)</option>
+                                        <option value="Europe/London" {% if settings.timezone == 'Europe/London' %}selected{% endif %}>London (GMT)</option>
+                                        <option value="Europe/Paris" {% if settings.timezone == 'Europe/Paris' %}selected{% endif %}>Paris (CET)</option>
+                                        <option value="Asia/Tokyo" {% if settings.timezone == 'Asia/Tokyo' %}selected{% endif %}>Tokyo (JST)</option>
+                                        <option value="Asia/Shanghai" {% if settings.timezone == 'Asia/Shanghai' %}selected{% endif %}>Shanghai (CST)</option>
+                                        <option value="Australia/Sydney" {% if settings.timezone == 'Australia/Sydney' %}selected{% endif %}>Sydney (AEST)</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between">
-                                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
-                                        <i class="fa fa-arrow-left"></i> Back to Admin Center
-                                    </a>
-                                    {{ form.submit(class="btn btn-success") }}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="business_hours_start" class="form-label">Business Hours Start</label>
+                                    <input type="time" class="form-control" id="business_hours_start" 
+                                           name="business_hours_start" 
+                                           value="{{ settings.business_hours_start or '09:00' }}">
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="business_hours_end" class="form-label">Business Hours End</label>
+                                    <input type="time" class="form-control" id="business_hours_end" 
+                                           name="business_hours_end" 
+                                           value="{{ settings.business_hours_end or '17:00' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        
-        <div class="col-lg-4 col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">📊 Current Preview</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-3">How dates and times will appear with current settings:</p>
-                    
-                    <div class="mb-3">
-                        <strong>Sample Date:</strong>
-                        <div class="text-info">
-                            <span id="sample-date">{{ settings.date_format }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <strong>Sample Time:</strong>
-                        <div class="text-info">
-                            <span id="sample-time">{{ settings.time_format }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <strong>Combined:</strong>
-                        <div class="text-info">
-                            <span id="sample-combined">{{ settings.date_format }} {{ settings.time_format }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <strong>Current Timezone:</strong>
-                        <div class="text-info" id="current-timezone">{{ settings.timezone }}</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <strong>Currency:</strong>
-                        <div class="text-info" id="current-currency">{{ settings.currency }}</div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <h6>📝 Settings Impact</h6>
-                    <ul class="small text-muted">
-                        <li>These settings apply organization-wide as defaults</li>
-                        <li>Users can override timezone in their profile</li>
-                        <li>Existing data display will update immediately</li>
-                        <li>New users inherit these settings by default</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">⚡ Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('auth.profile') }}" class="btn btn-primary btn-sm" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
-                            <i class="fa fa-user"></i> Manage My Profile
-                        </a>
-                        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary btn-sm" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
-                            <i class="fa fa-users"></i> User Management
-                        </a>
-                        <a href="{{ url_for('admin_audit_logs') }}" class="btn btn-outline-info btn-sm">
-                            <i class="fa fa-history"></i> Audit Logs
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-
-<script>
-// Auto-detect user's timezone and highlight if different from org setting
-document.addEventListener('DOMContentLoaded', function() {
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const orgTimezone = '{{ settings.timezone }}';
-    
-    // Show timezone detection info
-    const timezoneSelect = document.querySelector('select[name="timezone"]');
-    if (timezoneSelect) {
-        const detectHint = document.createElement('div');
-        detectHint.className = 'alert alert-info mt-2';
-        detectHint.innerHTML = `
-            <i class="fa fa-lightbulb"></i> 
-            <strong>Auto-detected:</strong> Your browser timezone is <code>${userTimezone}</code>
-            ${userTimezone !== orgTimezone ? ' (different from current org setting)' : ' (matches current setting)'}
-            <button type="button" class="btn btn-sm btn-primary ms-2" onclick="setDetectedTimezone()" style="color: #ffffff !important; font-weight: 600 !important; text-transform: uppercase;">
-                Use Detected Timezone
-            </button>
-        `;
-        timezoneSelect.parentNode.appendChild(detectHint);
-    }
-    
-    // Update preview with current date/time
-    updatePreview();
-});
-
-// Function to set detected timezone
-function setDetectedTimezone() {
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const timezoneSelect = document.querySelector('select[name="timezone"]');
-    
-    // Set the select value to detected timezone
-    timezoneSelect.value = userTimezone;
-    
-    // Update preview
-    updatePreview();
-    
-    // Show feedback
-    const hint = document.querySelector('.alert-info');
-    if (hint) {
-        hint.innerHTML = `
-            <i class="fa fa-check text-success"></i> 
-            <strong>Updated:</strong> Timezone set to your detected timezone: <code>${userTimezone}</code>
-        `;
-        hint.className = 'alert alert-success mt-2';
-    }
-}
-
-// Real-time preview updates when form values change
-function updatePreview() {
-    const timezone = document.querySelector('select[name="timezone"]').value;
-    const dateFormat = document.querySelector('select[name="date_format"]').value;
-    const timeFormat = document.querySelector('select[name="time_format"]').value;
-    const currency = document.querySelector('select[name="currency"]').value;
-    
-    // Update timezone display
-    const timezoneDisplay = document.querySelector('#current-timezone');
-    if (timezoneDisplay) timezoneDisplay.textContent = timezone;
-    
-    // Update currency display
-    const currencyDisplay = document.querySelector('#current-currency');
-    if (currencyDisplay) currencyDisplay.textContent = currency;
-    
-    // Create sample date/time in the selected timezone
-    try {
-        const now = new Date();
-        const options = { timeZone: timezone };
-        
-        // Update sample date
-        const sampleDate = document.querySelector('#sample-date');
-        if (sampleDate) {
-            sampleDate.textContent = formatDateWithPattern(now, dateFormat, timezone);
-        }
-        
-        // Update sample time
-        const sampleTime = document.querySelector('#sample-time');
-        if (sampleTime) {
-            sampleTime.textContent = formatTimeWithPattern(now, timeFormat, timezone);
-        }
-        
-        // Update combined display
-        const sampleCombined = document.querySelector('#sample-combined');
-        if (sampleCombined) {
-            sampleCombined.textContent = formatDateWithPattern(now, dateFormat, timezone) + ' ' + formatTimeWithPattern(now, timeFormat, timezone);
-        }
-    } catch (error) {
-        console.warn('Error updating preview:', error);
-    }
-}
-
-// Helper function to format date with pattern
-function formatDateWithPattern(date, pattern, timezone) {
-    const options = { timeZone: timezone };
-    
-    switch (pattern) {
-        case '%Y-%m-%d':
-            return date.toLocaleDateString('en-CA', options); // YYYY-MM-DD
-        case '%m/%d/%Y':
-            return date.toLocaleDateString('en-US', options); // MM/DD/YYYY
-        case '%d/%m/%Y':
-            return date.toLocaleDateString('en-GB', options); // DD/MM/YYYY
-        case '%d.%m.%Y':
-            return date.toLocaleDateString('de-DE', options); // DD.MM.YYYY
-        case '%B %d, %Y':
-            return date.toLocaleDateString('en-US', { 
-                ...options, 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-        default:
-            return date.toLocaleDateString('en-US', options);
-    }
-}
-
-// Helper function to format time with pattern
-function formatTimeWithPattern(date, pattern, timezone) {
-    const options = { timeZone: timezone };
-    
-    switch (pattern) {
-        case '%H:%M:%S':
-            return date.toLocaleTimeString('en-GB', { ...options, hour12: false });
-        case '%I:%M %p':
-            return date.toLocaleTimeString('en-US', { ...options, hour12: true });
-        case '%H:%M':
-            return date.toLocaleTimeString('en-GB', { 
-                ...options, 
-                hour12: false, 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-        default:
-            return date.toLocaleTimeString('en-US', options);
-    }
-}
-
-// Add change listeners to form selects
-document.querySelectorAll('select').forEach(select => {
-    select.addEventListener('change', updatePreview);
-});
-</script>
 {% endblock %}
