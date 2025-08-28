@@ -4,13 +4,11 @@ Handles CSV/Excel file processing and data import
 """
 
 import pandas as pd
-import json
-from datetime import datetime
-from typing import Dict, List, Tuple, Any, Optional
+from typing import Dict, List, Tuple, Any
 from werkzeug.datastructures import FileStorage
 
 from app import db
-from models import ImportJob, Problem, BusinessCase, Project, User, Department, RoleEnum
+from models import ImportJob, Problem, BusinessCase, Project, User, Department
 
 
 class ImportService:
@@ -234,7 +232,7 @@ class ImportService:
             db.session.commit()
             return True
         
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             return False
     

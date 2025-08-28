@@ -823,7 +823,7 @@ def write_summary():
             db.session.commit()
         
         return jsonify(summary=summary), 200
-    except Exception as e:
+    except Exception:
         current_app.logger.exception("AI write-summary failed")
         # Provide fallback on error
         fallback = f"Executive Summary: {title} represents a strategic business initiative with an estimated investment of ${cost_estimate:,.2f} and projected benefits of ${benefit_estimate:,.2f}. This case requires careful evaluation and stakeholder alignment to ensure successful implementation and value realization."
@@ -852,19 +852,19 @@ def get_fallback_requirements_answers(business_case):
     return {
         "q1": f"Core {system_type} functionality including data entry, processing workflows, document management, approval processes, and automated notifications to support {business_case.title}.",
         
-        "q2": f"Multi-tier user roles including System Administrator (full access), Department Manager (approval authority), Business Analyst (configuration rights), General User (data entry/viewing), and Guest (read-only access) with hierarchical permissions.",
+        "q2": "Multi-tier user roles including System Administrator (full access), Department Manager (approval authority), Business Analyst (configuration rights), General User (data entry/viewing), and Guest (read-only access) with hierarchical permissions.",
         
-        "q3": f"Integration with existing ERP systems, Active Directory authentication, email services (SMTP), document storage systems, and external APIs for data synchronization and automated workflow triggers.",
+        "q3": "Integration with existing ERP systems, Active Directory authentication, email services (SMTP), document storage systems, and external APIs for data synchronization and automated workflow triggers.",
         
         "q4": f"Support for {min(500, int(cost/1000))} concurrent users with sub-2-second response times, 99.5% uptime SLA, auto-scaling capabilities, and data processing capacity for {int(cost/100)} transactions per hour.",
         
-        "q5": f"Real-time dashboard with KPI visualization, automated compliance reporting, audit trail logging, configurable alerts, scheduled report generation, and data export capabilities (PDF, Excel, CSV formats).",
+        "q5": "Real-time dashboard with KPI visualization, automated compliance reporting, audit trail logging, configurable alerts, scheduled report generation, and data export capabilities (PDF, Excel, CSV formats).",
         
-        "q6": f"Comprehensive input validation with field-level error messaging, graceful error handling with user-friendly notifications, automatic data backup and recovery, duplicate detection, and data integrity validation rules.",
+        "q6": "Comprehensive input validation with field-level error messaging, graceful error handling with user-friendly notifications, automatic data backup and recovery, duplicate detection, and data integrity validation rules.",
         
-        "q7": f"Responsive web design compatible with desktop, tablet, and mobile devices, WCAG 2.1 AA accessibility compliance, intuitive navigation, modern Bootstrap-based UI, and multi-language support capability.",
+        "q7": "Responsive web design compatible with desktop, tablet, and mobile devices, WCAG 2.1 AA accessibility compliance, intuitive navigation, modern Bootstrap-based UI, and multi-language support capability.",
         
-        "q8": f"Role-based access control, AES-256 data encryption, secure authentication with password policies, HTTPS/TLS communication, regular security audits, GDPR compliance, and secure data backup procedures."
+        "q8": "Role-based access control, AES-256 data encryption, secure authentication with password policies, HTTPS/TLS communication, regular security audits, GDPR compliance, and secure data backup procedures."
     }
 
 def generate_contextual_epics(business_case, answers):
@@ -905,7 +905,7 @@ def generate_contextual_epics(business_case, answers):
     # Epic 2: User Roles & Access (q2)
     user_roles = answers.get('q2', 'System users and administrators')
     epics.append({
-        "title": f"User Management & Access Control",
+        "title": "User Management & Access Control",
         "description": f"Role-based access control and user management for {user_roles}",
         "stories": [
             {
@@ -936,7 +936,7 @@ def generate_contextual_epics(business_case, answers):
     # Epic 3: Integration Requirements (q3)
     integration_req = answers.get('q3', 'System integration and connectivity')
     epics.append({
-        "title": f"System Integration & APIs",
+        "title": "System Integration & APIs",
         "description": f"External system integration and API development: {integration_req}",
         "stories": [
             {
@@ -967,7 +967,7 @@ def generate_contextual_epics(business_case, answers):
     # Epic 4: Performance Requirements (q4)
     performance_req = answers.get('q4', 'System performance and scalability')
     epics.append({
-        "title": f"Performance & Scalability",
+        "title": "Performance & Scalability",
         "description": f"System performance optimization and scalability: {performance_req}",
         "stories": [
             {
@@ -998,7 +998,7 @@ def generate_contextual_epics(business_case, answers):
     # Epic 5: Reporting Requirements (q5)
     reporting_req = answers.get('q5', 'Business reporting and analytics')
     epics.append({
-        "title": f"Reporting & Analytics",
+        "title": "Reporting & Analytics",
         "description": f"Business intelligence and reporting capabilities: {reporting_req}",
         "stories": [
             {
@@ -1029,7 +1029,7 @@ def generate_contextual_epics(business_case, answers):
     # Epic 6: Data & Validation (q6)
     data_req = answers.get('q6', 'Data management and validation')
     epics.append({
-        "title": f"Data Management & Validation",
+        "title": "Data Management & Validation",
         "description": f"Data integrity, validation, and management: {data_req}",
         "stories": [
             {
@@ -1060,7 +1060,7 @@ def generate_contextual_epics(business_case, answers):
     # Epic 7: User Interface (q7)
     ui_req = answers.get('q7', 'User interface and experience')
     epics.append({
-        "title": f"User Interface & Experience",
+        "title": "User Interface & Experience",
         "description": f"User interface design and user experience: {ui_req}",
         "stories": [
             {
@@ -1091,7 +1091,7 @@ def generate_contextual_epics(business_case, answers):
     # Epic 8: Security & Compliance (q8)
     security_req = answers.get('q8', 'Security and compliance requirements')
     epics.append({
-        "title": f"Security & Compliance",
+        "title": "Security & Compliance",
         "description": f"Security measures and compliance requirements: {security_req}",
         "stories": [
             {
@@ -1206,7 +1206,7 @@ def generate_requirements_epic(case_id):
             }), 400
         
         # Generate intelligent contextual epics with timeout protection
-        print(f"🤖 Generating contextual epics...")
+        print("🤖 Generating contextual epics...")
         try:
             generated_epics = generate_contextual_epics(business_case, answers)
             current_app.logger.info(f"Generated {len(generated_epics)} contextual epics from requirements analysis")
@@ -1220,7 +1220,7 @@ def generate_requirements_epic(case_id):
         # Save epics to database if user is a Business Analyst, Admin, Director, or Manager
         print(f"🤖 User role: {user.role}, checking if authorized...")
         if user.role and user.role.value in ['BA', 'Admin', 'Director', 'Manager']:
-            print(f"🤖 User authorized, saving to database...")
+            print("🤖 User authorized, saving to database...")
             try:
                 # Clear existing stories first, then epics to avoid foreign key constraint violations
                 print(f"🤖 Clearing existing epics and stories for case {case_id}...")
@@ -1347,7 +1347,7 @@ def refine_story():
                 'description': story.description,
                 'acceptance_criteria': [
                     f"Given the user accesses {story.title.lower()}",
-                    f"When they interact with the system",
+                    "When they interact with the system",
                     f"Then they should be able to {story.description.lower()[:50]}..."
                 ],
                 'priority': story.priority or 'Medium',

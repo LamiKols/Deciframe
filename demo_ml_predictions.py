@@ -6,8 +6,6 @@ Demonstrates project success forecasting, cycle-time estimation, and anomaly det
 
 import os
 import sys
-import requests
-import json
 from datetime import datetime, timedelta
 
 # Add project root to path

@@ -4,7 +4,6 @@ Routes for Epic Collaborative Review System
 from datetime import datetime
 from flask import request, render_template, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from sqlalchemy import or_
 
 from . import review_bp
 from models import db, Epic, EpicComment, User, BusinessCase, BusinessCaseComment, Notification, StatusEnum, Project, ProjectComment, NotificationEventEnum

@@ -3,7 +3,7 @@ Main application forms for DeciFrame
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, TextAreaField, validators
+from wtforms import StringField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, Optional
 
 

@@ -4,7 +4,6 @@ Simple Admin Help Articles Creator
 Directly creates help articles for admin functionalities
 """
 
-import os
 import sys
 sys.path.append('/home/runner/workspace')
 

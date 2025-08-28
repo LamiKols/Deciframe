@@ -3,10 +3,8 @@ Full-Text Search Service for DeciFrame
 PostgreSQL tsvector-powered search across Problems, Business Cases, and Projects
 """
 
-from sqlalchemy import text, func
-from flask import current_app
+from sqlalchemy import text
 from app import db
-from models import Problem, BusinessCase, Project, User, Department
 import logging
 
 logger = logging.getLogger(__name__)

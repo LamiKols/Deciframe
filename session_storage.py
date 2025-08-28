@@ -2,7 +2,7 @@
 import json
 import uuid
 from datetime import datetime, timedelta
-from flask import request, g
+from flask import request
 from app import db
 
 class SessionData(db.Model):

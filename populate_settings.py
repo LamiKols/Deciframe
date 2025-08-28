@@ -5,7 +5,6 @@ Creates comprehensive system settings based on config.py and application default
 
 from app import app, db
 from models import Setting
-from config import Config
 import os
 from datetime import datetime
 
@@ -208,7 +207,7 @@ def populate_application_settings():
         # Commit all changes
         try:
             db.session.commit()
-            print(f"\n🎉 Settings population complete!")
+            print("\n🎉 Settings population complete!")
             print(f"   📊 Created: {created_count} new settings")
             print(f"   🔄 Updated: {updated_count} existing settings")
             print(f"   📈 Total settings: {len(application_settings)}")

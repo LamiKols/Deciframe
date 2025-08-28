@@ -1,4 +1,3 @@
-from datetime import datetime
 
 def format_date(dt):
     """

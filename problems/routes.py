@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from app import db
 from models import Problem, PriorityEnum, StatusEnum, Department
-from problems.forms import ProblemForm, ProblemFilterForm
+from problems.forms import ProblemForm
 from flask_login import login_required, current_user
-from auth.session_auth import require_session_auth
 
 problems = Blueprint('problems', __name__, template_folder='templates')
 # Create alias for blueprint registration
@@ -212,7 +211,7 @@ def create():
                 'department_id': prob.department_id
             }
             enqueue_workflow_event('problem_created', problem_context)
-        except Exception as e:
+        except Exception:
             # Don't break the user flow if workflow fails
             pass
         

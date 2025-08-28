@@ -2,7 +2,7 @@
 Workflow Context - Provides context and data access for workflow execution
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from models import WorkflowTemplate
 
 class WorkflowContext:

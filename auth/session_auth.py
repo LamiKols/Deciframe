@@ -4,7 +4,7 @@ Replaces JWT-based authentication with Flask-Login session management
 """
 from functools import wraps
 from flask import session, redirect, url_for, flash
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 def require_session_auth(f):
     """

@@ -2,7 +2,6 @@
 Verification script for Data Export & Retention System
 """
 from app import app, db
-from models import User, Problem, BusinessCase, Project, AuditLog, Department
 from admin.data_management import DataManagementService
 from datetime import datetime, timedelta
 import csv
@@ -98,7 +97,6 @@ def verify_data_management():
             # Test 4: Verify archive models exist
             print("\n4. Testing Archive Models...")
             
-            from models import ArchivedProblem, ArchivedBusinessCase, ArchivedProject
             
             # Check if archive tables exist in database
             try:

@@ -6,8 +6,6 @@ Final validation of all security measures and data isolation
 
 import os
 import re
-import ast
-from pathlib import Path
 
 class ComprehensiveSecurityAuditor:
     def __init__(self):
@@ -38,7 +36,7 @@ class ComprehensiveSecurityAuditor:
                 
                 if model_match:
                     # Find organization_id field
-                    org_id_pattern = rf'organization_id\s*=\s*db\.Column.*?ForeignKey.*?organizations\.id'
+                    org_id_pattern = r'organization_id\s*=\s*db\.Column.*?ForeignKey.*?organizations\.id'
                     if re.search(org_id_pattern, content):
                         print(f"✅ {model}: organization_id field found")
                         self.models_checked.append(f"{model}: SECURE")
@@ -129,7 +127,7 @@ class ComprehensiveSecurityAuditor:
                                 if 'organization_id' in content:
                                     print(f"✅ {template_path}: Contains organization context")
                                     
-                            except Exception as e:
+                            except Exception:
                                 continue
                                 
     def test_first_user_admin_logic(self):
@@ -166,33 +164,33 @@ class ComprehensiveSecurityAuditor:
         print("🛡️ COMPREHENSIVE SECURITY AUDIT REPORT")
         print("="*80)
         
-        print(f"\n📊 AUDIT SUMMARY:")
+        print("\n📊 AUDIT SUMMARY:")
         print(f"Models Checked: {len(self.models_checked)}")
         print(f"Routes Checked: {len(self.routes_checked)}")
         print(f"Security Violations: {len(self.violations)}")
         print(f"Security Issues: {len(self.security_issues)}")
         
         if self.violations:
-            print(f"\n❌ CRITICAL VIOLATIONS:")
+            print("\n❌ CRITICAL VIOLATIONS:")
             for violation in self.violations:
                 print(f"  - {violation}")
         else:
-            print(f"\n✅ NO CRITICAL VIOLATIONS FOUND")
+            print("\n✅ NO CRITICAL VIOLATIONS FOUND")
             
         if self.security_issues:
-            print(f"\n⚠️ SECURITY ISSUES:")
+            print("\n⚠️ SECURITY ISSUES:")
             for issue in self.security_issues:
                 print(f"  - {issue}")
                 
-        print(f"\n✅ SECURE MODELS:")
+        print("\n✅ SECURE MODELS:")
         for model in self.models_checked:
             print(f"  - {model}")
             
-        print(f"\n✅ SECURE ROUTES:")
+        print("\n✅ SECURE ROUTES:")
         for route in self.routes_checked:
             print(f"  - {route}")
             
-        print(f"\n🎯 RECOMMENDATIONS:")
+        print("\n🎯 RECOMMENDATIONS:")
         if self.violations:
             print("  - Fix critical violations before production deployment")
             print("  - Add organization_id fields to missing models")

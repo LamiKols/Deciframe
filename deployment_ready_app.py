@@ -1,4 +1,4 @@
-from flask import Flask, request, session, current_app
+from flask import Flask, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
@@ -8,9 +8,7 @@ import os
 import logging
 import json
 import secrets
-import uuid
 from datetime import datetime
-from sqlalchemy import text
 
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
@@ -153,7 +151,7 @@ def create_app():
         
         final_theme = user_theme if user_theme else org_settings.theme
         
-        logging.debug(f"🔧 Context Processor Debug:")
+        logging.debug("🔧 Context Processor Debug:")
         logging.debug(f"   User Theme: {user_theme}")
         logging.debug(f"   Org Theme: {org_settings.theme}")
         logging.debug(f"   Final Theme: {final_theme}")
@@ -185,7 +183,6 @@ def create_app():
             }
         
         from models import Epic, BusinessCase, Project
-        from sqlalchemy import and_
         
         try:
             logging.debug(f"🔧 Badge Debug: User {current_user.email} role: {current_user.role}")
@@ -260,10 +257,10 @@ def create_app():
         if request.endpoint and request.endpoint not in ['static', 'health', 'trigger_error']:
             logging.debug(f"🔧 Session Debug: {dict(session)}")
             if current_user.is_authenticated:
-                logging.debug(f"🔧 Auth Debug: Authenticated=True")
+                logging.debug("🔧 Auth Debug: Authenticated=True")
                 logging.debug(f"🔧 Auth Debug: User={current_user.email}, Role={current_user.role}")
             else:
-                logging.debug(f"🔧 Auth Debug: Authenticated=False")
+                logging.debug("🔧 Auth Debug: Authenticated=False")
     
     # Inject authentication state into templates
     @app.context_processor

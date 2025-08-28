@@ -2,7 +2,7 @@
 import json
 import uuid
 from datetime import datetime, timedelta
-from flask import session, request
+from flask import session
 from app import db
 
 class SimpleSessionData(db.Model):
@@ -48,7 +48,7 @@ def load_session_data():
     """Load data from database using Flask session key"""
     session_key = session.get('session_key')
     if not session_key:
-        print(f"🔧 No session key found")
+        print("🔧 No session key found")
         return {}
     
     session_record = SimpleSessionData.query.get(session_key)

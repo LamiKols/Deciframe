@@ -1,4 +1,6 @@
-import re, sys, requests
+import re
+import sys
+import requests
 from urllib.parse import urljoin, urlparse
 
 BASE = sys.argv[1] if len(sys.argv)>1 else "http://127.0.0.1:5000"

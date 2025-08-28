@@ -8,7 +8,6 @@ import os
 import logging
 import json
 import secrets
-import uuid
 from datetime import datetime
 from sqlalchemy import text
 
@@ -77,14 +76,23 @@ def create_app():
     login_manager.login_message_category = 'info'
     login_manager.session_protection = 'basic'  # Use basic session protection to avoid login issues
     
-    # Initialize Prometheus metrics
-    metrics = PrometheusMetrics(app, group_by='endpoint')
-    # Custom metrics for API monitoring
-    request_counter = metrics.counter(
-        'api_requests_total', 'Total API Requests', 
-        labels={'method': lambda: request.method}
-    )
-    logging.info("✓ Prometheus metrics initialized at /metrics")
+    # Initialize Prometheus metrics (with test isolation)
+    if not os.environ.get('TESTING', False):
+        try:
+            metrics = PrometheusMetrics(app, group_by='endpoint')
+            # Custom metrics for API monitoring
+            request_counter = metrics.counter(
+                'api_requests_total', 'Total API Requests', 
+                labels={'method': lambda: request.method}
+            )
+            logging.info("✓ Prometheus metrics initialized at /metrics")
+        except ValueError as e:
+            if "Duplicated timeseries" in str(e):
+                logging.warning("⚠️ Prometheus metrics already registered, skipping")
+            else:
+                raise
+    else:
+        logging.info("⚠️ Prometheus metrics disabled in testing mode")
     
     # Configure upload folder for bulk data import
     app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
@@ -284,7 +292,7 @@ def create_app():
         
         # Only inject if user is authenticated
         if not current_user.is_authenticated:
-            print(f"🔧 Context Processor Debug: User not authenticated, using defaults")
+            print("🔧 Context Processor Debug: User not authenticated, using defaults")
             default_currency = current_app.config.get('DEFAULT_CURRENCY', 'USD')
             default_date_format = current_app.config.get('DEFAULT_DATE_FORMAT', 'ISO')
             default_timezone = current_app.config.get('DEFAULT_TIMEZONE', 'UTC')
@@ -316,7 +324,7 @@ def create_app():
         org_theme = getattr(org_settings, 'default_theme', 'light') if org_settings else 'light'
         theme = user_theme if user_theme else org_theme
         
-        print(f"🔧 Context Processor Debug:")
+        print("🔧 Context Processor Debug:")
         print(f"   User Theme: {user_theme}")
         print(f"   Org Theme: {org_theme}")
         print(f"   Final Theme: {theme}")
@@ -361,7 +369,7 @@ def create_app():
         
         # Only show counts for users with reviewing roles
         if not current_user.is_authenticated:
-            print(f"🔧 Badge Debug: User not authenticated")
+            print("🔧 Badge Debug: User not authenticated")
             return {}
         
         print(f"🔧 Badge Debug: User {current_user.email} role: {current_user.role}")
@@ -371,7 +379,7 @@ def create_app():
             return {}
         
         try:
-            from models import Epic, BusinessCase, Project, StatusEnum
+            from models import Epic, BusinessCase, Project
             
             pending_epics = Epic.query.filter_by(status='Submitted').count()
             pending_cases = BusinessCase.query.filter_by(status='Submitted').count()
@@ -403,7 +411,6 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         from models import User
-        from flask import session
         
         print(f"🔧 User Loader Debug: Called with user_id={user_id}")
         
@@ -531,14 +538,17 @@ def create_app():
         from flask_login import current_user
         return dict(current_user=current_user)
     
-    # Create database tables
+    # Create database tables and load models first to prevent circular imports
     with app.app_context():
-        import models  # Import models to ensure tables are created
         db.create_all()
     
-    # Register all blueprints
-    from admin_working import init_admin_routes
-    init_admin_routes(app)
+    # Register all blueprints after models are loaded
+    try:
+        from admin_working import init_admin_routes
+        init_admin_routes(app)
+        print("✓ Admin routes initialized successfully")
+    except Exception as e:
+        print(f"⚠️ Failed to initialize admin routes: {e}")
     
     # Register the blueprints from blueprint modules
     from auth import bp as auth_bp
@@ -717,7 +727,7 @@ app = create_app()
 def index():
     """Main application home page"""
     from flask_login import current_user
-    from flask import render_template, redirect, url_for
+    from flask import render_template
     
     if current_user.is_authenticated:
         # Show home page for authenticated users with role-based quick actions

@@ -1,4 +1,7 @@
-import re, sys, subprocess, pathlib
+import re
+import sys
+import subprocess
+import pathlib
 
 # Get endpoints from Flask
 try:

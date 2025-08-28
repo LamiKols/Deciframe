@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
-from models import User, RoleEnum, Department
+from models import User, RoleEnum
 from flask_login import current_user
 from utils.email_validation import validate_business_email, is_new_organization_domain, extract_domain
 import pytz
@@ -183,7 +183,6 @@ class ProfileForm(FlaskForm):
         # Filter departments and users by organization for existing users
         try:
             if current_user.is_authenticated and hasattr(current_user, 'organization_id') and current_user.organization_id:
-                from app import db
                 from models import User, Department
                 org_id = current_user.organization_id
                 # Get departments from the same organization

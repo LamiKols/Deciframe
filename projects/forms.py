@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, DateField, SelectField, SubmitField, BooleanField, DecimalField
+from wtforms import StringField, TextAreaField, DateField, SelectField, SubmitField, DecimalField
 from wtforms.validators import DataRequired, Length, Optional
 from models import StatusEnum, PriorityEnum, RoleEnum, User, Department, BusinessCase
-from app import db
 
 def safe_int_coerce(value):
     """Safely coerce values to int, handling None and empty strings"""

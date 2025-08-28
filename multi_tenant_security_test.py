@@ -7,7 +7,6 @@ Tests cross-organizational data access and security boundaries
 import os
 import sys
 from datetime import datetime
-from flask import Flask
 from app import create_app, db
 from models import *
 from sqlalchemy import text
@@ -233,7 +232,7 @@ class MultiTenantSecurityTester:
             print("✅ Organization boundaries properly enforced")
             print("✅ No data leakage detected")
         else:
-            print(f"\n🚨 SECURITY VIOLATIONS DETECTED:")
+            print("\n🚨 SECURITY VIOLATIONS DETECTED:")
             for i, violation in enumerate(self.violations, 1):
                 print(f"{i}. ❌ {violation}")
         

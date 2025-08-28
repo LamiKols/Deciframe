@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask.helpers import url_for
 from flask_login import login_required, current_user
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 from datetime import datetime, date
 from app import db
-from models import Project, ProjectMilestone, User, Department, BusinessCase, StatusEnum, PriorityEnum, Epic
+from models import Project, ProjectMilestone, Department, StatusEnum, PriorityEnum, Epic
 from projects.forms import ProjectForm, MilestoneForm, ProjectFilterForm
 
 
@@ -155,7 +155,7 @@ def new_project():
                 'department_id': project.department_id
             }
             enqueue_workflow_event('project_created', project_context)
-        except Exception as e:
+        except Exception:
             pass
         
         flash(f'Project "{project.code}" created successfully!', 'success')
@@ -271,7 +271,7 @@ def edit_project(id):
                 # Check if project completed
                 if project.status.name == 'Completed':
                     enqueue_workflow_event('project_completed', project_context)
-        except Exception as e:
+        except Exception:
             pass
         
         flash(f'Project "{project.name}" updated successfully!', 'success')
@@ -385,7 +385,7 @@ def new_milestone(project_id):
                 'department_id': project.department_id
             }
             enqueue_workflow_event('milestone_created', milestone_context)
-        except Exception as e:
+        except Exception:
             pass
         
         flash(f'Milestone "{milestone.name}" created successfully!', 'success')
@@ -460,7 +460,7 @@ def edit_milestone(id):
                     'department_id': milestone.project.department_id
                 }
                 enqueue_workflow_event('milestone_completed', milestone_context)
-        except Exception as e:
+        except Exception:
             pass
         
         flash(f'Milestone "{milestone.name}" updated successfully!', 'success')
@@ -512,7 +512,7 @@ def complete_milestone(id):
             'department_id': milestone.project.department_id
         }
         enqueue_workflow_event('milestone_completed', milestone_context)
-    except Exception as e:
+    except Exception:
         pass
     
     flash(f'Milestone "{milestone.name}" marked as completed!', 'success')
@@ -593,7 +593,7 @@ def dashboard():
     for status_name, status_enum in db_status_mapping.items():
         try:
             status_stats[status_name] = Project.query.filter_by(status=status_enum, organization_id=current_user.organization_id).count()
-        except Exception as e:
+        except Exception:
             # Fallback for enum compatibility issues
             status_stats[status_name] = 0
     

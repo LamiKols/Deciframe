@@ -3,11 +3,11 @@ Workflow Service - Public API for workflow operations
 """
 
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime
 from workflows.processor import dispatch_event
 from workflows.actions import _resolve_recipients, _resolve_assignee, _compute_due_date
 from workflows.context import WorkflowContext
-from models import WorkflowTemplate, User, db
+from models import WorkflowTemplate, db
 
 class WorkflowService:
     """Service class for workflow operations"""

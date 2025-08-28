@@ -3,7 +3,6 @@ Workflow Event Triggers - Integration points for triggering workflows
 """
 
 import logging
-from typing import Dict, Any
 from workflows.processor import dispatch_event
 
 logger = logging.getLogger(__name__)
@@ -200,7 +199,7 @@ def trigger_leave_request_submitted(leave_request_data: dict, employee_data: dic
         'department_id': employee_data.get('dept_id') if employee_data else None
     }
     
-    logger.info(f"🔔 Triggering leave_request_submitted event")
+    logger.info("🔔 Triggering leave_request_submitted event")
     return dispatch_event('leave_request_submitted', context)
 
 def trigger_review_period_start(review_period_data: dict) -> list:
@@ -231,7 +230,7 @@ def trigger_change_request_submitted(change_request_data: dict) -> list:
         'user_id': change_request_data.get('requested_by')
     }
     
-    logger.info(f"🔔 Triggering change_request_submitted event")
+    logger.info("🔔 Triggering change_request_submitted event")
     return dispatch_event('change_request_submitted', context)
 
 def trigger_maintenance_due(system_data: dict) -> list:
@@ -253,7 +252,7 @@ def trigger_purchase_request_submitted(purchase_request_data: dict) -> list:
         'department_id': purchase_request_data.get('dept_id')
     }
     
-    logger.info(f"🔔 Triggering purchase_request_submitted event")
+    logger.info("🔔 Triggering purchase_request_submitted event")
     return dispatch_event('purchase_request_submitted', context)
 
 def trigger_invoice_received(invoice_data: dict) -> list:

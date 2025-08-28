@@ -3,7 +3,6 @@ Workflow Integration - Connect workflow events to existing DeciFrame modules
 """
 
 import logging
-from flask import current_app
 from workflows import events
 
 logger = logging.getLogger(__name__)

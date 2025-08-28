@@ -43,7 +43,7 @@ def reset_demo_passwords():
             except Exception as e:
                 print(f"❌ Failed to update {email}: {e}")
     
-    print(f"\n🎯 Demo Credentials:")
+    print("\n🎯 Demo Credentials:")
     print(f"📧 Emails: {', '.join(demo_accounts)}")
     print(f"🔑 Password: {demo_password}")
 

@@ -2,7 +2,6 @@
 """
 Fix workflow library display by creating a simplified route
 """
-import os
 import sys
 sys.path.append('.')
 

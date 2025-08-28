@@ -2,7 +2,7 @@
 Dashboard access helper - generates fresh URLs for dashboard access
 """
 
-from app import app, db
+from app import app
 from models import User, RoleEnum
 from stateless_auth import create_auth_token
 

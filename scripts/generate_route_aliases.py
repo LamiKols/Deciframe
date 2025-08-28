@@ -4,7 +4,7 @@ Usage:
   python scripts/generate_route_aliases.py > ALIAS_ROUTES.py
 Then manually review and (optionally) include into your Flask app during transition.
 """
-import csv, sys
+import csv
 
 csv_path = "MISSING_ROUTES.csv"
 
@@ -25,7 +25,7 @@ try:
             safe_missing = missing.replace('.', '_')
             print(f"    @app.route('/__alias__/{safe_missing}', endpoint='{missing}')")
             print(f"    def __alias_{safe_missing}():")
-            print(f"        # TEMP: redirect missing endpoint to best match")
+            print("        # TEMP: redirect missing endpoint to best match")
             print(f"        return redirect(url_for('{best}'))")
             print("")
             emitted.add(missing)

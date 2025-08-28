@@ -4,7 +4,6 @@ Comprehensive Button Visibility Audit & Fix Script
 Identifies and reports button visibility issues across the application
 """
 
-import os
 import re
 from pathlib import Path
 

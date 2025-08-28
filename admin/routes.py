@@ -5,13 +5,12 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from functools import wraps
-from sqlalchemy import func, desc, and_
+from sqlalchemy import desc, and_
 
 from app import db
 from models import (
     User, Department, Problem, BusinessCase, Project, Epic, 
-    AuditLog, Notification, TriageRule, Setting, OrganizationSettings,
-    UserRoleEnum, NotificationEventEnum
+    AuditLog, Notification, TriageRule, UserRoleEnum
 )
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -165,7 +164,6 @@ def test_rule(rule_id):
     """Test a triage rule (dry run)"""
     rule = TriageRule.query.get_or_404(rule_id)
     try:
-        from services.triage_engine import TriageEngine
         # This would be a dry run test - for now just show success
         flash(f'Triage rule "{rule.name}" test completed successfully', 'success')
     except Exception as e:

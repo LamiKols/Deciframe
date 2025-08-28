@@ -7,7 +7,6 @@ Changes "TITLE & DESCRIPTION" to just "TITLE"
 
 import os
 import re
-from pathlib import Path
 
 class ButtonContentOptimizer:
     def __init__(self):

@@ -1,7 +1,7 @@
 
 # 🔒 MULTI-TENANT SECURITY DECORATOR
 from functools import wraps
-from flask import abort, request
+from flask import abort
 from flask_login import current_user
 
 def require_same_org(get_record_func=None):

@@ -35,7 +35,7 @@ def verify_auth_token(token):
             print(f"🔧 User {user_id} not found in database")
             return None
     except jwt.ExpiredSignatureError:
-        print(f"🔧 Token has expired")
+        print("🔧 Token has expired")
         return None
     except jwt.InvalidTokenError as e:
         print(f"🔧 Invalid token: {e}")
@@ -87,7 +87,7 @@ def get_current_user():
             from flask import session
             session.pop('auth_token', None)
     
-    print(f"🔧 No auth token found in request")
+    print("🔧 No auth token found in request")
     return None
 
 def add_auth_token_to_url(endpoint, **values):

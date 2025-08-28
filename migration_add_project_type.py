@@ -11,7 +11,6 @@ from sqlalchemy.orm import sessionmaker
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from models import ProjectTypeEnum
 
 def run_migration():
     """Add project_type column to business_cases table"""

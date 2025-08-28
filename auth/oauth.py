@@ -4,14 +4,11 @@ Provides enterprise-grade authentication with multiple provider support
 """
 
 import os
-import json
-from urllib.parse import urlencode
-from flask import current_app, url_for, request, session, redirect, flash
+from flask import url_for, request, session
 from authlib.integrations.flask_client import OAuth
 from authlib.common.errors import AuthlibBaseError
 from werkzeug.security import generate_password_hash
 from models import User, db
-from app import login_manager
 import logging
 
 logger = logging.getLogger(__name__)

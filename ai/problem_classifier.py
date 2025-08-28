@@ -4,7 +4,7 @@ Analyzes problem titles and descriptions to suggest issue types
 """
 import os
 import logging
-from typing import Tuple, Optional
+from typing import Tuple
 
 logger = logging.getLogger(__name__)
 

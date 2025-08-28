@@ -6,7 +6,6 @@ Fixes button spacing issues in navigation areas where buttons are touching each 
 
 import os
 import re
-from pathlib import Path
 
 class ButtonSpacingFixer:
     def __init__(self):

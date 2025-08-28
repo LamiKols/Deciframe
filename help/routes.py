@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, request, jsonify
+from flask import Blueprint, render_template, request, jsonify
 from models import HelpCategory, HelpArticle
 import markdown
 

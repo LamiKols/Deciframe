@@ -4,9 +4,8 @@ Provides real-time monitoring insights and system health visualization
 """
 
 import psutil
-import time
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, jsonify
 from sqlalchemy import text, func
 from app import db
 from models import AuditLog, User, Problem, BusinessCase, Project

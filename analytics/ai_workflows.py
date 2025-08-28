@@ -3,12 +3,12 @@ AI-Driven Workflow Automation
 Triggers real-time actions based on ML predictions
 """
 
-from flask import url_for, current_app
+from flask import url_for
 from datetime import datetime, timedelta
 from app import db
 from models import (
-    Project, ProjectMilestone, BusinessCase, User, AIThresholdSettings,
-    Notification, NotificationEventEnum
+    Project, ProjectMilestone, User, AIThresholdSettings,
+    NotificationEventEnum
 )
 from notifications.service import NotificationService
 import logging

@@ -3,7 +3,7 @@ Workflow Action Handlers - Implementation of workflow actions
 """
 
 import logging
-from typing import Dict, Any, Callable
+from typing import Dict, Callable
 from datetime import datetime, timedelta
 from workflows.context import WorkflowContext
 

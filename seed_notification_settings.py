@@ -3,7 +3,6 @@
 Seed notification settings with default configuration
 """
 
-import os
 import sys
 sys.path.append('.')
 
@@ -89,7 +88,7 @@ def seed_notification_settings():
         
         try:
             db.session.commit()
-            print(f"\n🎉 Notification settings seeded successfully!")
+            print("\n🎉 Notification settings seeded successfully!")
             print(f"   Created: {created_count} new settings")
             print(f"   Updated: {updated_count} existing settings")
             

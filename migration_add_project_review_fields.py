@@ -10,9 +10,8 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from app import app, db
+from app import app
 import psycopg2
-from datetime import datetime
 
 def add_project_review_fields():
     """Add review fields to projects table and create project_comments table"""

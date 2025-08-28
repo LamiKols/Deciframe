@@ -3,8 +3,7 @@ CRITICAL SECURITY FIX: Multi-Tenant Data Isolation
 Fixes organization_id missing from Problems, BusinessCases, and Projects
 """
 
-from app import create_app, db
-from models import Problem, BusinessCase, Project, User
+from app import db
 from sqlalchemy import text
 
 def fix_organization_data_isolation():

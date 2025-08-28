@@ -6,7 +6,6 @@ Applies proven Bootstrap Icons + solid button styling to critical admin template
 
 import os
 import re
-from pathlib import Path
 
 class CriticalButtonFixer:
     def __init__(self):

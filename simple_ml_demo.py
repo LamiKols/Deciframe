@@ -11,7 +11,6 @@ from models import Project, BusinessCase, User, Department, ProjectMilestone
 from models import RoleEnum, StatusEnum, PriorityEnum, CaseTypeEnum
 from predict.routes import extract_project_features
 from datetime import datetime, timedelta
-import numpy as np
 
 def show_prediction_example():
     """Demonstrate ML prediction capabilities with existing data"""

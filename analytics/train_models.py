@@ -6,21 +6,20 @@ Trains models for project success forecasting, cycle-time estimation, and anomal
 import os
 import sys
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 import joblib
 import logging
 from sklearn.ensemble import RandomForestClassifier, IsolationForest
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, mean_absolute_error, r2_score
+from sklearn.metrics import mean_absolute_error, r2_score
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app, db
-from models import Project, BusinessCase, ProjectMilestone, User, StatusEnum, PriorityEnum
+from models import Project, BusinessCase, StatusEnum, PriorityEnum
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

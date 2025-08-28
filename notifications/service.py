@@ -5,7 +5,7 @@ Handles email dispatch via SendGrid and in-app notification creation
 
 import os
 from datetime import datetime, timedelta
-from flask import current_app, render_template_string
+from flask import render_template_string
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email, To, Content
 from app import db

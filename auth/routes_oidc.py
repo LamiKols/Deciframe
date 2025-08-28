@@ -2,7 +2,6 @@ from flask import Blueprint, redirect, url_for, session, request, flash, current
 from flask_login import login_user, logout_user
 from auth.oidc import oauth
 from auth.oauth import UserManager
-from models import User, db
 import logging
 
 logger = logging.getLogger(__name__)

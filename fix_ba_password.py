@@ -21,7 +21,7 @@ def fix_ba_password():
             ba_user.password_hash = generate_password_hash('password123')
             db.session.commit()
             print(f"✅ Password hash set for BA user: {ba_user.email}")
-            print(f"   Password: password123")
+            print("   Password: password123")
             print(f"   Role: {ba_user.role}")
         else:
             print("❌ BA user not found")

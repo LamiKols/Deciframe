@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from app import db
-from models import BusinessCase, Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum, ProjectTypeEnum, Department, RoleEnum, Epic, Story, PriorityEnum, Project, EpicComment, EpicSyncLog
-from business.forms import BusinessCaseForm, AssignBAForm, BusinessCaseFilterForm
+from models import BusinessCase, Problem, StatusEnum, CaseTypeEnum, CaseDepthEnum, ProjectTypeEnum, Department, RoleEnum, Epic, Story, Project, EpicComment, EpicSyncLog
+from business.forms import BusinessCaseForm, AssignBAForm
 from flask_login import login_required, current_user
-from auth.session_auth import require_session_auth, require_role
 from config import Config
 from datetime import datetime
 from sqlalchemy import or_
@@ -69,7 +68,7 @@ def new_case():
             flash("Invalid solution reference", "warning")
     
     if request.method == 'POST':
-        print(f"🔧 POST request received, validating form...")
+        print("🔧 POST request received, validating form...")
         # Re-populate choices for POST validation
         form.problem.choices = [(p.id, f"{p.code} – {p.title}") for p in problems]
         
@@ -82,7 +81,7 @@ def new_case():
                 solution = None
     
     if form.validate_on_submit():
-        print(f"🔧 Form validated successfully")
+        print("🔧 Form validated successfully")
         user = current_user
         
         # Determine case type, depth, and project type
@@ -180,7 +179,7 @@ def new_case():
                 roadmap=form.roadmap.data if cd is CaseDepthEnum.Full else None,
                 sensitivity_analysis=form.sensitivity_analysis.data if cd is CaseDepthEnum.Full else None
             )
-            print(f"🔧 BusinessCase object created successfully")
+            print("🔧 BusinessCase object created successfully")
         except Exception as e:
             print(f"❌ Error creating BusinessCase object: {e}")
             flash(f"Error creating business case: {str(e)}", "danger")
@@ -203,7 +202,7 @@ def new_case():
             print(f"🔧 Calculated ROI: {bc.roi}")
             
             db.session.commit()
-            print(f"🔧 BusinessCase committed successfully")
+            print("🔧 BusinessCase committed successfully")
             
             # Use only the flash notification to avoid duplicate messages
             flash(f"Business Case {bc.code} created successfully!", 'success')
@@ -358,7 +357,7 @@ def view_case(id):
                     'department_id': business_case.dept_id
                 }
                 enqueue_workflow_event('case_assigned', case_context)
-            except Exception as e:
+            except Exception:
                 pass
             
             # Send notification to assigned BA
@@ -489,7 +488,7 @@ def approve_case(id):
                 'department_id': project.department_id
             }
             enqueue_workflow_event('project_created', project_context)
-    except Exception as e:
+    except Exception:
         pass
     
     # 3) Redirect to backlog
@@ -681,7 +680,7 @@ def get_case_epics(case_id):
         # Get epics for this case with retry logic
         try:
             epics = Epic.query.filter_by(case_id=case_id, organization_id=current_user.organization_id).all()
-        except Exception as db_error:
+        except Exception:
             # Database connection issue, try to recover
             db.session.rollback()
             db.session.close()
@@ -692,7 +691,7 @@ def get_case_epics(case_id):
             # Get stories for this epic with retry logic
             try:
                 stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
-            except Exception as db_error:
+            except Exception:
                 db.session.rollback()
                 db.session.close()
                 stories = Story.query.filter_by(epic_id=epic.id, organization_id=current_user.organization_id).all()
@@ -872,7 +871,6 @@ def create_story():
         if epic.status == 'Approved':
             return jsonify({'success': False, 'error': 'Cannot add stories - Epic is already approved'}), 403
         
-        from models import PriorityEnum
         
         story = Story(
             title=title,
@@ -921,7 +919,6 @@ def update_story(story_id):
         if not title:
             return jsonify({'success': False, 'error': 'Title is required'}), 400
         
-        from models import PriorityEnum
         
         story.title = title
         story.description = description
@@ -1124,7 +1121,7 @@ def get_stories():
         business_case = BusinessCase.query.get(epic.case_id)
         if not business_case:
             logging.error(f"❌ Business case {epic.case_id} not found")
-            return jsonify({'error': f'Business case not found'}), 404
+            return jsonify({'error': 'Business case not found'}), 404
         
         # Get stories for this epic
         stories = Story.query.filter_by(epic_id=epic_id, organization_id=current_user.organization_id).all()
@@ -1182,7 +1179,7 @@ def get_stories_v2():
         business_case = BusinessCase.query.get(epic.case_id)
         if not business_case:
             logging.error(f"❌ Business case {epic.case_id} not found")
-            return jsonify({'error': f'Business case not found'}), 404
+            return jsonify({'error': 'Business case not found'}), 404
         
         # Build query with filters
         query = Story.query.filter_by(epic_id=epic_id, organization_id=current_user.organization_id)
@@ -1522,7 +1519,7 @@ def test_auto_link_epics():
         epics_before = Epic.query.filter_by(case_id=case_id, organization_id=current_user.organization_id).all()
         unlinked_epics_before = [e for e in epics_before if e.project_id is None]
         
-        print(f"🧪 BEFORE AUTO-LINK TEST:")
+        print("🧪 BEFORE AUTO-LINK TEST:")
         print(f"   Business Case: {business_case.title}")
         print(f"   Status: {business_case.status.value}")
         print(f"   Current Project ID: {business_case.project_id}")
@@ -1540,7 +1537,7 @@ def test_auto_link_epics():
         epics_after = Epic.query.filter_by(case_id=case_id, organization_id=current_user.organization_id).all()
         linked_epics_after = [e for e in epics_after if e.project_id == project_id]
         
-        print(f"🎯 AFTER AUTO-LINK TEST:")
+        print("🎯 AFTER AUTO-LINK TEST:")
         print(f"   Business Case Project ID: {business_case.project_id}")
         print(f"   Epics Linked to Project: {len(linked_epics_after)}")
         print(f"   Auto-linked Count: {linked_count}")

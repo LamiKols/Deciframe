@@ -4,7 +4,7 @@ Provides analytics, metrics, and reporting for leadership
 """
 
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, jsonify, request, abort, send_file
+from flask import Blueprint, render_template, jsonify, request, send_file
 from flask_login import login_required, current_user
 from sqlalchemy import func, extract, and_
 import io

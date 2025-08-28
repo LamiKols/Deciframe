@@ -8,7 +8,7 @@ from flask_login import login_required, current_user
 from datetime import datetime
 
 from . import notifications_bp
-from models import db, Notification, User
+from models import db, Notification
 
 
 @notifications_bp.route('/')

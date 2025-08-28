@@ -3,9 +3,9 @@ Organization and User Preference Utilities
 Provides centralized access to organization-level settings and user preferences
 """
 
-from flask import current_app, g
+from flask import current_app
 from flask_login import current_user
-from models import OrganizationSettings, User, Organization
+from models import OrganizationSettings
 
 
 def get_org_preferences():
@@ -138,7 +138,6 @@ def format_datetime_value(value, format_override=None, include_time=True):
     
     try:
         import pytz
-        from datetime import datetime
         
         prefs = get_org_preferences()
         

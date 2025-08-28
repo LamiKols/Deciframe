@@ -4,9 +4,6 @@ Simple test runner for Problem Management CRUD operations
 """
 
 import sys
-import os
-from flask import Flask
-from flask_login import login_user
 from models import Problem, Department, User, PriorityEnum, StatusEnum
 from app import db, app
 

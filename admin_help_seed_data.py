@@ -6,8 +6,6 @@ Creates comprehensive help articles for all admin functionalities
 
 from app import create_app, db
 from models import HelpCategory, HelpArticle, User, RoleEnum
-from flask_login import login_user
-from datetime import datetime
 import sys
 
 def create_admin_help_articles():

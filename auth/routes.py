@@ -4,8 +4,8 @@ from urllib.parse import urlparse
 from auth import bp
 from auth.forms import LoginForm, RegistrationForm, ProfileForm
 from auth.oauth import oauth_manager, UserManager, OAuthError
-from auth.oidc import oauth, get_oidc_client
-from models import User, Organization, RoleEnum
+from auth.oidc import get_oidc_client
+from models import User, RoleEnum
 from app import db
 from utils.email_validation import extract_domain, is_new_organization_domain
 import logging
@@ -62,7 +62,6 @@ def login():
 @bp.route('/logout')
 def logout():
     """User logout route"""
-    from flask_login import logout_user
     
     # Clear session and logout with Flask-Login
     session.pop('user_id', None)
@@ -341,7 +340,7 @@ def oidc_callback():
         if next_url and urlparse(next_url).netloc == '':
             return redirect(next_url)
         
-        flash(f'Successfully logged in with OIDC', 'success')
+        flash('Successfully logged in with OIDC', 'success')
         return redirect(url_for('index'))
         
     except Exception as e:

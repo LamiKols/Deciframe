@@ -4,8 +4,8 @@ Working Admin Routes Implementation
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
-from models import db, User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, HelpCategory, HelpArticle, NotificationSetting, FrequencyEnum, Problem, Project, OrganizationSettings, WorkflowConfiguration
-from werkzeug.security import generate_password_hash
+from models import User, Setting, AuditLog, RoleEnum, RolePermission, WorkflowTemplate, WorkflowLibrary, Department, HelpCategory, HelpArticle, Problem, Project, OrganizationSettings, WorkflowConfiguration
+from app import db
 from admin.forms import UserForm
 from datetime import datetime
 from utils.date import format_datetime
@@ -54,7 +54,7 @@ def init_admin_routes(app):
     @admin_required
     def admin_dashboard():
         # Calculate comprehensive statistics - ORGANIZATION FILTERED
-        from models import User, Department, Problem, Project, Epic, BusinessCase
+        from models import User, Department, Epic, BusinessCase
         
         # Filter all queries by organization_id for proper multi-tenant isolation
         org_id = current_user.organization_id
@@ -893,7 +893,7 @@ def init_admin_routes(app):
             db.session.commit()
             log_action(f"Updated workflow template: {workflow.name}")
         except json.JSONDecodeError:
-            log_action(f"Failed to update workflow template: Invalid JSON")
+            log_action("Failed to update workflow template: Invalid JSON")
         
         return redirect(url_for('admin_workflows'))
     
@@ -1001,7 +1001,6 @@ def init_admin_routes(app):
         """Column mapping interface"""
         from models import ImportJob
         import pandas as pd
-        import io
         
         job = ImportJob.query.get_or_404(job_id)
         
@@ -1026,7 +1025,6 @@ def init_admin_routes(app):
             return redirect(url_for('admin_import_execute', job_id=job.id, auth_token=request.form.get('auth_token')))
         
         # Read file to get actual columns
-        import pandas as pd
         
         try:
             upload_folder = app.config.get('UPLOAD_FOLDER', 'uploads')
@@ -1212,7 +1210,7 @@ def init_admin_routes(app):
                                      auth_token=request.args.get('auth_token'))
             
             # For POST requests, execute the import
-            from models import ImportJob, Problem, BusinessCase, Project, User, Department
+            from models import ImportJob, Problem, BusinessCase, Project, Department
             import pandas as pd
             
             job = ImportJob.query.get(int(job_id))
@@ -2126,7 +2124,7 @@ def init_admin_routes(app):
     def debug_data_export():
         """Debug version with manual auth check"""
         try:
-            print(f"🚀 DEBUG EXPORT: Route accessed!")
+            print("🚀 DEBUG EXPORT: Route accessed!")
             print(f"🚀 DEBUG EXPORT: User authenticated: {current_user.is_authenticated}")
             
             if not current_user.is_authenticated:
@@ -2198,7 +2196,7 @@ def init_admin_routes(app):
             print(f"🔧 Data Export Error: {str(e)}")
             return f"<h1>Data Export Error</h1><p>{str(e)}</p>"
 
-    print(f"🔧 Route Registration Debug: Data export route registered successfully")
+    print("🔧 Route Registration Debug: Data export route registered successfully")
 
     @app.route('/admin/org-reports', methods=['GET'])
     @login_required
@@ -2257,7 +2255,7 @@ def init_admin_routes(app):
         """Download organizational report in specified format"""
         try:
             from models import Department
-            from flask import Response, send_file, render_template
+            from flask import Response, send_file
             import io
             import csv
             
@@ -2453,7 +2451,6 @@ def init_admin_routes(app):
         """Download organizational chart in specified format"""
         try:
             from flask import request, Response
-            import json
             
             # Get SVG data from request
             data = request.get_json()

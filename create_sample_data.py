@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from app import app, db
 from models import (
     User, Department, Problem, BusinessCase, Project, ProjectMilestone,
-    NotificationTemplate, Epic, UserStory, AuditLog, OrganizationSettings
+    Epic, UserStory, AuditLog, OrganizationSettings
 )
 
 def create_sample_data():

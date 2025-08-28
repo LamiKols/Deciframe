@@ -104,7 +104,7 @@ See the help articles below for more details."""
         
     except Exception as e:
         return {
-            'response': f'I encountered an error processing your question. Please try rephrasing your question or browse the help articles directly.',
+            'response': 'I encountered an error processing your question. Please try rephrasing your question or browse the help articles directly.',
             'relevant_articles': [],
             'error': str(e)
         }

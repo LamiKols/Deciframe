@@ -6,7 +6,7 @@ Provides approval confidence scoring and risk assessment for business cases, epi
 import os
 import openai
 import re
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, List
 
 # Initialize OpenAI client
 openai_client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))

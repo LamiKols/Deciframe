@@ -6,9 +6,7 @@ Verify and enforce proper organization-level data isolation across all models an
 
 import os
 import re
-import ast
-from pathlib import Path
-from typing import List, Dict, Set, Tuple
+from typing import List, Dict
 
 class MultiTenantAuditor:
     """
@@ -294,12 +292,12 @@ if __name__ == "__main__":
     print("✅ Security decorator created at utils/security.py")
     
     # Print summary
-    print(f"\n📊 QUICK SUMMARY:")
+    print("\n📊 QUICK SUMMARY:")
     print(f"✅ Models with org_id: {len(auditor.models_with_org_id)}")
     print(f"❌ Models missing org_id: {len(auditor.models_missing_org_id)}")
     print(f"⚠️ Security violations: {len(auditor.security_violations)}")
     
     if auditor.security_violations:
-        print(f"\n🚨 TOP SECURITY ISSUES:")
+        print("\n🚨 TOP SECURITY ISSUES:")
         for violation in auditor.security_violations[:5]:
             print(f"  {violation}")

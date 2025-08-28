@@ -4,7 +4,6 @@ Adds module_name, role, tags, faq, and analytics fields to help_articles table
 """
 
 from app import db
-from models import HelpArticle, HelpArticleRoleEnum
 from sqlalchemy import text
 
 def migrate_help_articles():

@@ -101,8 +101,8 @@ try:
         
         print("System Status: AI-Enhanced Production Ready")
         
-except Exception as e:
-    print(f"System Integration: Active (detailed status requires app context)")
+except Exception:
+    print("System Integration: Active (detailed status requires app context)")
 
 print("\n" + "=" * 50)
 print("DEMONSTRATION COMPLETE")

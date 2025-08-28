@@ -5,7 +5,7 @@ Provides comprehensive API endpoints for help articles management
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
-from sqlalchemy import or_, and_
+from sqlalchemy import or_
 from models import HelpArticle, HelpCategory, HelpArticleRoleEnum, db
 from datetime import datetime
 import markdown

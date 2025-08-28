@@ -4,9 +4,9 @@ Workflow Processor - Execute admin-defined WorkflowTemplates on incoming events
 
 import logging
 from typing import Dict, Any, List
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy import text
-from models import WorkflowTemplate, db
+from models import WorkflowTemplate
 from workflows.actions import ACTION_HANDLERS
 from workflows.context import WorkflowContext
 

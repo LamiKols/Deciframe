@@ -6,7 +6,6 @@ Creates all remaining admin help articles for comprehensive coverage
 
 from app import create_app, db
 from models import HelpCategory, HelpArticle, User, RoleEnum
-from datetime import datetime
 import sys
 
 def create_remaining_admin_articles():

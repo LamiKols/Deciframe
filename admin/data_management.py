@@ -4,7 +4,7 @@ Provides admin interface for data management operations
 """
 import logging
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Response
+from flask import Blueprint, render_template, request, redirect, url_for, flash, Response
 from flask_login import current_user
 from auth.session_auth import require_session_auth, require_role
 from app import db

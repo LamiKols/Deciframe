@@ -4,14 +4,13 @@ Comprehensive models for problem and business case management
 """
 
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Enum as SQLEnum, Enum as SAEnum
 import enum
 import pytz
 
 from app import db
+from sqlalchemy import Enum as SQLEnum
 
 # Enums for consistent data validation
 class UserRoleEnum(enum.Enum):
@@ -237,7 +236,6 @@ class User(UserMixin, db.Model):
         if not utc_datetime:
             return None
             
-        import pytz
         user_tz = pytz.timezone(self.get_effective_timezone())
         
         # Ensure UTC datetime is timezone-aware

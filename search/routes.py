@@ -4,7 +4,6 @@ Full-text search API endpoints and web interface
 """
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
-from flask_login import login_required, current_user
 from auth.session_auth import require_session_auth, get_current_session_user
 from search.search_service import SearchService
 import logging

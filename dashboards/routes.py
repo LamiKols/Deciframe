@@ -2,9 +2,9 @@
 Role-Scoped Dashboard Routes
 Provides personalized home pages based on user roles
 """
-from flask import Blueprint, redirect, url_for, render_template, session, flash, Response
-from flask_login import login_required, current_user, login_user
-from sqlalchemy import desc, and_
+from flask import Blueprint, redirect, url_for, render_template, flash, Response
+from flask_login import login_required, current_user
+from sqlalchemy import desc
 from datetime import datetime, timedelta
 
 from models import Problem, BusinessCase, Project, ProjectMilestone, User, ImportJob, Department, AuditLog
@@ -238,7 +238,6 @@ def director_dashboard():
 def exec_dashboard():
     """Executive dashboard with organization-wide metrics"""
     from models import Problem, BusinessCase, Project, Department, User
-    from sqlalchemy import func
     from datetime import datetime, timedelta
     
     user = current_user
@@ -353,7 +352,7 @@ def exec_dashboard():
 @login_required
 def executive_dashboard():
     """Improved Executive dashboard with role-based access and department scoping"""
-    from models import Problem, BusinessCase, Project, Department, User
+    from models import Problem, BusinessCase, Project, Department
     
     # Check if user has appropriate role for executive dashboard
     if current_user.role.value not in ['Director', 'CEO', 'Admin']:
@@ -589,7 +588,6 @@ def admin_dashboard():
     }
     
     # Get role-based user statistics
-    from models import RoleEnum
     role_counts = {}
     for role in RoleEnum:
         role_counts[role.value] = User.query.filter_by(role=role).count()

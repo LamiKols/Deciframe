@@ -6,12 +6,11 @@ Handles automated report generation, PDF conversion, and email distribution
 import os
 import json
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from datetime import datetime
+from typing import Dict, Any
 import requests
 from jinja2 import Template
 import weasyprint
-from flask import current_app, url_for
 from app import db
 from models import ReportTemplate, ReportRun, User, RoleEnum
 from notifications.service import NotificationService
@@ -83,7 +82,7 @@ class ReportService:
         if template.filters:
             try:
                 filters = json.loads(template.filters)
-            except:
+            except (json.JSONDecodeError, TypeError):
                 pass
         
         # Build filter query string
@@ -273,8 +272,8 @@ class ReportService:
                             role = RoleEnum(recipient)
                             users = User.query.filter_by(role=role).all()
                             recipients.extend([u.email for u in users if u.email])
-                        except:
-                            pass
+                        except (ValueError, Exception) as e:
+                            logging.warning(f"Failed to resolve role {recipient}: {e}")
             
             # Send emails with PDF attachment
             emails_sent = 0

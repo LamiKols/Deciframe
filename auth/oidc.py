@@ -2,7 +2,6 @@
 Clean OIDC Factory Pattern Implementation
 """
 from authlib.integrations.flask_client import OAuth
-from flask import current_app
 
 oauth = OAuth()
 

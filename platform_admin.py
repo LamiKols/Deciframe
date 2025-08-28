@@ -6,7 +6,7 @@ This is NOT visible to client organizations or their admins
 
 import os
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, session, abort
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, session
 from functools import wraps
 from models import Waitlist, db
 import csv

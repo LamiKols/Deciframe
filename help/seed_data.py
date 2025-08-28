@@ -141,8 +141,8 @@ def seed_help_articles():
     # Commit all changes
     try:
         db.session.commit()
-        print(f"\n🎉 Help Center seeding completed successfully!")
-        print(f"📊 Summary:")
+        print("\n🎉 Help Center seeding completed successfully!")
+        print("📊 Summary:")
         print(f"   - Categories: {len(categories) + 1}")  # +1 for General
         print(f"   - Articles created: {articles_created}")
         print(f"   - Articles updated: {articles_updated}")

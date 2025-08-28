@@ -5,7 +5,7 @@ Provides comprehensive timezone-aware display functionality.
 
 import pytz
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 from flask import current_app
 from flask_login import current_user
 

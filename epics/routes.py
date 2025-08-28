@@ -3,12 +3,12 @@ Epic Management Routes
 Handles epic and user story management
 """
 
-from flask import render_template, request, jsonify, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime
 
 from . import epics_bp
-from models import db, Epic, Story, BusinessCase, Project
+from models import db, Epic, Story, BusinessCase
 
 
 @epics_bp.route('/')

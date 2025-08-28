@@ -4,7 +4,6 @@ Handles waitlist form submissions and management
 """
 
 from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_required
 from . import waitlist_bp
 from models import Waitlist, db
 from forms import WaitlistForm

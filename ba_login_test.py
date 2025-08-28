@@ -5,7 +5,6 @@ Creates a test login session for Sarah Martinez (BA user)
 """
 
 import requests
-import json
 
 def create_ba_session():
     """Create a login session for BA user testing"""
@@ -30,9 +29,9 @@ def create_ba_session():
         # For demonstration, we'll create a direct database session
         print("\n=== BA User Login Information ===")
         print(f"Email: {ba_user['email']}")
-        print(f"Role: Business Analyst")
-        print(f"Access: BA Dashboard, Requirements Management, Case Assignment")
-        print(f"\nTo test BA functionality:")
+        print("Role: Business Analyst")
+        print("Access: BA Dashboard, Requirements Management, Case Assignment")
+        print("\nTo test BA functionality:")
         print("1. Go to http://localhost:5000/auth/login")
         print("2. Use email: sarah.martinez@deciframe.com")
         print("3. Use password: password123 (if password auth is enabled)")

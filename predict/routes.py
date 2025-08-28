@@ -5,20 +5,18 @@ Provides ML-powered forecasting for project success, cycle time, and anomaly det
 
 import os
 import sys
-import json
 import logging
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 import joblib
 import numpy as np
-import pandas as pd
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import db
-from models import Project, BusinessCase, PredictionFeedback, User, RoleEnum, StatusEnum, PriorityEnum
+from models import Project, BusinessCase, PredictionFeedback, RoleEnum, StatusEnum, PriorityEnum
 
 predict_bp = Blueprint('predict', __name__, url_prefix='/api/predict')
 
