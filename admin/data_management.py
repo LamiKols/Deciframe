@@ -315,7 +315,7 @@ def archive_data():
             flash('Please select a table and cutoff date', 'error')
             return redirect(url_for('data_management.data_retention_page'))
         
-        cutoff_date = datetime.strptime(cutoff_date_str, '%Y-%m-%d')
+        # cutoff_date = datetime.strptime(cutoff_date_str, '%Y-%m-%d')  # Variable assigned but unused
         
         # Log the archival action
         from models import AuditLog

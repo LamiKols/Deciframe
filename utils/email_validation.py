@@ -51,7 +51,7 @@ def has_mx_record(domain: str):
             import dns.resolver
             mx_records = dns.resolver.resolve(domain, 'MX')
             return len(mx_records) > 0
-        except:
+        except Exception:
             # If DNS checks fail, assume it's valid (conservative approach)
             return True
 

@@ -287,7 +287,9 @@ def exec_dashboard():
             dept_problems = Problem.query.filter_by(department_id=dept.id, organization_id=current_user.organization_id).count() if hasattr(Problem, 'department_id') else 0
             dept_cases = BusinessCase.query.filter_by(department_id=dept.id, organization_id=current_user.organization_id).count() if hasattr(BusinessCase, 'department_id') else 0
             dept_projects = Project.query.filter_by(department_id=dept.id, organization_id=current_user.organization_id).count() if hasattr(Project, 'department_id') else 0
-        except:
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Error counting department items for {dept.name}: {e}")
             pass  # Default to 0 counts
         
         dept_performance.append({
@@ -306,7 +308,9 @@ def exec_dashboard():
     try:
         project_list = projects.all()
         total_budget = sum([p.budget or 0 for p in project_list])
-    except:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Error calculating project budget: {e}")
         project_list = []
         total_budget = 0
 
@@ -373,7 +377,9 @@ def executive_dashboard():
                 'AUD': 'A$', 'JPY': '¥', 'CNY': '¥', 'INR': '₹'
             }
             currency_symbol = currency_symbols.get(org_settings.currency, '$')
-    except:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Error getting organization settings: {e}")
         pass  # Use default
 
     # Show all if Admin or CEO, else just their department with error handling
@@ -429,23 +435,31 @@ def executive_dashboard():
     # Calculate metrics with error handling
     try:
         case_count = cases.count()
-    except:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Error counting cases: {e}")
         case_count = 0
         
     try:
         project_count = projects.count()
-    except:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Error counting projects: {e}")
         project_count = 0
         
     try:
         problem_count = Problem.query.filter_by(status="Open", organization_id=current_user.organization_id).count()
-    except:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Error counting problems: {e}")
         problem_count = 0
         
     try:
         project_list = projects.all()
         total_budget = sum([p.budget or 0 for p in project_list])
-    except:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Error calculating total budget: {e}")
         project_list = []
         total_budget = 0
 

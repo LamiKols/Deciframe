@@ -552,10 +552,10 @@ def _build_notification_context(context: WorkflowContext) -> dict:
     
     return notification_context
 
-# Action handler registry
+# Fixed: removed duplicate keys 'notify_manager' and 'assign_user' to ensure unique action mappings
 ACTION_HANDLERS: Dict[str, Callable] = {
     'send_notification': send_notification,
-    'notify_manager': send_notification,  # Alias
+    'notify_manager': send_notification,  # Manager notifications
     'create_task': create_task,
     'escalate_to_manager': escalate_to_manager,
     'escalate_to_director': escalate_to_manager,  # Alias
@@ -563,12 +563,10 @@ ACTION_HANDLERS: Dict[str, Callable] = {
     'schedule_follow_up': schedule_follow_up,
     'create_business_case': create_business_case,
     'assign_business_analyst': assign_business_analyst,
-    'assign_user': assign_business_analyst,  # Alias
-    'log_action': log_workflow_action,
-    'notify_stakeholders': send_notification,  # Alias
-    'request_status_update': create_task,  # Creates a task for status update
-    'notify_manager': send_notification,  # Alias for manager notifications
     'assign_user': assign_business_analyst,  # General user assignment
+    'log_action': log_workflow_action,
+    'notify_stakeholders': send_notification,  # Stakeholder notifications
+    'request_status_update': create_task,  # Creates a task for status update
     'check_overdue_problems': log_workflow_action,  # Placeholder for monitoring actions
     'gather_stakeholder_feedback': create_task,  # Create feedback collection task
     'schedule_review_meeting': schedule_follow_up,  # Schedule meeting follow-up

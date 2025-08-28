@@ -7,4 +7,4 @@ from flask import Blueprint
 
 waitlist_bp = Blueprint('waitlist', __name__, url_prefix='/waitlist')
 
-from . import routes
+from . import routes  # noqa: E402

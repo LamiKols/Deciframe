@@ -651,10 +651,7 @@ def risks_issues():
     """Risk and issue backlog by project"""
     return _get_risks_issues()
 
-@dashboard_bp.route('/api/dashboard-demo/risks-issues')
-def risks_issues_demo():
-    """Demo risk and issue backlog"""
-    return _get_risks_issues()
+# Duplicate removed - using the original at line 184
 
 @dashboard_bp.route('/api/dashboard/milestone-burndown')
 @admin_required
@@ -663,11 +660,7 @@ def milestone_burndown():
     project_id = request.args.get('project_id')
     return _get_milestone_burndown(project_id)
 
-@dashboard_bp.route('/api/dashboard-demo/milestone-burndown')
-def milestone_burndown_demo():
-    """Demo milestone burn-down"""
-    project_id = request.args.get('project_id')
-    return _get_milestone_burndown(project_id)
+# Duplicate removed - using the original at line 189
 
 @dashboard_bp.route('/api/dashboard/roi-waterfall')
 @admin_required
@@ -675,10 +668,7 @@ def roi_waterfall():
     """ROI waterfall chart showing cumulative ROI by case"""
     return _get_roi_waterfall()
 
-@dashboard_bp.route('/api/dashboard-demo/roi-waterfall')
-def roi_waterfall_demo():
-    """Demo ROI waterfall"""
-    return _get_roi_waterfall()
+# Duplicate removed - using the original at line 194
 
 @dashboard_bp.route('/api/dashboard/problem-clusters')
 @admin_required
@@ -686,10 +676,7 @@ def problem_clusters():
     """Top problem clusters with resolution times"""
     return _get_problem_clusters()
 
-@dashboard_bp.route('/api/dashboard-demo/problem-clusters')
-def problem_clusters_demo():
-    """Demo problem clusters"""
-    return _get_problem_clusters()
+# Duplicate removed - using the original at line 199
 
 @dashboard_bp.route('/api/dashboard/resource-utilization')
 @admin_required
@@ -697,10 +684,7 @@ def resource_utilization():
     """Resource utilization gauge for BAs/PMs"""
     return _get_resource_utilization()
 
-@dashboard_bp.route('/api/dashboard-demo/resource-utilization')
-def resource_utilization_demo():
-    """Demo resource utilization"""
-    return _get_resource_utilization()
+# Duplicate removed - using the original at line 204
 
 def _get_department_heatmap():
     """Generate department heat-map data with filtering support"""
@@ -784,7 +768,7 @@ def _get_time_to_value():
     ).join(
         Project, Project.business_case_id == BusinessCase.id
     ).filter(
-        Project.start_date != None
+        Project.start_date is not None
     ).all()
     
     approval_to_start = []
@@ -836,7 +820,7 @@ def _get_risks_issues():
     risk_data = []
     
     for project in projects:
-        milestone_count = ProjectMilestone.query.filter_by(project_id=project.id).count()
+        # milestone_count = ProjectMilestone.query.filter_by(project_id=project.id).count()  # Unused variable
         overdue_milestones = ProjectMilestone.query.filter(
             ProjectMilestone.project_id == project.id,
             ProjectMilestone.due_date < datetime.now().date(),
@@ -1078,7 +1062,9 @@ def _drilldown_time_range(time_range, filters):
     # Parse time range (e.g., "7-14" days)
     try:
         start_days, end_days = map(int, time_range.split('-'))
-    except:
+    except (ValueError, AttributeError) as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Invalid time range format '{time_range}': {e}")
         return jsonify({'error': 'Invalid time range format'}), 400
     
     # Find projects within this time range
@@ -1113,7 +1099,9 @@ def _drilldown_project(project_code, filters):
         try:
             project_id = int(project_code.replace('PRJ', ''))
             project = Project.query.get(project_id)
-        except:
+        except (ValueError, TypeError) as e:
+            import logging
+            logging.getLogger(__name__).debug(f"Failed to parse project code '{project_code}': {e}")
             pass
     
     if not project:
@@ -1195,7 +1183,9 @@ def _drilldown_business_case(case_code, filters):
         try:
             case_id = int(case_code.replace('C', ''))
             case = BusinessCase.query.get(case_id)
-        except:
+        except (ValueError, TypeError) as e:
+            import logging
+            logging.getLogger(__name__).debug(f"Failed to parse case code '{case_code}': {e}")
             pass
     
     if not case:
@@ -1233,7 +1223,9 @@ def _drilldown_project_milestones(project_code, filters):
         try:
             project_id = int(project_code.replace('PRJ', ''))
             project = Project.query.get(project_id)
-        except:
+        except (ValueError, TypeError) as e:
+            import logging
+            logging.getLogger(__name__).debug(f"Failed to parse project code '{project_code}' in milestones: {e}")
             pass
     
     if not project:

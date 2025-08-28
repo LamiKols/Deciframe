@@ -122,7 +122,9 @@ class WorkflowEventQueue:
             try:
                 from app import app
                 return app.app_context()
-            except:
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"Failed to get app context: {e}")
                 # Fallback - create a mock context that does nothing
                 class MockContext:
                     def __enter__(self): return self
