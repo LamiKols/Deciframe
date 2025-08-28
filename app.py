@@ -637,6 +637,28 @@ def create_app():
     except ImportError as e:
         logging.warning(f"Settings blueprint not found: {e}")
     
+    # Register new blueprints for missing endpoints
+    try:
+        from platform_admin import platform_admin_bp
+        app.register_blueprint(platform_admin_bp)
+        print("✓ Platform admin blueprint registered successfully")
+    except ImportError as e:
+        logging.warning(f"Platform admin blueprint not found: {e}")
+    
+    try:
+        from data_management import data_management_bp  
+        app.register_blueprint(data_management_bp)
+        print("✓ Data management blueprint registered successfully")
+    except ImportError as e:
+        logging.warning(f"Data management blueprint not found: {e}")
+    
+    try:
+        from epics import epics_bp
+        app.register_blueprint(epics_bp)
+        print("✓ Epics blueprint registered successfully")
+    except ImportError as e:
+        logging.warning(f"Epics blueprint not found: {e}")
+    
     # Note: scheduled doesn't have a routes.py, only send_exec_report.py
     
     # Initialize workflow automation and scheduled tasks
