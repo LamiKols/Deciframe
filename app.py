@@ -669,6 +669,43 @@ def create_app():
     except ImportError as e:
         logging.warning(f"Epics blueprint not found: {e}")
     
+    # Register additional blueprints for missing endpoints
+    try:
+        from workflows.routes import workflows_bp
+        app.register_blueprint(workflows_bp)
+        print("✓ Workflows blueprint registered successfully")
+    except ImportError as e:
+        print(f"⚠️ Workflows blueprint not available: {e}")
+        
+    try:
+        from notifications.routes import notifications_bp
+        app.register_blueprint(notifications_bp)
+        print("✓ Notifications blueprint registered successfully")
+    except ImportError as e:
+        print(f"⚠️ Notifications blueprint not available: {e}")
+        
+    # Register additional route handlers
+    try:
+        from auth.profile import init_profile_routes
+        init_profile_routes(app)
+        print("✓ Profile routes registered successfully")
+    except ImportError as e:
+        print(f"⚠️ Profile routes not available: {e}")
+        
+    try:
+        from problems.additional_routes import init_additional_problem_routes
+        init_additional_problem_routes(app)
+        print("✓ Additional problem routes registered successfully")
+    except ImportError as e:
+        print(f"⚠️ Additional problem routes not available: {e}")
+        
+    try:
+        from projects.additional_routes import init_additional_project_routes
+        init_additional_project_routes(app)
+        print("✓ Additional project routes registered successfully")
+    except ImportError as e:
+        print(f"⚠️ Additional project routes not available: {e}")
+    
     # Note: scheduled doesn't have a routes.py, only send_exec_report.py
     
     # Initialize workflow automation and scheduled tasks
