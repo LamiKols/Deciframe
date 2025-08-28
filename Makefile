@@ -23,3 +23,7 @@ backup-db: ## Create database backup (engine-agnostic)
 # Release Management
 release-gate: ## Run comprehensive release gate checks
         python scripts/release_gate.py
+
+# UI Testing
+sweep: ## Run comprehensive UI sweep testing
+        python scripts/ui_sweep.py
