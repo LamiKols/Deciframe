@@ -26,6 +26,7 @@ DeciFrame employs a modular Flask backend with SQLAlchemy ORM and a PostgreSQL d
 -   **Admin**: Comprehensive dashboard with user management, role permissions, system settings, audit logs, and data management (import/export).
 -   **Help**: Contextual help system with a floating widget, public help center, and AI-powered chat assistant.
 -   **Executive Dashboard**: Real-time organizational analytics with portfolio funnel tracking, ROI analysis, department performance metrics, cached data delivery, CSV export, and AI-powered executive summaries.
+-   **Safe Onboarding Wizard**: Non-invasive, opt-in organizational setup wizard with feature flag control (ENABLE_ONBOARDING_FLOW=0 default), role-based access, and comprehensive safety guarantees to protect existing authentication flows.
 
 **Key Technical Implementations & Design Decisions:**
 -   **Database Models**: User (role-based), Department (hierarchical), Problem, BusinessCase, Project, ProjectMilestone, NotificationTemplate, Notification, Epic, Story, Solution, AuditLog, ImportJob, OrgUnit, EpicSyncLog, ReportTemplate, ReportRun, PredictionFeedback, AIThresholdSettings. All core business models include `organization_id` for multi-tenant data isolation.

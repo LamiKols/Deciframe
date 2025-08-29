@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Organization Setup - DeciFrame{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">🏢 Organization Setup</h4>
+          <p class="text-muted mb-0">Step 1 of 3</p>
+        </div>
+        <div class="card-body">
+          <div class="progress mb-4">
+            <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemax="100"></div>
+          </div>
+          
+          <h5>Welcome to DeciFrame!</h5>
+          <p>Let's set up your organization for success. This wizard will help you configure the key settings to get started quickly.</p>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Organization Name</label>
+              <input type="text" class="form-control" value="{{ user.organization.name if user.organization else 'Your Organization' }}" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Administrator</label>
+              <input type="text" class="form-control" value="{{ user.name or user.email }}" readonly>
+            </div>
+          </div>
+          
+          <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle"></i> 
+            <strong>Getting Started:</strong> Your organization is ready to go! This wizard will help you set up departments, workflows, and initial configurations.
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-house"></i> Skip Setup
+            </a>
+            <a href="{{ url_for('onboard.step2_departments') }}" class="btn btn-primary">
+              Next: Departments <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

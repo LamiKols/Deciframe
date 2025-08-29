@@ -732,6 +732,14 @@ def create_app():
         print(f"⚠️ Executive dashboard not available: {e}")
         print("⚠️ Continuing without executive dashboard functionality")
     
+    # Register safe onboarding wizard (opt-in only)
+    try:
+        from onboarding import onboard_bp
+        app.register_blueprint(onboard_bp)
+        print("✓ Safe onboarding wizard registered (flag-controlled)")
+    except ImportError as e:
+        print(f"⚠️ Onboarding wizard not available: {e}")
+    
     # Note: scheduled doesn't have a routes.py, only send_exec_report.py
     
     # Initialize workflow automation and scheduled tasks
@@ -792,10 +800,41 @@ def index():
     """Main application home page"""
     from flask_login import current_user
     from flask import render_template
+    import sys
+    sys.path.insert(0, 'app')
+    from flags import is_enabled
     
     if current_user.is_authenticated:
+        # Check onboarding flag and user eligibility
+        enable_onboarding_flow = is_enabled("ENABLE_ONBOARDING_FLOW", default=False)
+        user_is_admin = current_user.role in ['admin', 'ceo', 'director']
+        
+        # Check if organization is "new" (lightweight check)
+        is_new_org = False
+        if user_is_admin and enable_onboarding_flow:
+            try:
+                from sqlalchemy import text
+                # Quick check: org has minimal data (problems + cases + projects < 5)
+                total_items = db.session.execute(
+                    text("""
+                        SELECT (
+                            (SELECT COUNT(*) FROM problems WHERE organization_id=:org_id) +
+                            (SELECT COUNT(*) FROM business_cases WHERE organization_id=:org_id) +
+                            (SELECT COUNT(*) FROM projects WHERE organization_id=:org_id)
+                        ) as total
+                    """), 
+                    {"org_id": current_user.organization_id}
+                ).scalar() or 0
+                is_new_org = total_items < 5
+            except Exception:
+                is_new_org = False  # Safe fallback
+        
         # Show home page for authenticated users with role-based quick actions
-        return render_template('home.html', user=current_user)
+        return render_template('home.html', 
+                               user=current_user,
+                               enable_onboarding_flow=enable_onboarding_flow,
+                               user_is_admin=user_is_admin,
+                               is_new_org=is_new_org)
     else:
         # Show landing page for unauthenticated users
         return render_template('landing.html')

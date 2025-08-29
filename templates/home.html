@@ -3,6 +3,18 @@
 {% block title %}Home - DeciFrame{% endblock %}
 
 {% block content %}
+<!-- Safe Onboarding Banner (Non-invasive, Opt-in Only) -->
+{% if enable_onboarding_flow and user_is_admin and is_new_org %}
+  <div class="alert alert-info alert-dismissible fade show mx-4 mt-3" role="alert">
+    <i class="bi bi-lightbulb"></i> <strong>New to DeciFrame?</strong> 
+    Get started quickly with our guided setup wizard.
+    <a class="btn btn-sm btn-primary ms-2" href="/onboarding/step1">
+      <i class="bi bi-arrow-right-circle"></i> Run Guided Setup
+    </a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{% endif %}
+
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-12">
