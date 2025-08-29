@@ -4,7 +4,7 @@ import io
 import csv
 import time
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from cachetools import TTLCache
 from sqlalchemy import text
 from app import db
@@ -18,6 +18,20 @@ cache = TTLCache(maxsize=256, ttl=300)
 
 def _key(org_id: int) -> str:
     return f"metrics:org:{org_id}"
+
+def stage_to_label(stage: str) -> str:
+    return {"problems":"problems","cases":"business_cases","approved":"approved_cases","projects":"projects","done":"done"}.get(stage,"")
+
+def get_org_id_from_instance(obj) -> Optional[int]:
+    """Extract organization ID from model instance"""
+    for attr in ("org_id","organization_id","orgId"):
+        if hasattr(obj, attr):
+            return getattr(obj, attr)
+    return None
+
+def invalidate_metrics(org_id: int):
+    """Invalidate cached metrics for an organization"""
+    cache.pop(_key(org_id), None)
 
 def require_executive_access():
     """Decorator for executive-level access"""
@@ -208,6 +222,57 @@ def roi_metrics():
         roi_data["realization_rate"] = 0
     
     return jsonify(roi_data), 200
+
+@metrics_bp.route("/portfolio/list", methods=["GET"])
+@login_required
+def portfolio_list():
+    """
+    Returns a lightweight list of underlying items for a stage:
+      stage ∈ {problems, cases, approved, projects, done}
+    Query params:
+      org_id (int), page (int, default 1), per_page (int, default 20), q (search, optional)
+    """
+    access_check = require_executive_access()
+    if access_check:
+        return access_check
+    
+    org_id = current_user.organization_id
+    stage = request.args.get("stage","").lower()
+    page = max(1, int(request.args.get("page", 1)))
+    per_page = min(100, max(1, int(request.args.get("per_page", 20))))
+    q = (request.args.get("q") or "").strip()
+
+    sql_map = {
+        "problems": "SELECT id, title AS name, created_at AS created FROM problems WHERE organization_id=:o {flt} ORDER BY created_at DESC LIMIT :lim OFFSET :off",
+        "cases":    "SELECT id, title AS name, created_at AS created FROM business_cases WHERE organization_id=:o {flt} ORDER BY created_at DESC LIMIT :lim OFFSET :off",
+        "approved": "SELECT id, title AS name, approved_at AS created FROM business_cases WHERE organization_id=:o AND status='approved' {flt} ORDER BY approved_at DESC NULLS LAST LIMIT :lim OFFSET :off",
+        "projects": "SELECT id, name, created_at AS created FROM projects WHERE organization_id=:o {flt} ORDER BY created_at DESC LIMIT :lim OFFSET :off",
+        "done":     "SELECT id, name, updated_at AS created FROM projects WHERE organization_id=:o AND status='completed' {flt} ORDER BY updated_at DESC NULLS LAST LIMIT :lim OFFSET :off",
+    }
+    
+    if stage not in sql_map:
+        return jsonify({"error":"invalid stage"}), 400
+
+    flt = ""
+    params = {"o": org_id, "lim": per_page, "off": (page-1)*per_page}
+    if q:
+        # Simple safe filter for search
+        if stage in ["problems", "cases", "approved"]:
+            flt = "AND (LOWER(title) LIKE :q)"
+        else:
+            flt = "AND (LOWER(name) LIKE :q)"
+        params["q"] = f"%{q.lower()}%"
+
+    try:
+        rows = db.session.execute(text(sql_map[stage].format(flt=(" " + flt if flt else ""))), params).mappings().all()
+        return jsonify({
+            "stage": stage,
+            "page": page,
+            "per_page": per_page,
+            "items": [{"id": r["id"], "name": r.get("name") or "Untitled", "created": str(r.get("created", ""))} for r in rows]
+        }), 200
+    except Exception as e:
+        return jsonify({"error": f"Database query failed: {str(e)}"}), 500
 
 @metrics_bp.route("/summary", methods=["GET"])
 @login_required

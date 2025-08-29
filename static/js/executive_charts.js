@@ -276,6 +276,122 @@
         });
     }
 
+    // Drill-through functionality
+    function openDrill(stage, stageLabel) {
+        let page = 1;
+        let q = "";
+        const modalEl = q("#drillModal");
+        const tbody = q("#drillTableBody");
+        const titleEl = q("#drillModalTitle");
+        const pageInfo = q("#drillPageInfo");
+        const prevBtn = q("#drillPrev");
+        const nextBtn = q("#drillNext");
+        
+        if (titleEl) titleEl.textContent = `${stageLabel} Details`;
+        
+        const doFetch = async () => {
+            try {
+                const url = `/api/metrics/portfolio/list?stage=${stage}&page=${page}&per_page=20` + 
+                           (q ? `&q=${encodeURIComponent(q)}` : "");
+                const response = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (tbody) {
+                    if (data.items && data.items.length > 0) {
+                        tbody.innerHTML = data.items.map(item => 
+                            `<tr>
+                                <td>${item.id}</td>
+                                <td>${item.name || "Untitled"}</td>
+                                <td>${item.created ? new Date(item.created).toLocaleDateString() : ""}</td>
+                            </tr>`
+                        ).join("");
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No items found</td></tr>';
+                    }
+                }
+                
+                if (pageInfo) pageInfo.textContent = `Page ${page}`;
+                if (prevBtn) prevBtn.disabled = page <= 1;
+                if (nextBtn) nextBtn.disabled = !data.items || data.items.length < 20;
+                
+            } catch (error) {
+                console.error('Drill-through fetch error:', error);
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Error loading data</td></tr>';
+                }
+            }
+        };
+
+        // Event handlers
+        if (q("#drillSearchBtn")) {
+            q("#drillSearchBtn").onclick = () => {
+                q = q("#drillSearch")?.value || "";
+                page = 1;
+                doFetch();
+            };
+        }
+
+        if (prevBtn) {
+            prevBtn.onclick = () => {
+                page = Math.max(1, page - 1);
+                doFetch();
+            };
+        }
+
+        if (nextBtn) {
+            nextBtn.onclick = () => {
+                page = page + 1;
+                doFetch();
+            };
+        }
+
+        // Load initial data and show modal
+        doFetch().then(() => {
+            if (typeof bootstrap !== 'undefined' && modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+    }
+
+    // Chart click handlers
+    if (charts.funnel) {
+        const canvas = q("#chart-funnel");
+        if (canvas) {
+            canvas.onclick = (evt) => {
+                try {
+                    const chart = Chart.getChart("chart-funnel");
+                    if (chart) {
+                        const points = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                        if (points.length > 0) {
+                            const idx = points[0].index;
+                            const stages = [
+                                { key: 'problems', label: 'Problems' },
+                                { key: 'cases', label: 'Business Cases' },
+                                { key: 'approved', label: 'Approved Cases' },
+                                { key: 'projects', label: 'Projects' },
+                                { key: 'done', label: 'Completed Projects' }
+                            ];
+                            
+                            if (stages[idx]) {
+                                openDrill(stages[idx].key, stages[idx].label);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Chart click handler error:', error);
+                }
+            };
+        }
+    }
+
     // Initialize dashboard
     loadDashboard();
 

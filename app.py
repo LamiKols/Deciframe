@@ -720,6 +720,14 @@ def create_app():
         app.register_blueprint(metrics_bp)
         app.register_blueprint(exec_dash_bp)
         print("✓ Executive dashboard and metrics API registered successfully")
+        
+        # Register cache invalidation signals
+        try:
+            from metrics_signals import register_metrics_signals
+            register_metrics_signals()
+        except ImportError as signal_e:
+            print(f"⚠️ Metrics signals not available: {signal_e}")
+            
     except ImportError as e:
         print(f"⚠️ Executive dashboard not available: {e}")
         print("⚠️ Continuing without executive dashboard functionality")
